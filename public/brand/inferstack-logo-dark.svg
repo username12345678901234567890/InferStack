@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" fill="none">
+  <defs>
+    <linearGradient id="g" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#608aff"/><stop offset=".55" stop-color="#3b63fb"/><stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <linearGradient id="t" x1="160" y1="0" x2="290" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#608aff"/><stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <path d="M8 40.5 32 53l24-12.5" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
+  <path d="M8 30.5 32 43l24-12.5" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>
+  <path d="M32 6 56 18.5 32 31 8 18.5Z" fill="url(#g)"/>
+  <path d="M32 12.5 37.5 18.5 32 24.5 26.5 18.5Z" fill="#0b1020"/>
+  <text x="72" y="43" font-family="Inter, Pretendard, system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-1" fill="#f8fafc">Infer<tspan fill="url(#t)">Stack</tspan></text>
+</svg>
