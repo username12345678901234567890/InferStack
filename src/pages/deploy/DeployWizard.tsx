@@ -96,7 +96,7 @@ export default function DeployWizard() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <Link to="/deploy" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-500">
+      <Link to="/deploy" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-fg">
         <ArrowLeft size={14} /> 모델 업로드
       </Link>
       <h1 className="text-2xl font-semibold tracking-tight">새 모델 배포</h1>
@@ -109,12 +109,12 @@ export default function DeployWizard() {
               onClick={() => setStep(i)}
               className={cx(
                 'flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors',
-                i === step && 'border-brand-500 bg-brand-500/10 font-medium text-brand-600 dark:text-brand-300',
+                i === step && 'border-fg/50 bg-raised font-medium text-fg',
                 i < step && 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
                 i > step && 'border-slate-200 text-slate-400 dark:border-white/10',
               )}
             >
-              <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-emerald-500 text-white' : i === step ? 'bg-brand-600 text-white' : 'bg-slate-200 dark:bg-white/10')}>
+              <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-fg text-bg' : i === step ? 'border border-fg text-fg' : 'border border-line2 text-fg3')}>
                 {i < step ? <Check size={12} /> : i + 1}
               </span>
               {label}
@@ -132,7 +132,7 @@ export default function DeployWizard() {
         {step === 4 && <Review s={s} need={need} />}
       </div>
 
-      <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-3 border-t border-slate-200 bg-white/90 py-4 backdrop-blur dark:border-white/10 dark:bg-[#070a14]/90">
+      <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-3 border-t border-slate-200 bg-white/90 py-4 backdrop-blur dark:border-white/10 dark:bg-[#08090a]/90">
         <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
           <ArrowLeft size={16} /> 이전
         </Button>

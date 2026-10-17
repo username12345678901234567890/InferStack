@@ -38,13 +38,13 @@ export function FormatStep({ s, set }: { s: WizardState; set: Setter }) {
             onClick={() => set({ format: o.id, engine: o.id === 'gguf' ? 'llama.cpp' : 'vLLM' })}
             className={cx(
               'rounded-xl border p-5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-              s.format === o.id ? 'border-brand-500 bg-brand-500/5 ring-2 ring-brand-500/20' : 'border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20',
+              s.format === o.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20',
             )}
           >
             <div className="flex items-center gap-2">
-              <FileBox size={18} className={s.format === o.id ? 'text-brand-500' : 'text-slate-400'} />
+              <FileBox size={18} className={s.format === o.id ? 'text-fg' : 'text-slate-400'} />
               <span className="font-semibold">{o.title}</span>
-              {s.format === o.id && <CheckCircle2 size={16} className="ml-auto text-brand-500" />}
+              {s.format === o.id && <CheckCircle2 size={16} className="ml-auto text-fg" />}
             </div>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{o.desc}</p>
             <div className="mt-3 text-xs text-slate-500">{o.meta}</div>

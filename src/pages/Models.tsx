@@ -83,7 +83,7 @@ export default function Models() {
       <aside className="space-y-6 text-sm lg:sticky lg:top-20 lg:max-h-[calc(100vh-6rem)] lg:overflow-y-auto lg:pr-2">
         <div className="flex items-center justify-between">
           <h2 className="font-semibold">필터</h2>
-          <button onClick={reset} className="text-xs text-slate-500 hover:text-brand-500">
+          <button onClick={reset} className="text-xs text-slate-500 hover:text-fg">
             초기화
           </button>
         </div>
@@ -202,7 +202,7 @@ export default function Models() {
                       <td className="px-4 py-2.5">
                         <Link to={modelHref(m)} className="flex items-center gap-2">
                           <OrgAvatar org={m.org} name={m.orgName} size={22} />
-                          <span className="font-medium hover:text-brand-500">{m.name}</span>
+                          <span className="font-medium hover:text-fg">{m.name}</span>
                           <ModelFlags m={m} />
                         </Link>
                       </td>
@@ -242,7 +242,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       onClick={onClick}
       className={cx(
         'rounded-md border px-2 py-1 text-xs transition-colors',
-        active ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:text-brand-300' : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20',
+        active ? 'border-fg/50 bg-raised text-fg' : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-white/10 dark:text-slate-300 dark:hover:border-white/20',
       )}
     >
       {children}

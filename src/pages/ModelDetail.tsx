@@ -39,7 +39,7 @@ export default function ModelDetail() {
 
   return (
     <div>
-      <Link to="/models" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-500">
+      <Link to="/models" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-fg">
         <ArrowLeft size={14} /> 모델
       </Link>
       <div className="flex flex-col gap-4 md:flex-row md:items-start">
@@ -102,7 +102,7 @@ export default function ModelDetail() {
           { id: 'endpoints', label: `엔드포인트 (${eps.length})` },
           { id: 'api', label: 'API' },
           { id: 'activity', label: '사용량' },
-          { id: 'hf', label: '🤗 Hugging Face' },
+          { id: 'hf', label: 'Hugging Face' },
         ]}
       />
 
@@ -115,7 +115,7 @@ export default function ModelDetail() {
                 <div className="mb-2 text-sm font-semibold">기능</div>
                 <div className="flex flex-wrap gap-1.5">
                   {m.capabilities.map((c) => (
-                    <Badge key={c} color="brand">
+                    <Badge key={c}>
                       {CAPABILITY_LABEL[c]}
                     </Badge>
                   ))}
@@ -141,7 +141,7 @@ export default function ModelDetail() {
                 <Row
                   k="원본"
                   v={
-                    <a href={hfUrl(m.hfId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-brand-500 hover:underline">
+                    <a href={hfUrl(m.hfId)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">
                       {m.hfId} <ExternalLink size={11} />
                     </a>
                   }
@@ -242,15 +242,15 @@ function UsageChart({ slug, weekly, big }: { slug: string; weekly: number; big?:
           <AreaChart data={data} margin={{ left: 0, right: 0, top: 5, bottom: 0 }}>
             <defs>
               <linearGradient id="ug" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#3b63fb" stopOpacity={0.45} />
-                <stop offset="1" stopColor="#3b63fb" stopOpacity={0} />
+                <stop offset="0" stopColor="#ff6a1a" stopOpacity={0.45} />
+                <stop offset="1" stopColor="#ff6a1a" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.15)" vertical={false} />
             <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} interval={4} />
             <YAxis tickFormatter={(v) => fmtTokens(v)} tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} width={48} />
             <Tooltip formatter={(v: number) => [fmtTokens(v), '토큰']} contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, fontSize: 12 }} />
-            <Area type="monotone" dataKey="tokens" stroke="#3b63fb" strokeWidth={2} fill="url(#ug)" />
+            <Area type="monotone" dataKey="tokens" stroke="#ff6a1a" strokeWidth={2} fill="url(#ug)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>
@@ -321,7 +321,7 @@ for await (const chunk of stream) {
       <CodeBlock code={code[lang]} lang={lang === 'curl' ? 'bash' : lang} />
       <p className="mt-3 text-sm text-slate-500">
         API 키가 없다면{' '}
-        <Link to="/keys" className="text-brand-500 hover:underline">
+        <Link to="/keys" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">
           API 키 페이지
         </Link>
         에서 발급하세요.
@@ -348,7 +348,7 @@ function HFPanel({ repo }: { repo: string }) {
     <div className="grid gap-4 md:grid-cols-3">
       <Card className="p-5 md:col-span-2">
         <div className="flex items-center justify-between">
-          <a href={hfUrl(repo)} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-mono text-sm font-medium hover:text-brand-500">
+          <a href={hfUrl(repo)} target="_blank" rel="noreferrer" className="flex items-center gap-1 font-mono text-sm font-medium hover:text-fg">
             {repo} <ExternalLink size={12} />
           </a>
           <Badge color="green">실시간</Badge>

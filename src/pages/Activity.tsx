@@ -6,7 +6,7 @@ import { useStore } from '../store'
 import { fmtDateTime, fmtTokens, fmtUSD } from '../lib/format'
 import { findModel } from '../data/models'
 
-const COLORS = ['#3b63fb', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#94a3b8']
+const COLORS = ['#ff6a1a', '#7c8aa5', '#4fa3a5', '#c9a66b', '#9b8bb4', '#6b7280']
 
 export default function Activity() {
   const logs = useStore((s) => s.logs)

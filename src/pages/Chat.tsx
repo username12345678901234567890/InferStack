@@ -191,7 +191,7 @@ export default function Chat() {
         <div className="mt-3 rounded-lg border border-slate-200 p-3 text-xs dark:border-white/10">
           <div className="text-slate-500">남은 크레딧</div>
           <div className="mt-0.5 text-base font-semibold">{fmtUSD(credits, 4)}</div>
-          <Link to="/credits" className="text-brand-500 hover:underline">
+          <Link to="/credits" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">
             충전하기
           </Link>
         </div>
@@ -306,7 +306,7 @@ function MessageView({ m, model, compact }: { m: Msg; model?: CatalogModel; comp
   if (m.role === 'user')
     return (
       <div className="flex justify-end">
-        <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-brand-600 px-4 py-2.5 text-sm text-white">{m.content}</div>
+        <div className="max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md border border-line bg-raised px-4 py-2.5 text-sm text-fg">{m.content}</div>
       </div>
     )
   return (
@@ -345,7 +345,7 @@ function Welcome({ models, onPick }: { models: CatalogModel[]; onPick: (p: strin
       <p className="mt-1 text-sm text-slate-500">{models.length > 1 ? '같은 프롬프트를 여러 모델에 동시에 보내 결과를 비교하세요.' : models[0]?.description}</p>
       <div className="mt-8 grid w-full gap-2 sm:grid-cols-2">
         {prompts.map((p) => (
-          <button key={p} onClick={() => onPick(p)} className="rounded-xl border border-slate-200 p-3 text-left text-sm text-slate-600 hover:border-brand-400 hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5">
+          <button key={p} onClick={() => onPick(p)} className="rounded-xl border border-slate-200 p-3 text-left text-sm text-slate-600 hover:border-line2 hover:bg-slate-50 dark:border-white/10 dark:text-slate-300 dark:hover:bg-white/5">
             {p}
           </button>
         ))}

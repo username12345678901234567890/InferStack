@@ -1,31 +1,24 @@
-import { useId } from 'react'
-
-export function LogoMark({ size = 28, className }: { size?: number; className?: string }) {
-  const id = useId().replace(/:/g, '')
+/**
+ * InferStack 마크: 오른쪽으로 한 칸씩 밀려 쌓이는 세 개의 바.
+ * 요청 트레이스(워터폴)처럼 읽히고, 마지막 주황 바는 지금 생성 중인 토큰을 뜻한다.
+ * 타일은 테마의 반대색(다크 → 흰 타일, 라이트 → 검은 타일).
+ */
+export function LogoMark({ size = 24, className = '' }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
-      <defs>
-        <linearGradient id={`g${id}`} x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#608aff" />
-          <stop offset=".55" stopColor="#3b63fb" />
-          <stop offset="1" stopColor="#06b6d4" />
-        </linearGradient>
-      </defs>
-      <path d="M8 40.5 32 53l24-12.5" stroke={`url(#g${id})`} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" opacity=".45" />
-      <path d="M8 30.5 32 43l24-12.5" stroke={`url(#g${id})`} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" opacity=".75" />
-      <path d="M32 6 56 18.5 32 31 8 18.5Z" fill={`url(#g${id})`} />
-      <path d="M32 12.5 37.5 18.5 32 24.5 26.5 18.5Z" className="fill-white dark:fill-[#0b1020]" />
+    <svg width={size} height={size} viewBox="0 0 32 32" className={className} aria-hidden>
+      <rect width="32" height="32" rx="8" className="fill-fg" />
+      <rect x="6" y="8" width="12" height="4" rx="2" className="fill-bg" />
+      <rect x="10" y="14" width="12" height="4" rx="2" className="fill-bg" />
+      <rect x="14" y="20" width="12" height="4" rx="2" fill="#ff6a1a" />
     </svg>
   )
 }
 
-export function Logo({ size = 28, className }: { size?: number; className?: string }) {
+export function Logo({ size = 24, className = '' }: { size?: number; className?: string }) {
   return (
-    <span className={'inline-flex items-center gap-2 ' + (className ?? '')}>
+    <span className={'inline-flex items-center gap-2 ' + className}>
       <LogoMark size={size} />
-      <span className="text-[17px] font-extrabold tracking-tight">
-        Infer<span className="bg-gradient-to-r from-brand-500 to-accent-500 bg-clip-text text-transparent dark:from-brand-400 dark:to-accent-400">Stack</span>
-      </span>
+      <span className="text-[18px] font-bold tracking-tightest text-fg">inferstack</span>
     </span>
   )
 }

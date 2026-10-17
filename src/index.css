@@ -2,27 +2,67 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light */
 :root {
   color-scheme: light;
+  --bg: 250 250 250;
+  --panel: 255 255 255;
+  --raised: 243 243 245;
+  --fg: 17 17 19;
+  --fg2: 82 82 91;
+  --fg3: 136 136 146;
+  --accent: 238 88 10;
+  --line: rgba(9, 9, 11, 0.08);
+  --line2: rgba(9, 9, 11, 0.15);
 }
+/* Dark (default) */
 .dark {
   color-scheme: dark;
+  --bg: 8 9 10;
+  --panel: 16 17 19;
+  --raised: 25 26 29;
+  --fg: 243 244 246;
+  --fg2: 161 164 171;
+  --fg3: 108 112 120;
+  --accent: 255 106 26;
+  --line: rgba(255, 255, 255, 0.08);
+  --line2: rgba(255, 255, 255, 0.15);
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
 body {
-  @apply bg-white text-slate-900 antialiased dark:bg-[#070a14] dark:text-slate-100;
-  font-feature-settings: 'ss01', 'cv11';
+  @apply bg-bg text-fg antialiased;
+  font-feature-settings: 'ss06', 'tnum' 0;
+  word-break: keep-all;
 }
-
-code {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+h1, h2, h3 {
+  text-wrap: balance;
 }
-
+code, kbd, .font-mono {
+  font-feature-settings: 'zero' 0, 'calt' 0;
+}
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
 ::selection {
-  @apply bg-brand-500/30;
+  background: rgb(var(--accent) / 0.25);
 }
-
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  scrollbar-color: rgba(128, 128, 140, 0.35) transparent;
+}
+:is(a, button, summary, [role='switch'], [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--accent) / 0.6);
+  outline-offset: 2px;
+}
+:is(input, textarea, select):focus-visible {
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

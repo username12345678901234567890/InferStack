@@ -65,7 +65,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           <div className="flex-1 overflow-y-auto">
             <ArchOption selected={s.arch === CUSTOM_ARCH} onClick={() => set({ arch: CUSTOM_ARCH, newArchName: s.newArchName || det.name || '' })}>
               <div className="flex items-center gap-2 font-medium">
-                <Sparkles size={14} className="text-violet-500" /> 새 아키텍처 (커스텀 추론 코드)
+                <Sparkles size={14} className="text-accent" /> 새 아키텍처 (커스텀 추론 코드)
               </div>
               <div className="text-xs text-slate-500">레지스트리에 없는 아키텍처 — GitHub / 로컬에서 코드 업로드</div>
             </ArchOption>
@@ -111,7 +111,7 @@ function ArchOption({ selected, disabled, onClick, children }: { selected: boole
       onClick={onClick}
       className={cx(
         'block w-full border-b border-slate-100 px-4 py-2.5 text-left last:border-0 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/5',
-        selected ? 'bg-brand-500/10' : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]',
+        selected ? 'bg-raised' : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]',
       )}
     >
       {children}
@@ -125,7 +125,7 @@ function SelectedArch({ name, s, set }: { name: string; s: WizardState; set: Set
   return (
     <Card className="p-5">
       <div className="flex items-center gap-2">
-        <Cpu size={18} className="text-brand-500" />
+        <Cpu size={18} className="text-fg" />
         <span className="font-mono font-semibold">{a.name}</span>
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -154,7 +154,7 @@ function SelectedArch({ name, s, set }: { name: string; s: WizardState; set: Set
         href={`https://huggingface.co/models?other=${a.modelType}&sort=trending`}
         target="_blank"
         rel="noreferrer"
-        className="mt-5 inline-flex items-center gap-1 text-xs text-brand-500 hover:underline"
+        className="mt-5 inline-flex items-center gap-1 text-xs text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg"
       >
         Hugging Face에서 {a.modelType} 아키텍처 모델 보기 <ExternalLink size={11} />
       </a>

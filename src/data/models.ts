@@ -148,7 +148,7 @@ export function weeklyTokens(m: CatalogModel): number {
   const r = rng(m.slug)()
   const pop = Math.log10(m.hfDownloads + 10) * 0.6 + Math.log10(m.hfLikes + 10) * 0.9
   const cheap = 1 / Math.sqrt(m.price.output + 0.05)
-  return Math.round(Math.pow(10, pop) * cheap * (0.6 + r) * 2.2e5)
+  return Math.round(Math.pow(10, pop) * cheap * (0.6 + r) * 2.2e3)
 }
 
 const REGIONS = [
@@ -170,11 +170,13 @@ export function endpointsFor(m: CatalogModel): Endpoint[] {
   const gpus = big ? ['B200', 'H200', 'MI355X'] : m.params > 60e9 ? ['H200', 'H100', 'B200'] : ['H100', 'L40S', 'A100 80GB']
   const quants = big ? ['FP8', 'FP8', 'NVFP4'] : ['BF16', 'FP8', 'FP8']
   const n = 2 + Math.floor(rand() * 3)
-  const regions = [...REGIONS].sort(() => rand() - 0.5).slice(0, n)
+  // 서울이 기본 리전, 나머지는 모델마다 다르게
+  const regions = [REGIONS[0], ...REGIONS.slice(1).sort(() => rand() - 0.5)].slice(0, n)
   return regions.map((reg, i) => {
     const quant = quants[i % quants.length]
     const fast = quant === 'NVFP4' || quant === 'FP8'
-    const act = (m.activeParams ?? m.params) / 1e9
+    // 활성 파라미터가 공개되지 않은 대형 MoE는 총 파라미터의 약 4.5%로 가정
+    const act = (m.activeParams ?? (m.params > 1e11 ? m.params * 0.045 : m.params)) / 1e9
     const base = 380 / Math.pow(act + 2, 0.55)
     return {
       id: `${reg.region}-${i}`,

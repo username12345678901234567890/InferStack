@@ -10,7 +10,7 @@ import type { Setter, WizardState } from './state'
 import type { ImportSource } from '../../data/types'
 
 const SOURCES: { id: ImportSource; label: React.ReactNode }[] = [
-  { id: 'huggingface', label: <span className="flex items-center gap-1.5">🤗 Hugging Face</span> },
+  { id: 'huggingface', label: <span className="flex items-center gap-1.5"><Download size={13} /> Hugging Face</span> },
   { id: 'modelscope', label: <span className="flex items-center gap-1.5"><Globe2 size={13} /> ModelScope</span> },
   { id: 'cli', label: <span className="flex items-center gap-1.5"><Terminal size={13} /> CLI 업로드</span> },
 ]
@@ -153,7 +153,7 @@ function HFImport({ s, set, onLoaded }: { s: WizardState; set: Setter; onLoaded:
         </div>
       </div>
       <div className="mt-3">
-        <button onClick={() => setShowToken(!showToken)} className="flex items-center gap-1 text-xs text-slate-500 hover:text-brand-500">
+        <button onClick={() => setShowToken(!showToken)} className="flex items-center gap-1 text-xs text-slate-500 hover:text-fg">
           <Lock size={12} /> 게이트·비공개 모델용 액세스 토큰 {showToken ? '숨기기' : '입력'}
         </button>
         {showToken && (
@@ -184,7 +184,7 @@ function HFImport({ s, set, onLoaded }: { s: WizardState; set: Setter; onLoaded:
                 set({ repo: r })
                 load(r)
               }}
-              className="rounded-md border border-slate-200 px-2 py-0.5 font-mono hover:border-brand-400 dark:border-white/10"
+              className="rounded-md border border-slate-200 px-2 py-0.5 font-mono hover:border-line2 dark:border-white/10"
             >
               {r}
             </button>
@@ -356,7 +356,7 @@ inferstack upload ./${fmt === 'gguf' ? files[0].path : 'my-model-dir/'} \\
       <Card className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center">
         <div className="flex-1">
           <div className="flex items-center gap-2 text-sm font-medium">
-            {uploading === null ? <Loader2 size={15} className="animate-spin text-slate-400" /> : <Loader2 size={15} className="animate-spin text-brand-500" />}
+            {uploading === null ? <Loader2 size={15} className="animate-spin text-slate-400" /> : <Loader2 size={15} className="animate-spin text-fg" />}
             {uploading === null ? 'CLI 업로드 대기 중…' : `업로드 중 ${uploading}% — ${fmtBytes((total * uploading) / 100)} / ${fmtBytes(total)}`}
           </div>
           {uploading !== null && <Progress value={uploading / 100} className="mt-2" />}
@@ -386,7 +386,7 @@ function RepoSummary({ s }: { s: WizardState }) {
         <CheckCircle2 size={18} className="text-emerald-500" />
         <span className="font-mono font-semibold">{info.id}</span>
         {s.resolvedVia === 'huggingface' && (
-          <a href={hfUrl(info.id)} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-brand-500">
+          <a href={hfUrl(info.id)} target="_blank" rel="noreferrer" className="text-slate-400 hover:text-fg">
             <ExternalLink size={14} />
           </a>
         )}
@@ -411,7 +411,7 @@ function RepoSummary({ s }: { s: WizardState }) {
         />
       </div>
       <div className="mt-4 flex flex-wrap gap-2 text-xs">
-        <span className={cx('rounded-md px-2 py-1', st.length ? 'bg-brand-500/10 text-brand-600 dark:text-brand-300' : 'bg-slate-100 text-slate-400 line-through dark:bg-white/5')}>Safetensors {st.length ? `· ${st.length} shards` : ''}</span>
+        <span className={cx('rounded-md px-2 py-1', st.length ? 'bg-raised text-fg ring-1 ring-line2' : 'bg-slate-100 text-slate-400 line-through dark:bg-white/5')}>Safetensors {st.length ? `· ${st.length} shards` : ''}</span>
         <span className={cx('rounded-md px-2 py-1', ggufs.length ? 'bg-amber-500/10 text-amber-600 dark:text-amber-300' : 'bg-slate-100 text-slate-400 line-through dark:bg-white/5')}>GGUF {ggufs.length ? `· ${ggufs.length} quants` : ''}</span>
         {info.chatTemplate && <span className="rounded-md bg-emerald-500/10 px-2 py-1 text-emerald-600 dark:text-emerald-300">chat template ✓</span>}
         {info.lastModified && <span className="px-2 py-1 text-slate-500">수정 {timeAgo(info.lastModified)}</span>}

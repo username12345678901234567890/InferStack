@@ -51,7 +51,7 @@ export default function Docs() {
         <section>
           <h2 id="quickstart">빠른 시작</h2>
           <p className="mt-3">
-            1) <Link to="/keys" className="text-brand-500 hover:underline">API 키 발급</Link> → 2) <Link to="/credits" className="text-brand-500 hover:underline">크레딧 충전</Link> → 3) OpenAI SDK의 <code>base_url</code>을 변경합니다.
+            1) <Link to="/keys" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">API 키 발급</Link> → 2) <Link to="/credits" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">크레딧 충전</Link> → 3) OpenAI SDK의 <code>base_url</code>을 변경합니다.
           </p>
           <CodeBlock
             className="mt-4"
@@ -243,7 +243,7 @@ inferstack code validate ./beam-inferstack/`}
         <section>
           <h2 id="arch">아키텍처 패키지 규격 (v1)</h2>
           <p className="mt-3">
-            InferStack 레지스트리에 없는 아키텍처(<Link to="/deploy" className="text-brand-500 hover:underline">지원 목록</Link>)는 아래 규격의 추론 코드 패키지를 GitHub 리포지토리 또는 로컬 디렉터리로 업로드해야 합니다. 런타임은 <code>config.json</code>의 <code>architectures[0]</code>와 매니페스트의 <code>metadata.architectures</code>를 매칭하여 엔트리포인트 클래스를 로드합니다.
+            InferStack 레지스트리에 없는 아키텍처(<Link to="/deploy" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">지원 목록</Link>)는 아래 규격의 추론 코드 패키지를 GitHub 리포지토리 또는 로컬 디렉터리로 업로드해야 합니다. 런타임은 <code>config.json</code>의 <code>architectures[0]</code>와 매니페스트의 <code>metadata.architectures</code>를 매칭하여 엔트리포인트 클래스를 로드합니다.
           </p>
           <pre className="mt-4 overflow-x-auto rounded-xl bg-slate-100 p-4 font-mono text-xs dark:bg-white/5">{SPEC_TREE}</pre>
           <h3>inferstack.yaml</h3>
@@ -284,7 +284,7 @@ inferstack code validate ./beam-inferstack/`}
           <h2 id="billing">과금</h2>
           <p className="mt-3">
             카탈로그 모델은 입력/출력 토큰 단위로 과금되며 캐시된 입력 토큰은 75% 할인됩니다. 비공개 커스텀 모델은 GPU 사용 시간(초 단위)으로, 마켓플레이스 공개 모델은 호출자에게 토큰 단위로 과금되고 제공자에게 매출의 80%가 정산됩니다. 자세한 내용은{' '}
-            <Link to="/pricing" className="text-brand-500 hover:underline">
+            <Link to="/pricing" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">
               가격
             </Link>{' '}
             페이지를 참고하세요.

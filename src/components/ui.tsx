@@ -5,21 +5,22 @@ import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttribute
 
 export const cx = clsx
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline' | 'accent'
 type Size = 'sm' | 'md' | 'lg'
 
 export function Button({ variant = 'primary', size = 'md', className, children, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
   return (
     <button
       className={cx(
-        'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60',
-        size === 'sm' && 'h-8 px-3 text-sm',
-        size === 'md' && 'h-10 px-4 text-sm',
-        size === 'lg' && 'h-12 px-6 text-base',
-        variant === 'primary' && 'bg-brand-600 text-white hover:bg-brand-500 shadow-sm shadow-brand-900/30',
-        variant === 'secondary' && 'bg-slate-100 text-slate-900 hover:bg-slate-200 dark:bg-white/10 dark:text-white dark:hover:bg-white/15',
-        variant === 'outline' && 'border border-slate-300 bg-transparent text-slate-800 hover:bg-slate-50 dark:border-white/15 dark:text-slate-100 dark:hover:bg-white/5',
-        variant === 'ghost' && 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white',
+        'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+        size === 'sm' && 'h-8 px-3 text-[13px]',
+        size === 'md' && 'h-9 px-4 text-sm',
+        size === 'lg' && 'h-11 px-5 text-[15px]',
+        variant === 'primary' && 'bg-fg text-bg hover:bg-fg/85',
+        variant === 'accent' && 'bg-accent text-white hover:bg-accent/90',
+        variant === 'secondary' && 'border border-line bg-raised text-fg hover:border-line2',
+        variant === 'outline' && 'border border-line2 text-fg hover:bg-raised',
+        variant === 'ghost' && 'text-fg2 hover:bg-raised hover:text-fg',
         variant === 'danger' && 'bg-rose-600 text-white hover:bg-rose-500',
         className,
       )}
@@ -32,7 +33,7 @@ export function Button({ variant = 'primary', size = 'md', className, children, 
 
 export function Card({ className, children, ...rest }: { className?: string; children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cx('rounded-xl border border-slate-200 bg-white dark:border-white/10 dark:bg-white/[0.03]', className)} {...rest}>
+    <div className={cx('rounded-xl border border-line bg-panel', className)} {...rest}>
       {children}
     </div>
   )
@@ -40,22 +41,21 @@ export function Card({ className, children, ...rest }: { className?: string; chi
 
 export function Badge({ children, color = 'slate', className }: { children: ReactNode; color?: 'slate' | 'brand' | 'green' | 'amber' | 'rose' | 'cyan' | 'violet'; className?: string }) {
   const map = {
-    slate: 'bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-300',
-    brand: 'bg-brand-50 text-brand-700 dark:bg-brand-500/15 dark:text-brand-300',
-    green: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300',
-    amber: 'bg-amber-50 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
-    rose: 'bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300',
-    cyan: 'bg-cyan-50 text-cyan-700 dark:bg-cyan-500/15 dark:text-cyan-300',
-    violet: 'bg-violet-50 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300',
+    slate: 'border-line2 text-fg2',
+    brand: 'border-accent/40 text-accent',
+    cyan: 'border-accent/40 text-accent',
+    violet: 'border-line2 text-fg',
+    green: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
+    amber: 'border-amber-500/40 text-amber-600 dark:text-amber-400',
+    rose: 'border-rose-500/40 text-rose-600 dark:text-rose-400',
   }
-  return <span className={cx('inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-medium leading-4', map[color], className)}>{children}</span>
+  return <span className={cx('inline-flex items-center gap-1 rounded-[5px] border px-1.5 font-mono text-[10.5px] font-medium uppercase leading-[18px] tracking-wide', map[color], className)}>{children}</span>
 }
 
-const fieldBase =
-  'w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-white/15 dark:bg-slate-900/60 dark:text-slate-100 dark:placeholder:text-slate-500'
+const fieldBase = 'w-full rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/40 focus:outline-none'
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cx(fieldBase, 'h-10', className)} {...rest} />
+  return <input className={cx(fieldBase, 'h-9', className)} {...rest} />
 }
 
 export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
@@ -64,7 +64,7 @@ export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLText
 
 export function Select({ className, children, ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select className={cx(fieldBase, 'h-10 pr-8', className)} {...rest}>
+    <select className={cx(fieldBase, 'h-9 pr-8', className)} {...rest}>
       {children}
     </select>
   )
@@ -72,9 +72,9 @@ export function Select({ className, children, ...rest }: SelectHTMLAttributes<HT
 
 export function Label({ children, hint, className }: { children: ReactNode; hint?: ReactNode; className?: string }) {
   return (
-    <label className={cx('mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-200', className)}>
+    <label className={cx('mb-1.5 block text-[13px] font-medium text-fg', className)}>
       {children}
-      {hint && <span className="ml-2 text-xs font-normal text-slate-500">{hint}</span>}
+      {hint && <span className="ml-2 text-xs font-normal text-fg3">{hint}</span>}
     </label>
   )
 }
@@ -84,8 +84,8 @@ export function Toggle({ checked, onChange, label, description }: { checked: boo
     <label className="flex cursor-pointer items-start justify-between gap-4">
       {(label || description) && (
         <span>
-          {label && <span className="block text-sm font-medium text-slate-800 dark:text-slate-100">{label}</span>}
-          {description && <span className="mt-0.5 block text-xs text-slate-500">{description}</span>}
+          {label && <span className="block text-sm font-medium text-fg">{label}</span>}
+          {description && <span className="mt-0.5 block text-xs text-fg3">{description}</span>}
         </span>
       )}
       <button
@@ -93,9 +93,9 @@ export function Toggle({ checked, onChange, label, description }: { checked: boo
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={cx('relative mt-0.5 inline-flex h-5 w-9 shrink-0 rounded-full transition-colors', checked ? 'bg-brand-600' : 'bg-slate-300 dark:bg-white/20')}
+        className={cx('relative mt-0.5 inline-flex h-5 w-9 shrink-0 rounded-full border transition-colors', checked ? 'border-fg bg-fg' : 'border-line2 bg-raised')}
       >
-        <span className={cx('absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform', checked ? 'translate-x-4' : 'translate-x-0.5')} />
+        <span className={cx('absolute top-[1px] h-4 w-4 rounded-full shadow transition-transform', checked ? 'translate-x-[17px] bg-bg' : 'translate-x-[1px] bg-fg3')} />
       </button>
     </label>
   )
@@ -111,23 +111,16 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={onClose} />
-      <div
-        className={cx(
-          'relative w-full animate-fade-in rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-white/10 dark:bg-slate-900',
-          size === 'sm' && 'max-w-md',
-          size === 'md' && 'max-w-lg',
-          size === 'lg' && 'max-w-2xl',
-        )}
-      >
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-white/10">
-          <h3 className="text-base font-semibold">{title}</h3>
-          <button onClick={onClose} className="rounded-md p-1 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/10">
-            <X size={18} />
+      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
+      <div className={cx('relative w-full animate-fade-in rounded-xl border border-line2 bg-panel shadow-2xl shadow-black/40', size === 'sm' && 'max-w-md', size === 'md' && 'max-w-lg', size === 'lg' && 'max-w-2xl')}>
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+          <h3 className="text-[15px] font-semibold">{title}</h3>
+          <button onClick={onClose} className="rounded-md p-1 text-fg3 hover:bg-raised hover:text-fg">
+            <X size={16} />
           </button>
         </div>
         <div className="max-h-[70vh] overflow-y-auto px-5 py-4">{children}</div>
-        {footer && <div className="flex justify-end gap-2 border-t border-slate-200 px-5 py-3 dark:border-white/10">{footer}</div>}
+        {footer && <div className="flex justify-end gap-2 border-t border-line px-5 py-3">{footer}</div>}
       </div>
     </div>
   )
@@ -135,15 +128,12 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: {
 
 export function Tabs<T extends string>({ tabs, value, onChange, className }: { tabs: { id: T; label: ReactNode }[]; value: T; onChange: (v: T) => void; className?: string }) {
   return (
-    <div className={cx('flex gap-1 overflow-x-auto border-b border-slate-200 dark:border-white/10', className)}>
+    <div className={cx('flex gap-5 overflow-x-auto border-b border-line', className)}>
       {tabs.map((t) => (
         <button
           key={t.id}
           onClick={() => onChange(t.id)}
-          className={cx(
-            '-mb-px whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium transition-colors',
-            value === t.id ? 'border-brand-500 text-slate-900 dark:text-white' : 'border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200',
-          )}
+          className={cx('-mb-px whitespace-nowrap border-b py-2.5 text-sm transition-colors', value === t.id ? 'border-fg font-medium text-fg' : 'border-transparent text-fg3 hover:text-fg')}
         >
           {t.label}
         </button>
@@ -152,16 +142,17 @@ export function Tabs<T extends string>({ tabs, value, onChange, className }: { t
   )
 }
 
-export function Segmented<T extends string>({ options, value, onChange, className }: { options: { id: T; label: ReactNode }[]; value: T; onChange: (v: T) => void; className?: string }) {
+export function Segmented<T extends string>({ options, value, onChange, className, size = 'sm' }: { options: { id: T; label: ReactNode }[]; value: T; onChange: (v: T) => void; className?: string; size?: 'sm' | 'xs' }) {
   return (
-    <div className={cx('inline-flex rounded-lg bg-slate-100 p-0.5 dark:bg-white/5', className)}>
+    <div className={cx('inline-flex rounded-lg border border-line bg-raised/60 p-0.5', className)}>
       {options.map((o) => (
         <button
           key={o.id}
           onClick={() => onChange(o.id)}
           className={cx(
-            'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
-            value === o.id ? 'bg-white text-slate-900 shadow-sm dark:bg-white/15 dark:text-white' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200',
+            'rounded-md font-medium transition-colors',
+            size === 'sm' ? 'px-2.5 py-1 text-xs' : 'px-2 py-0.5 text-[11.5px]',
+            value === o.id ? 'bg-panel text-fg shadow-sm ring-1 ring-line' : 'text-fg3 hover:text-fg',
           )}
         >
           {o.label}
@@ -184,35 +175,47 @@ export function CopyButton({ text, className, label }: { text: string; className
         setOk(true)
         setTimeout(() => setOk(false), 1400)
       }}
-      className={cx('inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-white', className)}
+      className={cx('inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-xs text-fg3 transition-colors hover:bg-raised hover:text-fg', className)}
       title="복사"
     >
-      {ok ? <Check size={14} className="text-emerald-500" /> : <Copy size={14} />}
+      {ok ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
       {label && <span>{ok ? '복사됨' : label}</span>}
     </button>
   )
 }
 
-export function CodeBlock({ code, lang, className }: { code: string; lang?: string; className?: string }) {
+/** 코드 패널. 라이트/다크 모두 어두운 바탕. */
+export function CodeBlock({ code, lang, className, lineNumbers = true, header = true }: { code: string; lang?: string; className?: string; lineNumbers?: boolean; header?: boolean }) {
+  const lines = code.split('\n')
   return (
-    <div className={cx('group relative overflow-hidden rounded-xl border border-slate-800 bg-[#0b1020] text-slate-200', className)}>
-      <div className="flex items-center justify-between border-b border-white/5 px-3 py-1.5">
-        <span className="font-mono text-[11px] uppercase tracking-wide text-slate-500">{lang ?? 'code'}</span>
-        <CopyButton text={code} className="text-slate-400 hover:bg-white/10 hover:text-white" label="복사" />
-      </div>
-      <pre className="overflow-x-auto p-4 font-mono text-[12.5px] leading-relaxed">
-        <code>{highlight(code, lang)}</code>
+    <div className={cx('overflow-hidden rounded-xl border border-line bg-[#0c0d0f] text-[#d6d7db]', className)}>
+      {header && (
+        <div className="flex items-center justify-between border-b border-white/[0.06] py-1 pl-3.5 pr-1.5">
+          <span className="font-mono text-[11px] text-white/40">{lang ?? 'code'}</span>
+          <CopyButton text={code} className="text-white/45 hover:bg-white/10 hover:text-white" label="복사" />
+        </div>
+      )}
+      <pre className="overflow-x-auto py-3.5 font-mono text-[12.5px] leading-[1.75]">
+        <code className="block min-w-max">
+          {lines.map((l, i) => (
+            <span key={i} className="flex">
+              {lineNumbers && <span className="w-10 shrink-0 select-none pr-4 text-right text-white/20">{i + 1}</span>}
+              <span className={cx('pr-5', !lineNumbers && 'pl-4')}>{highlight(l, lang)}</span>
+            </span>
+          ))}
+        </code>
       </pre>
     </div>
   )
 }
 
-/** 아주 가벼운 하이라이터: 문자열/주석/키워드 */
-function highlight(code: string, lang?: string): ReactNode[] {
+/** 가벼운 하이라이터: 문자열 / 주석 / 키워드 / 숫자 */
+export function highlight(code: string, lang?: string): ReactNode[] {
+  if (!code) return [' ']
   const kw =
     lang === 'bash' || lang === 'shell'
-      ? /\b(curl|pip|npm|inferstack|export|cd|git|huggingface-cli)\b/
-      : /\b(from|import|def|class|return|for|in|if|else|await|async|const|let|new|yield|with|as|print|true|false|null|None|True|False|self)\b/
+      ? /^(curl|pip|npm|inferstack|export|cd|git|huggingface-cli)$/
+      : /^(from|import|def|class|return|for|in|if|else|await|async|const|let|new|yield|with|as|print|true|false|null|None|True|False|self|of)$/
   const re = /(#[^\n]*|\/\/[^\n]*|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`|\b\d+(?:\.\d+)?\b|\b[A-Za-z_][\w-]*\b)/g
   const out: ReactNode[] = []
   let last = 0
@@ -222,10 +225,10 @@ function highlight(code: string, lang?: string): ReactNode[] {
     const idx = m.index ?? 0
     if (idx > last) out.push(code.slice(last, idx))
     let cls = ''
-    if (s.startsWith('#') || (s.startsWith('//') && lang !== 'bash')) cls = 'text-slate-500 italic'
-    else if (/^["'`]/.test(s)) cls = 'text-emerald-300'
-    else if (/^\d/.test(s)) cls = 'text-amber-300'
-    else if (kw.test(s) && s.match(kw)?.[0] === s) cls = 'text-violet-300'
+    if (s.startsWith('#') || (s.startsWith('//') && lang !== 'bash')) cls = 'text-white/35'
+    else if (/^["'`]/.test(s)) cls = 'text-[#a5d6a7]'
+    else if (/^\d/.test(s)) cls = 'text-[#f6c177]'
+    else if (kw.test(s)) cls = 'text-[#ff9b5e]'
     out.push(cls ? <span key={i++} className={cls}>{s}</span> : s)
     last = idx + s.length
   }
@@ -236,22 +239,22 @@ function highlight(code: string, lang?: string): ReactNode[] {
 export function Stat({ label, value, sub, icon }: { label: ReactNode; value: ReactNode; sub?: ReactNode; icon?: ReactNode }) {
   return (
     <Card className="p-4">
-      <div className="flex items-center justify-between text-xs font-medium text-slate-500">
+      <div className="flex items-center justify-between text-xs text-fg3">
         {label}
         {icon}
       </div>
-      <div className="mt-2 text-2xl font-semibold tracking-tight">{value}</div>
-      {sub && <div className="mt-1 text-xs text-slate-500">{sub}</div>}
+      <div className="tabular mt-2 text-[22px] font-semibold tracking-tight">{value}</div>
+      {sub && <div className="mt-1 text-xs text-fg3">{sub}</div>}
     </Card>
   )
 }
 
 export function Empty({ icon, title, description, action }: { icon?: ReactNode; title: ReactNode; description?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 px-6 py-14 text-center dark:border-white/15">
-      {icon && <div className="mb-3 text-slate-400">{icon}</div>}
+    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line2 px-6 py-14 text-center">
+      {icon && <div className="mb-3 text-fg3">{icon}</div>}
       <div className="font-medium">{title}</div>
-      {description && <div className="mt-1 max-w-md text-sm text-slate-500">{description}</div>}
+      {description && <div className="mt-1 max-w-md text-sm text-fg3">{description}</div>}
       {action && <div className="mt-4">{action}</div>}
     </div>
   )
@@ -259,18 +262,18 @@ export function Empty({ icon, title, description, action }: { icon?: ReactNode; 
 
 export function Progress({ value, className }: { value: number; className?: string }) {
   return (
-    <div className={cx('h-1.5 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-white/10', className)}>
-      <div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500 transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />
+    <div className={cx('h-1 w-full overflow-hidden rounded-full bg-raised', className)}>
+      <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />
     </div>
   )
 }
 
 export function PageHeader({ title, description, actions }: { title: ReactNode; description?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-        {description && <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{description}</p>}
+        <h1 className="text-[26px] font-semibold tracking-[-0.03em]">{title}</h1>
+        {description && <p className="mt-1.5 text-sm text-fg2">{description}</p>}
       </div>
       {actions && <div className="flex gap-2">{actions}</div>}
     </div>
@@ -283,14 +286,13 @@ interface ToastItem {
   text: ReactNode
   kind: 'ok' | 'err' | 'info'
 }
-const useToasts = create<{ items: ToastItem[]; push: (t: Omit<ToastItem, 'id'>) => void; remove: (id: number) => void }>((set) => ({
+const useToasts = create<{ items: ToastItem[]; push: (t: Omit<ToastItem, 'id'>) => void }>((set) => ({
   items: [],
   push: (t) => {
     const id = Date.now() + Math.random()
     set((s) => ({ items: [...s.items, { ...t, id }] }))
     setTimeout(() => set((s) => ({ items: s.items.filter((i) => i.id !== id) })), 3200)
   },
-  remove: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),
 }))
 
 export const toast = {
@@ -304,15 +306,8 @@ export function Toaster() {
   return (
     <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex flex-col gap-2">
       {items.map((t) => (
-        <div
-          key={t.id}
-          className={cx(
-            'pointer-events-auto animate-fade-in rounded-lg border px-4 py-2.5 text-sm shadow-lg',
-            t.kind === 'ok' && 'border-emerald-500/30 bg-emerald-50 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-100',
-            t.kind === 'err' && 'border-rose-500/30 bg-rose-50 text-rose-900 dark:bg-rose-950 dark:text-rose-100',
-            t.kind === 'info' && 'border-slate-300 bg-white text-slate-900 dark:border-white/10 dark:bg-slate-800 dark:text-slate-100',
-          )}
-        >
+        <div key={t.id} className="pointer-events-auto flex animate-fade-in items-center gap-2.5 rounded-lg border border-line2 bg-panel px-3.5 py-2.5 text-sm shadow-xl shadow-black/30">
+          <span className={cx('h-1.5 w-1.5 rounded-full', t.kind === 'ok' && 'bg-emerald-500', t.kind === 'err' && 'bg-rose-500', t.kind === 'info' && 'bg-fg3')} />
           {t.text}
         </div>
       ))}

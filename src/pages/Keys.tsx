@@ -63,7 +63,7 @@ export default function Keys() {
                       </div>
                       {k.limit ? (
                         <div className="mt-1 h-1 w-28 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                          <div className={pct > 0.9 ? 'h-full bg-rose-500' : 'h-full bg-brand-500'} style={{ width: `${pct * 100}%` }} />
+                          <div className={pct > 0.9 ? 'h-full bg-rose-500' : 'h-full bg-fg/70'} style={{ width: `${pct * 100}%` }} />
                         </div>
                       ) : null}
                     </td>

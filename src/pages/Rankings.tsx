@@ -9,7 +9,7 @@ import { Card, PageHeader, Segmented } from '../components/ui'
 import { fmtPrice, fmtTokens } from '../lib/format'
 import { rng } from '../lib/rand'
 
-const COLORS = ['#3b63fb', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899', '#64748b', '#ef4444']
+const COLORS = ['#ff6a1a', '#7c8aa5', '#4fa3a5', '#c9a66b', '#9b8bb4', '#6b7280', '#b0796b', '#8aa37b']
 
 type Cat = 'all' | Capability
 
@@ -89,7 +89,7 @@ export default function Rankings() {
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{m.name}</div>
                   <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/5">
-                    <div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
+                    <div className="h-full rounded-full bg-fg/70" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
                   </div>
                 </div>
                 <div className="w-20 text-right text-sm font-medium">{fmtTokens(weeklyTokens(m))}</div>
@@ -124,7 +124,7 @@ export default function Rankings() {
             <div className="text-sm font-semibold">가장 빠른 모델 (tok/s)</div>
             <div className="mt-3 space-y-2 text-sm">
               {fastest.map(({ m, tps }) => (
-                <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-brand-500">
+                <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
                   <span className="truncate">{m.name}</span>
                   <span className="font-mono text-xs text-slate-500">{tps}</span>
                 </Link>
@@ -138,7 +138,7 @@ export default function Rankings() {
                 .sort((a, b) => a.price.output - b.price.output)
                 .slice(0, 6)
                 .map((m) => (
-                  <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-brand-500">
+                  <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
                     <span className="truncate">{m.name}</span>
                     <span className="font-mono text-xs text-slate-500">{fmtPrice(m.price.output)}</span>
                   </Link>

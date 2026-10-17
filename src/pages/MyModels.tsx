@@ -71,9 +71,9 @@ export default function MyModels() {
             const p = buildProgress(m)
             return (
               <Link key={m.id} to={`/my-models/${m.slug}`}>
-                <Card className="p-4 transition-colors hover:border-brand-400/60">
+                <Card className="p-4 transition-colors hover:border-line2">
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/15 text-violet-500">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-raised text-fg2">
                       <Cpu size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -144,11 +144,11 @@ export function MyModelDetail() {
 
   return (
     <div>
-      <Link to="/my-models" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-brand-500">
+      <Link to="/my-models" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-fg">
         <ArrowLeft size={14} /> 내 모델
       </Link>
       <div className="flex flex-col gap-4 md:flex-row md:items-start">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/15 text-violet-500">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-line bg-raised text-fg2">
           <Cpu size={24} />
         </div>
         <div className="flex-1">
@@ -245,7 +245,7 @@ export function MyModelDetail() {
         )}
 
         {tab === 'logs' && (
-          <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#0b1020]">
+          <div className="overflow-hidden rounded-xl border border-slate-800 bg-[#0c0d0f]">
             <div className="max-h-[520px] overflow-y-auto p-4 font-mono text-[12px] leading-relaxed">
               {logs.map((l, i) => (
                 <div key={i} className={cx(l.level === 'ok' ? 'text-emerald-400' : l.level === 'warn' ? 'text-amber-400' : 'text-slate-300')}>

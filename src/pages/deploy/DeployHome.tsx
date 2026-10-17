@@ -24,16 +24,16 @@ export default function DeployHome() {
       />
       <div className="grid gap-4 md:grid-cols-3">
         {[
-          { icon: Download, emoji: '🤗', title: 'Hugging Face에서 불러오기', desc: 'Repo ID 입력 → config.json, safetensors 샤드, GGUF 양자화 파일을 자동 분석. 게이트/비공개 모델은 토큰으로.', source: 'huggingface' },
+          { icon: Download, title: 'Hugging Face에서 불러오기', desc: 'Repo ID 입력 → config.json, safetensors 샤드, GGUF 양자화 파일을 자동 분석. 게이트/비공개 모델은 토큰으로.', source: 'huggingface' },
           { icon: Globe2, title: 'ModelScope에서 불러오기', desc: 'ModelScope 모델 ID로 가중치를 가져옵니다. 중국 리전 미러를 사용해 대형 모델도 빠르게 동기화.', source: 'modelscope' },
           { icon: Terminal, title: 'CLI로 업로드', desc: '로컬/사내 스토리지의 가중치를 inferstack-cli로 멀티파트 업로드. 중단 시 이어올리기 지원.', source: 'cli' },
         ].map((x) => (
           <Link key={x.source} to={`/deploy/new?source=${x.source}`}>
-            <Card className="group h-full p-6 transition-all hover:-translate-y-0.5 hover:border-brand-400">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/10 text-brand-500">{x.emoji ? <span className="text-xl">{x.emoji}</span> : <x.icon size={20} />}</div>
+            <Card className="group h-full p-6 transition-all hover:border-line2 hover:bg-raised/40">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-raised text-fg"><x.icon size={20} /></div>
               <div className="mt-4 font-semibold">{x.title}</div>
               <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{x.desc}</p>
-              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-brand-500">
+              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-fg">
                 시작하기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </div>
             </Card>
@@ -93,8 +93,8 @@ export default function DeployHome() {
             </tbody>
           </table>
         </div>
-        <div className="flex flex-col gap-3 border-t border-slate-200 bg-violet-500/5 p-5 sm:flex-row sm:items-center dark:border-white/10">
-          <Sparkles size={20} className="text-violet-500" />
+        <div className="flex flex-col gap-3 border-t border-slate-200 bg-raised/50 p-5 sm:flex-row sm:items-center dark:border-white/10">
+          <Sparkles size={20} className="text-accent" />
           <div className="flex-1 text-sm">
             <div className="font-medium">목록에 없는 새 아키텍처인가요?</div>
             <div className="text-slate-600 dark:text-slate-400">

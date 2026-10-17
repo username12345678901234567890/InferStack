@@ -34,7 +34,6 @@ export default function Credits() {
       />
       <div className="grid gap-3 md:grid-cols-4">
         <Card className="relative overflow-hidden p-5 md:col-span-2">
-          <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gradient-to-br from-brand-500/30 to-accent-500/30 blur-2xl" />
           <div className="relative">
             <div className="flex items-center gap-2 text-sm text-slate-500">
               <Wallet size={15} /> 잔액
@@ -136,7 +135,7 @@ export default function Credits() {
       >
         <div className="grid grid-cols-5 gap-2">
           {PRESETS.map((p) => (
-            <button key={p} onClick={() => setAmount(p)} className={cx('rounded-lg border py-2 text-sm font-medium', amount === p ? 'border-brand-500 bg-brand-500/10 text-brand-600 dark:text-brand-300' : 'border-slate-200 dark:border-white/10')}>
+            <button key={p} onClick={() => setAmount(p)} className={cx('rounded-lg border py-2 text-sm font-medium', amount === p ? 'border-fg/50 bg-raised text-fg' : 'border-slate-200 dark:border-white/10')}>
               ${p}
             </button>
           ))}

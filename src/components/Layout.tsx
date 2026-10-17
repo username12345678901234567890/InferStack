@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, BookOpen, Boxes, ChevronDown, CreditCard, Github, KeyRound, LogOut, Menu, MessageSquare, Moon, Search, Settings, Sun, Trophy, Upload, X } from 'lucide-react'
+import { Activity, ArrowRight, Boxes, ChevronDown, CreditCard, KeyRound, LogOut, Menu, Moon, Search, Settings, Sun, X } from 'lucide-react'
 import { Logo } from './Logo'
+import { OrgAvatar } from './ModelBits'
 import { Button, Toaster, cx } from './ui'
 import { useStore } from '../store'
 import { MODELS } from '../data/models'
@@ -10,12 +11,14 @@ import { buildProgress } from '../lib/build'
 
 const NAV = [
   { to: '/models', label: '모델' },
-  { to: '/chat', label: '채팅' },
   { to: '/rankings', label: '랭킹' },
   { to: '/deploy', label: '모델 업로드' },
+  { to: '/chat', label: '채팅' },
   { to: '/docs', label: '문서' },
   { to: '/pricing', label: '가격' },
 ]
+
+export const CONTAINER = 'mx-auto w-full max-w-[1200px] px-5 sm:px-8'
 
 function useBuildTicker() {
   const models = useStore((s) => s.customModels)
@@ -37,11 +40,13 @@ function useBuildTicker() {
 function GlobalSearch() {
   const [q, setQ] = useState('')
   const [open, setOpen] = useState(false)
+  const [sel, setSel] = useState(0)
   const nav = useNavigate()
   const ref = useRef<HTMLInputElement>(null)
   useEffect(() => {
     const h = (e: KeyboardEvent) => {
-      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA')) {
+      const typing = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName ?? '')
+      if ((e.key === 'k' && (e.metaKey || e.ctrlKey)) || (e.key === '/' && !typing)) {
         e.preventDefault()
         ref.current?.focus()
       }
@@ -49,40 +54,46 @@ function GlobalSearch() {
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [])
-  const results = q.trim()
-    ? MODELS.filter((m) => (m.name + m.slug + m.orgName).toLowerCase().includes(q.toLowerCase())).slice(0, 7)
-    : []
+  const results = q.trim() ? MODELS.filter((m) => (m.name + m.slug + m.orgName + m.architecture).toLowerCase().includes(q.toLowerCase())).slice(0, 7) : []
+  const go = (slug?: string) => {
+    nav(slug ? `/models/${slug}` : `/models?q=${encodeURIComponent(q)}`)
+    setOpen(false)
+    setQ('')
+    ref.current?.blur()
+  }
   return (
-    <div className="relative hidden w-64 lg:block">
-      <Search size={15} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+    <div className="relative hidden w-56 lg:block">
+      <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg3" />
       <input
         ref={ref}
         value={q}
         onChange={(e) => {
           setQ(e.target.value)
+          setSel(0)
           setOpen(true)
         }}
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
         onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            if (results[0]) nav(`/models/${results[0].slug}`)
-            else nav(`/models?q=${encodeURIComponent(q)}`)
-            setOpen(false)
-            ref.current?.blur()
-          }
+          if (e.key === 'ArrowDown') setSel((s) => Math.min(s + 1, results.length - 1))
+          if (e.key === 'ArrowUp') setSel((s) => Math.max(s - 1, 0))
+          if (e.key === 'Enter') go(results[sel]?.slug)
+          if (e.key === 'Escape') ref.current?.blur()
         }}
         placeholder="모델 검색"
-        className="h-9 w-full rounded-lg border border-slate-200 bg-slate-50 pl-8 pr-10 text-sm placeholder:text-slate-400 focus:border-brand-500 focus:outline-none dark:border-white/10 dark:bg-white/5"
+        className="h-8 w-full rounded-lg border border-line bg-panel pl-8 pr-10 text-[13px] text-fg placeholder:text-fg3 focus:border-line2 focus:outline-none"
       />
-      <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-slate-300 px-1.5 font-mono text-[10px] text-slate-400 dark:border-white/15">/</kbd>
+      <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-line px-1 font-mono text-[10px] text-fg3">⌘K</kbd>
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-11 z-50 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-white/10 dark:bg-slate-900">
-          {results.map((m) => (
-            <Link key={m.slug} to={`/models/${m.slug}`} className="block px-3 py-2 hover:bg-slate-50 dark:hover:bg-white/5">
-              <div className="text-sm font-medium">{m.name}</div>
-              <div className="font-mono text-[11px] text-slate-500">{m.slug}</div>
-            </Link>
+        <div className="absolute left-0 top-10 z-50 w-80 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
+          {results.map((m, i) => (
+            <button key={m.slug} onMouseDown={() => go(m.slug)} className={cx('flex w-full items-center gap-2.5 px-3 py-2 text-left', i === sel ? 'bg-raised' : 'hover:bg-raised')}>
+              <OrgAvatar org={m.org} name={m.orgName} size={22} />
+              <span className="min-w-0">
+                <span className="block truncate text-[13px] font-medium">{m.name}</span>
+                <span className="block truncate font-mono text-[11px] text-fg3">{m.slug}</span>
+              </span>
+            </button>
           ))}
         </div>
       )}
@@ -99,44 +110,94 @@ function UserMenu() {
   useEffect(() => setOpen(false), [loc.pathname])
   if (!user)
     return (
-      <Link to="/signin">
-        <Button size="sm">로그인</Button>
-      </Link>
+      <>
+        <Link to="/signin">
+          <Button variant="ghost" size="sm">
+            로그인
+          </Button>
+        </Link>
+        <Link to="/signin">
+          <Button size="sm">시작하기</Button>
+        </Link>
+      </>
     )
   const items = [
-    { to: '/credits', label: '크레딧', icon: CreditCard },
     { to: '/keys', label: 'API 키', icon: KeyRound },
+    { to: '/credits', label: '크레딧', icon: CreditCard },
     { to: '/activity', label: '활동', icon: Activity },
     { to: '/my-models', label: '내 모델', icon: Boxes },
     { to: '/settings', label: '설정', icon: Settings },
   ]
   return (
-    <div className="relative">
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-white/5">
-        <span className="hidden text-xs font-medium text-slate-500 sm:inline">{fmtUSD(credits)}</span>
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-500 text-xs font-bold text-white">{user.name[0]}</span>
-        <ChevronDown size={14} className="text-slate-400" />
+    <div className="relative flex items-center gap-1.5">
+      <Link to="/keys" className="hidden sm:block">
+        <Button size="sm">API 키</Button>
+      </Link>
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 rounded-lg py-1 pl-1 pr-1.5 hover:bg-raised">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-line2 bg-raised text-[12px] font-semibold">{user.name[0]}</span>
+        <ChevronDown size={13} className="text-fg3" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-xl dark:border-white/10 dark:bg-slate-900">
-            <div className="border-b border-slate-200 px-3 py-2 dark:border-white/10">
+          <div className="absolute right-0 top-11 z-50 w-60 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
+            <div className="border-b border-line px-3.5 py-2.5">
               <div className="text-sm font-medium">{user.name}</div>
-              <div className="text-xs text-slate-500">{user.email}</div>
+              <div className="text-xs text-fg3">{user.email}</div>
+              <div className="tabular mt-2 flex items-center justify-between rounded-lg bg-raised px-2.5 py-1.5 font-mono text-xs">
+                <span className="font-sans text-fg3">크레딧</span>
+                {fmtUSD(credits)}
+              </div>
             </div>
             {items.map((it) => (
-              <Link key={it.to} to={it.to} className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-slate-50 dark:hover:bg-white/5">
-                <it.icon size={15} className="text-slate-400" /> {it.label}
-                {it.to === '/credits' && <span className="ml-auto text-xs text-slate-500">{fmtUSD(credits)}</span>}
+              <Link key={it.to} to={it.to} className="flex items-center gap-2.5 px-3.5 py-2 text-[13px] text-fg2 hover:bg-raised hover:text-fg">
+                <it.icon size={14} /> {it.label}
               </Link>
             ))}
-            <button onClick={signOut} className="flex w-full items-center gap-2 border-t border-slate-200 px-3 py-2 text-sm text-rose-500 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5">
-              <LogOut size={15} /> 로그아웃
+            <button onClick={signOut} className="flex w-full items-center gap-2.5 border-t border-line px-3.5 py-2 text-[13px] text-fg2 hover:bg-raised hover:text-fg">
+              <LogOut size={14} /> 로그아웃
             </button>
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+function Announcement() {
+  const [hidden, setHidden] = useState(() => {
+    try {
+      return localStorage.getItem('is-ann-glm53') === '1'
+    } catch {
+      return false
+    }
+  })
+  if (hidden) return null
+  return (
+    <div className="relative border-b border-line bg-panel">
+      <div className={cx(CONTAINER, 'flex h-9 items-center justify-center gap-2 pr-10 text-[12.5px] sm:pr-8')}>
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+        <span className="truncate text-fg2">
+          <span className="font-medium text-fg">GLM-5.3, LFM2.5-24B-A2B, Ling-3.1-flash</span> 지원을 시작했습니다
+        </span>
+        <Link to="/models?sort=newest" className="hidden shrink-0 items-center gap-1 font-medium text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg sm:inline-flex">
+          새 모델 보기 <ArrowRight size={12} />
+        </Link>
+      </div>
+      <button
+        onClick={() => {
+          setHidden(true)
+          try {
+            localStorage.setItem('is-ann-glm53', '1')
+          } catch {
+            /* ignore */
+          }
+        }}
+        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-fg3 hover:text-fg"
+        aria-label="공지 닫기"
+      >
+        <X size={13} />
+      </button>
     </div>
   )
 }
@@ -155,42 +216,38 @@ export function Layout() {
     document.documentElement.classList.toggle('dark', theme === 'dark')
   }, [theme])
   const isChat = loc.pathname.startsWith('/chat')
+  const isHome = loc.pathname === '/'
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur dark:border-white/10 dark:bg-[#070a14]/80">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4">
-          <Link to="/" className="shrink-0">
+      {isHome && <Announcement />}
+      <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
+        <div className={cx(CONTAINER, 'flex h-14 items-center gap-7', isChat && 'max-w-none')}>
+          <Link to="/" className="shrink-0" aria-label="InferStack 홈">
             <Logo />
           </Link>
-          <GlobalSearch />
-          <nav className="ml-auto hidden items-center gap-0.5 md:flex">
+          <nav className="hidden items-center gap-5 md:flex">
             {NAV.map((n) => (
-              <NavLink
-                key={n.to}
-                to={n.to}
-                className={({ isActive }) =>
-                  cx('rounded-md px-3 py-1.5 text-sm font-medium transition-colors', isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white')
-                }
-              >
+              <NavLink key={n.to} to={n.to} className={({ isActive }) => cx('text-[13.5px] transition-colors', isActive ? 'text-fg' : 'text-fg2 hover:text-fg')}>
                 {n.label}
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-1 md:ml-2">
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-white/5" title="테마 전환">
-              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
+          <div className="ml-auto flex items-center gap-2">
+            <GlobalSearch />
+            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-lg p-2 text-fg3 hover:bg-raised hover:text-fg" title="테마 전환" aria-label="테마 전환">
+              {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <UserMenu />
-            <button className="rounded-lg p-2 md:hidden" onClick={() => setMobile(!mobile)}>
+            <button className="rounded-lg p-2 text-fg2 md:hidden" onClick={() => setMobile(!mobile)} aria-label="메뉴">
               {mobile ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
         {mobile && (
-          <nav className="border-t border-slate-200 px-4 py-2 md:hidden dark:border-white/10">
+          <nav className="border-t border-line px-5 py-2 md:hidden">
             {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} className="block rounded-md px-2 py-2 text-sm">
+              <NavLink key={n.to} to={n.to} className="block py-2.5 text-[15px] text-fg2">
                 {n.label}
               </NavLink>
             ))}
@@ -198,7 +255,7 @@ export function Layout() {
         )}
       </header>
 
-      <main className={cx('flex-1', !isChat && 'mx-auto w-full max-w-7xl px-4 py-8')}>
+      <main className={cx('flex-1', !isChat && !isHome && cx(CONTAINER, 'py-10'))}>
         <Outlet />
       </main>
 
@@ -210,42 +267,25 @@ export function Layout() {
 
 function Footer() {
   const cols = [
-    { title: '제품', links: [['모델', '/models'], ['채팅', '/chat'], ['랭킹', '/rankings'], ['가격', '/pricing']] },
-    { title: '개발자', links: [['문서', '/docs'], ['API 레퍼런스', '/docs#api'], ['CLI', '/docs#cli'], ['아키텍처 패키지', '/docs#arch']] },
-    { title: '모델 제공자', links: [['모델 업로드', '/deploy'], ['내 모델', '/my-models'], ['수익 정산', '/credits']] },
+    { title: '제품', links: [['모델', '/models'], ['랭킹', '/rankings'], ['채팅', '/chat'], ['가격', '/pricing']] },
+    { title: '개발자', links: [['빠른 시작', '/docs#quickstart'], ['API 레퍼런스', '/docs#api'], ['CLI', '/docs#cli'], ['아키텍처 패키지', '/docs#arch']] },
+    { title: '모델 업로드', links: [['Hugging Face', '/deploy/new?source=huggingface'], ['ModelScope', '/deploy/new?source=modelscope'], ['CLI 업로드', '/deploy/new?source=cli'], ['내 모델', '/my-models']] },
     { title: '계정', links: [['API 키', '/keys'], ['크레딧', '/credits'], ['활동', '/activity'], ['설정', '/settings']] },
   ]
   return (
-    <footer className="border-t border-slate-200 dark:border-white/10">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-6">
-        <div className="md:col-span-2">
+    <footer className="border-t border-line">
+      <div className={cx(CONTAINER, 'grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(4,1fr)]')}>
+        <div>
           <Logo />
-          <p className="mt-3 max-w-xs text-sm text-slate-500">최신 오픈소스 LLM을 하나의 OpenAI 호환 API로. 내 모델을 올리면 몇 분 만에 서버리스 엔드포인트가 됩니다.</p>
-          <div className="mt-4 flex gap-3 text-slate-400">
-            <a href="https://github.com" target="_blank" rel="noreferrer" className="hover:text-slate-700 dark:hover:text-white">
-              <Github size={18} />
-            </a>
-            <Link to="/docs" className="hover:text-slate-700 dark:hover:text-white">
-              <BookOpen size={18} />
-            </Link>
-            <Link to="/chat" className="hover:text-slate-700 dark:hover:text-white">
-              <MessageSquare size={18} />
-            </Link>
-            <Link to="/rankings" className="hover:text-slate-700 dark:hover:text-white">
-              <Trophy size={18} />
-            </Link>
-            <Link to="/deploy" className="hover:text-slate-700 dark:hover:text-white">
-              <Upload size={18} />
-            </Link>
-          </div>
+          <p className="mt-4 max-w-[17rem] text-[13px] leading-relaxed text-fg3">오픈 웨이트 모델을 위한 추론 API. 카탈로그 모델과 직접 올린 모델을 같은 엔드포인트에서 호출합니다.</p>
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <div className="text-sm font-semibold">{c.title}</div>
-            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+            <div className="text-[13px] font-medium">{c.title}</div>
+            <ul className="mt-4 space-y-2.5 text-[13px] text-fg3">
               {c.links.map(([l, to]) => (
                 <li key={l}>
-                  <Link to={to} className="hover:text-slate-900 dark:hover:text-white">
+                  <Link to={to} className="transition-colors hover:text-fg">
                     {l}
                   </Link>
                 </li>
@@ -254,8 +294,11 @@ function Footer() {
           </div>
         ))}
       </div>
-      <div className="border-t border-slate-200 py-5 text-center text-xs text-slate-500 dark:border-white/10">
-        © 2026 InferStack · 프론트엔드 데모 — 실제 추론·결제는 수행되지 않습니다
+      <div className="border-t border-line">
+        <div className={cx(CONTAINER, 'flex flex-col justify-between gap-2 py-6 text-xs text-fg3 sm:flex-row')}>
+          <span>© 2026 InferStack</span>
+          <span>프론트엔드 데모입니다. 추론, 결제, 배포는 시뮬레이션이며 사용량 수치는 예시 데이터입니다.</span>
+        </div>
       </div>
     </footer>
   )

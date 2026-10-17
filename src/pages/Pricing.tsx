@@ -17,7 +17,7 @@ export default function Pricing() {
       <PageHeader title="가격" description="구독 없이 사용한 토큰만큼만. 모든 가격은 USD / 100만 토큰 기준입니다." />
       <div className="grid gap-4 md:grid-cols-3">
         {plans.map((p) => (
-          <Card key={p.name} className={p.hi ? 'relative border-brand-500 p-6 ring-2 ring-brand-500/20' : 'p-6'}>
+          <Card key={p.name} className={p.hi ? 'relative border-fg/40 p-6 ring-1 ring-fg/10' : 'p-6'}>
             {p.hi && <Badge color="brand" className="absolute right-4 top-4">인기</Badge>}
             <div className="font-semibold">{p.name}</div>
             <div className="mt-2 text-3xl font-bold tracking-tight">{p.price}</div>
@@ -48,7 +48,7 @@ export default function Pricing() {
             {[...MODELS].sort((a, b) => a.orgName.localeCompare(b.orgName)).map((m) => (
               <tr key={m.slug} className="border-b border-slate-100 last:border-0 dark:border-white/5">
                 <td className="px-4 py-2.5">
-                  <Link to={`/models/${m.slug}`} className="flex items-center gap-2 hover:text-brand-500">
+                  <Link to={`/models/${m.slug}`} className="flex items-center gap-2 hover:text-fg">
                     <OrgAvatar org={m.org} name={m.orgName} size={20} /> {m.name} {m.free && <Badge color="green">무료 티어</Badge>}
                   </Link>
                 </td>
