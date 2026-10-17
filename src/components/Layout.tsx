@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, ArrowRight, Boxes, ChevronDown, CreditCard, KeyRound, LogOut, Menu, Moon, Search, Settings, Sun, X } from 'lucide-react'
+import { Activity, Boxes, ChevronDown, CreditCard, KeyRound, LogOut, Menu, Moon, Search, Settings, Sun, X } from 'lucide-react'
 import { Logo } from './Logo'
 import { OrgAvatar } from './ModelBits'
 import { Button, Toaster, cx } from './ui'
@@ -164,44 +164,6 @@ function UserMenu() {
   )
 }
 
-function Announcement() {
-  const [hidden, setHidden] = useState(() => {
-    try {
-      return localStorage.getItem('is-ann-glm53') === '1'
-    } catch {
-      return false
-    }
-  })
-  if (hidden) return null
-  return (
-    <div className="relative border-b border-line bg-panel">
-      <div className={cx(CONTAINER, 'flex h-9 items-center justify-center gap-2 pr-10 text-[12.5px] sm:pr-8')}>
-        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-        <span className="truncate text-fg2">
-          <span className="font-medium text-fg">GLM-5.3, LFM2.5-24B-A2B, Ling-3.1-flash</span> 지원을 시작했습니다
-        </span>
-        <Link to="/models?sort=newest" className="hidden shrink-0 items-center gap-1 font-medium text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg sm:inline-flex">
-          새 모델 보기 <ArrowRight size={12} />
-        </Link>
-      </div>
-      <button
-        onClick={() => {
-          setHidden(true)
-          try {
-            localStorage.setItem('is-ann-glm53', '1')
-          } catch {
-            /* ignore */
-          }
-        }}
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-fg3 hover:text-fg"
-        aria-label="공지 닫기"
-      >
-        <X size={13} />
-      </button>
-    </div>
-  )
-}
-
 export function Layout() {
   useBuildTicker()
   const theme = useStore((s) => s.theme)
@@ -220,7 +182,6 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      {isHome && <Announcement />}
       <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
         <div className={cx(CONTAINER, 'flex h-14 items-center gap-7', isChat && 'max-w-none')}>
           <Link to="/" className="shrink-0" aria-label="InferStack 홈">

@@ -1,14 +1,14 @@
 import { useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
-import { LayoutList, Search, Table2 } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Search } from 'lucide-react'
 import { CAPABILITY_LABEL, ORGS, weeklyTokens } from '../data/models'
 import type { Capability, Modality } from '../data/types'
-import { ModelFlags, ModelRow, OrgAvatar, modelHref } from '../components/ModelBits'
-import { Button, Card, Input, Segmented, Select, cx } from '../components/ui'
-import { fmtCtx, fmtParams, fmtPrice, fmtTokens } from '../lib/format'
+import { OrgAvatar } from '../components/ModelBits'
+import { ModelTable, speedOf } from '../components/ModelTable'
+import { Input, Segmented, Select, cx } from '../components/ui'
 import { useAllModels } from '../lib/catalog'
 
-type Sort = 'popular' | 'newest' | 'price-asc' | 'price-desc' | 'context' | 'params'
+type Sort = 'popular' | 'newest' | 'price-asc' | 'price-desc' | 'context' | 'params' | 'fast'
 
 const CTX_OPTS = [
   [0, '전체'],
@@ -28,7 +28,6 @@ export default function Models() {
   const [minCtx, setMinCtx] = useState(0)
   const [maxPrice, setMaxPrice] = useState(5)
   const [freeOnly, setFreeOnly] = useState(false)
-  const [view, setView] = useState<'list' | 'table'>('list')
 
   const list = useMemo(() => {
     const ql = q.trim().toLowerCase()
@@ -61,6 +60,9 @@ export default function Models() {
         break
       case 'params':
         s.sort((a, b) => b.params - a.params)
+        break
+      case 'fast':
+        s.sort((a, b) => speedOf(b) - speedOf(a))
         break
     }
     return s
@@ -109,9 +111,9 @@ export default function Models() {
           </div>
         </FilterGroup>
         <FilterGroup title={`최대 출력 가격: ${maxPrice >= 5 ? '제한 없음' : `$${maxPrice.toFixed(2)}/M`}`}>
-          <input type="range" min={0.05} max={5} step={0.05} value={maxPrice} onChange={(e) => setMaxPrice(+e.target.value)} className="w-full accent-brand-600" />
+          <input type="range" min={0.05} max={5} step={0.05} value={maxPrice} onChange={(e) => setMaxPrice(+e.target.value)} className="w-full accent-fg" />
           <label className="mt-2 flex items-center gap-2 text-slate-600 dark:text-slate-300">
-            <input type="checkbox" checked={freeOnly} onChange={(e) => setFreeOnly(e.target.checked)} className="accent-brand-600" /> 무료 티어만
+            <input type="checkbox" checked={freeOnly} onChange={(e) => setFreeOnly(e.target.checked)} className="accent-fg" /> 무료 티어만
           </label>
         </FilterGroup>
         <FilterGroup title="기능">
@@ -127,7 +129,7 @@ export default function Models() {
           <div className="space-y-1">
             {ORGS.map((o) => (
               <label key={o.id} className="flex cursor-pointer items-center gap-2 rounded-md px-1 py-1 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/5">
-                <input type="checkbox" checked={orgs.includes(o.id)} onChange={() => toggle(orgs, o.id, setOrgs)} className="accent-brand-600" />
+                <input type="checkbox" checked={orgs.includes(o.id)} onChange={() => toggle(orgs, o.id, setOrgs)} className="accent-fg" />
                 <OrgAvatar org={o.id} name={o.name} size={18} />
                 {o.name}
               </label>
@@ -137,90 +139,36 @@ export default function Models() {
       </aside>
 
       <div>
-        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight">모델</h1>
-            <p className="text-sm text-slate-500">{list.length}개 모델</p>
+            <h1 className="text-[26px] font-semibold tracking-[-0.03em]">모델</h1>
+            <p className="tabular mt-1 text-[14px] text-fg2">{list.length}개</p>
           </div>
-          <div className="flex flex-1 items-center gap-2 sm:justify-end">
-            <div className="relative w-full sm:max-w-xs">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="이름, 제공자, 아키텍처…" className="pl-9" />
+          <div className="flex flex-1 items-center gap-2 sm:max-w-md">
+            <div className="relative min-w-0 flex-1">
+              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg3" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="이름, 제작사, 아키텍처" className="pl-9" aria-label="모델 검색" />
             </div>
-            <Select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="w-auto">
-              <option value="popular">인기순 (토큰)</option>
-              <option value="newest">최신순</option>
-              <option value="price-asc">가격 낮은순</option>
-              <option value="price-desc">가격 높은순</option>
-              <option value="context">컨텍스트 긴순</option>
-              <option value="params">파라미터 큰순</option>
+            <Select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="w-auto" aria-label="정렬">
+              <option value="popular">많이 쓰는</option>
+              <option value="newest">최신</option>
+              <option value="price-asc">저렴한</option>
+              <option value="fast">빠른</option>
+              <option value="context">컨텍스트 긴</option>
+              <option value="params">파라미터 큰</option>
             </Select>
-            <Segmented
-              value={view}
-              onChange={setView}
-              options={[
-                { id: 'list', label: <LayoutList size={14} /> },
-                { id: 'table', label: <Table2 size={14} /> },
-              ]}
-            />
           </div>
         </div>
 
-        {list.length === 0 && (
-          <Card className="p-10 text-center text-sm text-slate-500">
+        {list.length === 0 ? (
+          <div className="border-t border-line py-16 text-center text-[14px] text-fg2">
             조건에 맞는 모델이 없습니다.{' '}
-            <Button variant="ghost" size="sm" onClick={reset}>
+            <button onClick={reset} className="text-fg underline underline-offset-4">
               필터 초기화
-            </Button>
-          </Card>
-        )}
-
-        {view === 'list' ? (
-          <div className="space-y-3">
-            {list.map((m) => (
-              <ModelRow key={m.slug} m={m} />
-            ))}
+            </button>
           </div>
         ) : (
-          list.length > 0 && (
-            <Card className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-left text-xs text-slate-500">
-                  <tr className="border-b border-slate-200 dark:border-white/10">
-                    <th className="px-4 py-3 font-medium">모델</th>
-                    <th className="px-3 py-3 font-medium">파라미터</th>
-                    <th className="px-3 py-3 font-medium">컨텍스트</th>
-                    <th className="px-3 py-3 text-right font-medium">입력 $/M</th>
-                    <th className="px-3 py-3 text-right font-medium">출력 $/M</th>
-                    <th className="px-3 py-3 text-right font-medium">주간 토큰</th>
-                    <th className="px-3 py-3 font-medium">공개일</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {list.map((m) => (
-                    <tr key={m.slug} className="border-b border-slate-100 last:border-0 hover:bg-slate-50 dark:border-white/5 dark:hover:bg-white/[0.03]">
-                      <td className="px-4 py-2.5">
-                        <Link to={modelHref(m)} className="flex items-center gap-2">
-                          <OrgAvatar org={m.org} name={m.orgName} size={22} />
-                          <span className="font-medium hover:text-fg">{m.name}</span>
-                          <ModelFlags m={m} />
-                        </Link>
-                      </td>
-                      <td className="px-3 py-2.5 text-slate-500">
-                        {fmtParams(m.params)}
-                        {m.activeParams ? <span className="text-xs"> / {fmtParams(m.activeParams)}</span> : null}
-                      </td>
-                      <td className="px-3 py-2.5 text-slate-500">{fmtCtx(m.context)}</td>
-                      <td className="px-3 py-2.5 text-right font-mono">{fmtPrice(m.price.input)}</td>
-                      <td className="px-3 py-2.5 text-right font-mono">{fmtPrice(m.price.output)}</td>
-                      <td className="px-3 py-2.5 text-right text-slate-500">{fmtTokens(weeklyTokens(m))}</td>
-                      <td className="px-3 py-2.5 text-slate-500">{m.released}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </Card>
-          )
+          <ModelTable models={list} />
         )}
       </div>
     </div>

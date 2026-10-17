@@ -52,19 +52,22 @@ export function Badge({ children, color = 'slate', className }: { children: Reac
   return <span className={cx('inline-flex items-center gap-1 rounded-[5px] border px-1.5 font-mono text-[10.5px] font-medium uppercase leading-[18px] tracking-wide', map[color], className)}>{children}</span>
 }
 
-const fieldBase = 'w-full rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/40 focus:outline-none'
+const fieldBase = 'rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/40 focus:outline-none'
+
+/** 너비 클래스를 넘기지 않으면 w-full */
+const width = (className?: string) => (/(^|\s)(w-|min-w-|flex-1)/.test(className ?? '') ? '' : 'w-full')
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cx(fieldBase, 'h-9', className)} {...rest} />
+  return <input className={cx(fieldBase, 'h-9', width(className), className)} {...rest} />
 }
 
 export function Textarea({ className, ...rest }: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={cx(fieldBase, 'py-2', className)} {...rest} />
+  return <textarea className={cx(fieldBase, 'py-2', width(className), className)} {...rest} />
 }
 
 export function Select({ className, children, ...rest }: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select className={cx(fieldBase, 'h-9 pr-8', className)} {...rest}>
+    <select className={cx(fieldBase, 'h-9 pr-8', width(className), className)} {...rest}>
       {children}
     </select>
   )

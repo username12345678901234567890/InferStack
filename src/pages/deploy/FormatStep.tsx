@@ -61,7 +61,7 @@ export function FormatStep({ s, set }: { s: WizardState; set: Setter }) {
               const rec = g.quant === 'Q4_K_M' || g.quant === 'UD-Q4_K_XL'
               return (
                 <label key={g.quant} className={cx('flex cursor-pointer items-center gap-3 border-b border-slate-100 px-5 py-2.5 text-sm last:border-0 dark:border-white/5', s.ggufQuant === g.quant ? 'bg-brand-500/5' : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]')}>
-                  <input type="radio" name="quant" checked={s.ggufQuant === g.quant} onChange={() => set({ ggufQuant: g.quant })} className="accent-brand-600" />
+                  <input type="radio" name="quant" checked={s.ggufQuant === g.quant} onChange={() => set({ ggufQuant: g.quant })} className="accent-fg" />
                   <span className="w-28 font-mono font-medium">{g.quant}</span>
                   <span className="min-w-0 flex-1 truncate font-mono text-xs text-slate-500">{g.label}</span>
                   {rec && <Badge color="green">추천</Badge>}

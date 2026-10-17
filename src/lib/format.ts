@@ -29,9 +29,11 @@ export function fmtUSD(n: number, digits = 2): string {
   return '$' + n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 
+/** $/1M 토큰 가격. 소수점은 최소 2자리, 필요할 때만 3자리 (0.08, 0.035, 1.10) */
 export function fmtPrice(perMillion: number): string {
   if (perMillion === 0) return '무료'
-  return '$' + (perMillion < 0.1 ? perMillion.toFixed(3) : perMillion.toFixed(2))
+  const three = perMillion.toFixed(3)
+  return '$' + (three.endsWith('0') ? perMillion.toFixed(2) : three)
 }
 
 export function fmtBytes(n: number): string {

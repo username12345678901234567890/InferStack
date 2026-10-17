@@ -230,7 +230,7 @@ function KeyForm({ open, onClose, onSubmit, initial }: { open: boolean; onClose:
           <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2 dark:border-white/10">
             {MODELS.map((m) => (
               <label key={m.slug} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm hover:bg-slate-50 dark:hover:bg-white/5">
-                <input type="checkbox" className="accent-brand-600" checked={allowed.includes(m.slug)} onChange={() => setAllowed(allowed.includes(m.slug) ? allowed.filter((x) => x !== m.slug) : [...allowed, m.slug])} />
+                <input type="checkbox" className="accent-fg" checked={allowed.includes(m.slug)} onChange={() => setAllowed(allowed.includes(m.slug) ? allowed.filter((x) => x !== m.slug) : [...allowed, m.slug])} />
                 <span className="font-mono text-xs">{m.slug}</span>
               </label>
             ))}
