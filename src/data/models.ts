@@ -35,18 +35,18 @@ const TIA: Modality[] = ['text', 'image', 'audio']
 
 const ROWS: Row[] = [
   ['deepseek/deepseek-v4.1-flash', 'DeepSeek V4.1 Flash', 'deepseek-ai/DeepSeek-V4.1-Flash', 'DeepseekV41ForCausalLM', 763.2e9, undefined, 1048576, 'mit', '2026-09-10', TI, ['reasoning', 'tools', 'vision', 'long-context', 'coding'], 0.28, 1.1, 4556, 1276459,
-    'The latest Flash update in the DeepSeek V4 line. A large MoE with 1M context and image input — strong value for general agents and coding, and a sensible default.', { isNew: true }],
+    'The latest Flash update in the DeepSeek V4 line. A large MoE with 1M context and image input. Good value for agents and coding, and a sensible default.', { isNew: true }],
   ['deepseek/deepseek-v4-pro', 'DeepSeek V4 Pro (0813)', 'deepseek-ai/DeepSeek-V4-Pro-0813', 'DeepseekV4ForCausalLM', 1650.5e9, undefined, 1048576, 'mit', '2026-08-13', T, ['reasoning', 'tools', 'long-context', 'coding', 'agent'], 0.85, 3.4, 897, 157814,
     'DeepSeek V4\'s flagship Pro checkpoint (0813). A 1.65T-parameter MoE tuned for hard reasoning and long-context work.'],
   ['deepseek/deepseek-v4-flash-vision-exp', 'DeepSeek V4 Flash Vision (Exp)', 'deepseek-ai/DeepSeek-V4-Flash-Vision-Exp', 'DeepseekV4ForCausalLM', 304.6e9, undefined, 1048576, 'mit', '2026-08-31', TI, ['vision', 'tools', 'long-context'], 0.18, 0.7, 952, 480973,
     'Experimental vision-language model built on DeepSeek V4 Flash. Specialized in documents, charts and screenshots.', { preview: true }],
   ['deepseek/deepseek-v3.2', 'DeepSeek V3.2', 'deepseek-ai/DeepSeek-V3.2', 'DeepseekV32ForCausalLM', 685.4e9, 37e9, 163840, 'mit', '2025-12-01', T, ['reasoning', 'tools', 'coding'], 0.26, 0.4, 1580, 4972497,
-    'DeepSeek V3.2 with sparse attention (DSA). Proven, stable and cheap — still one of the most used models.'],
+    'DeepSeek V3.2 with sparse attention (DSA). Stable, cheap and still one of the most used models.'],
 
   ['qwen/qwen3.8-2.4t-a95b', 'Qwen3.8 2.4T A95B', 'Qwen/Qwen3.8-2.4T-A95B', 'Qwen3_5MoeForCausalLM', 2446.2e9, 95e9, 262144, 'qwen', '2026-08-08', T, ['reasoning', 'tools', 'multilingual', 'coding', 'agent'], 1.2, 4.8, 1313, 31991,
     'The largest Qwen ever: a 2.4T-parameter MoE with 95B active. Flagship open-weight reasoning and multilingual quality.'],
   ['qwen/qwen3.8-flash-next', 'Qwen3.8 Flash Next', 'Qwen/Qwen3.8-Flash-Next', 'Qwen4ExpForConditionalGeneration', 180e9, undefined, 262144, 'qwen', '2026-08-24', TI, ['vision', 'tools', 'multilingual', 'agent'], 0.15, 0.6, 6271, 2379596,
-    'Fast multimodal model on the next-gen (Qwen4 experimental) architecture. Built for low-latency, high-throughput production traffic.', { isNew: true }],
+    'Fast multimodal model on the experimental Qwen4 architecture. Built for low-latency, high-throughput production traffic.', { isNew: true }],
   ['qwen/qwen3.8-27b', 'Qwen3.8 27B', 'Qwen/Qwen3.8-27B', 'Qwen3_5ForConditionalGeneration', 27.8e9, undefined, 262144, 'apache-2.0', '2026-08-05', TI, ['vision', 'tools', 'reasoning', 'multilingual'], 0.08, 0.32, 17830, 7516626,
     'The most popular open model on Hugging Face. A 27B dense multimodal model, widely used for single-GPU serving and as a fine-tuning base.', { free: true }],
   ['qwen/qwen3-coder-next', 'Qwen3 Coder Next', 'Qwen/Qwen3-Coder-Next', 'Qwen3NextForCausalLM', 79.7e9, 3e9, 262144, 'apache-2.0', '2026-01-30', T, ['coding', 'tools', 'agent', 'long-context'], 0.14, 0.55, 1698, 515484,
@@ -59,7 +59,7 @@ const ROWS: Row[] = [
   ['z-ai/glm-5.2', 'GLM-5.2', 'zai-org/GLM-5.2', 'GlmMoeDsaForCausalLM', 753.3e9, undefined, 1048576, 'mit', '2026-06-16', T, ['reasoning', 'coding', 'agent', 'tools', 'long-context'], 0.55, 2.0, 5182, 480170,
     'GLM-5.2 under the MIT license. Few commercial restrictions, widely adopted by enterprises.'],
   ['z-ai/glm-4.7-flash', 'GLM-4.7 Flash', 'zai-org/GLM-4.7-Flash', 'Glm4MoeLiteForCausalLM', 31.2e9, undefined, 202752, 'mit', '2026-01-19', T, ['tools', 'coding', 'multilingual'], 0.06, 0.4, 1879, 1260693,
-    'The lightweight Flash version of GLM-4.7. Fast and cheap — great for classification, summarization and RAG.', { free: true }],
+    'The lightweight Flash version of GLM-4.7. Fast and cheap. Use it for classification, summarization and RAG.', { free: true }],
 
   ['moonshotai/kimi-k3', 'Kimi K3', 'moonshotai/Kimi-K3', 'KimiK3ForConditionalGeneration', 2779.9e9, undefined, 1048576, 'modified-mit', '2026-06-13', TI, ['reasoning', 'agent', 'tools', 'vision', 'long-context', 'coding'], 1.0, 4.0, 11743, 1052786,
     'Moonshot AI\'s 2.8T-parameter multimodal agent model. Long-horizon autonomous tasks with 1M context.'],
@@ -69,7 +69,7 @@ const ROWS: Row[] = [
     'A 1T-parameter multimodal MoE. Excellent agent-swarm behavior and reliable tool calling.'],
 
   ['minimax/minimax-m2.7', 'MiniMax M2.7', 'MiniMaxAI/MiniMax-M2.7', 'MiniMaxM2ForCausalLM', 228.7e9, 10e9, 204800, 'other', '2026-04-09', T, ['coding', 'agent', 'tools'], 0.3, 1.2, 1256, 615924,
-    'Agentic coding model with few active parameters — fast and cheap. Supports interleaved thinking.'],
+    'Agentic coding model with few active parameters, so it is fast and cheap. Supports interleaved thinking.'],
 
   ['xiaomi/mimo-v2.6-pro', 'MiMo V2.6 Pro', 'XiaomiMiMo/MiMo-V2.6-Pro-RL', 'MiMoV2ForCausalLM', 1024.2e9, undefined, 1048576, 'mit', '2026-09-21', T, ['reasoning', 'coding', 'tools', 'long-context'], 0.7, 2.8, 736, 100156,
     'Xiaomi MiMo V2.6 Pro RL checkpoint. A 1T-class model with math and coding reasoning boosted by RL.', { isNew: true }],
@@ -94,7 +94,7 @@ const ROWS: Row[] = [
     'The small gpt-oss. Low-latency reasoning that runs on edge and local-class hardware.', { free: true }],
 
   ['liquid/lfm2.5-24b-a2b', 'LFM2.5 24B A2B', 'LiquidAI/LFM2.5-24B-A2B', 'Lfm2MoeForCausalLM', 24e9, 2e9, 131072, 'lfm-open', '2026-10-12', T, ['tools', 'multilingual'], 0.03, 0.12, 412, 9356,
-    'Liquid AI\'s hybrid (convolution + attention) MoE. Ultra-low latency with 2B active — #1 on HF trending this week.', { isNew: true }],
+    'Liquid AI\'s hybrid (convolution + attention) MoE. Very low latency with 2B active parameters. Currently trending on Hugging Face.', { isNew: true }],
   ['inclusionai/ling-3.1-flash', 'Ling 3.1 Flash', 'inclusionAI/Ling-3.1-flash', 'BailingMoeV3ForCausalLM', 572.1e9, undefined, 262144, 'mit', '2026-10-13', T, ['reasoning', 'tools', 'multilingual'], 0.25, 1.0, 109, 1276,
     'inclusionAI\'s hybrid linear-attention MoE. Throughput holds up even on very long inputs.', { isNew: true }],
   ['tencent/hy4-preview', 'Hunyuan Hy4 Preview', 'tencent/Hy4-preview', 'HYV4ForCausalLM', 780e9, undefined, 1048576, 'apache-2.0', '2026-08-27', T, ['reasoning', 'long-context', 'multilingual'], 0.5, 2.0, 508, 22997,

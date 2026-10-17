@@ -27,7 +27,7 @@ export default function Credits() {
 
   return (
     <div>
-      <PageHeader title="Credits" description="Prepay for credits and pay only for the tokens you use. Pay with card — every purchase comes with an invoice and receipt." />
+      <PageHeader title="Credits" description="Prepay for credits and pay only for the tokens you use. Every card payment comes with an invoice and receipt." />
 
       <Card className="flex flex-col gap-6 p-6 sm:flex-row sm:items-end sm:justify-between">
         <div>

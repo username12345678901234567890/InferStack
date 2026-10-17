@@ -116,7 +116,7 @@ export default function Chat() {
       return
     }
     if (!m.free && useStore.getState().credits <= 0) {
-      patchMsg(cid, mid, { content: 'Not enough credits. Add credits on the Credits page — free-tier models work without credits.', streaming: false, error: true })
+      patchMsg(cid, mid, { content: 'Not enough credits. Add credits on the Credits page, or pick a free-tier model.', streaming: false, error: true })
       return
     }
     const ep = m.custom ? { region: 'us-east-1', throughput: 90, latency: 420 } : endpointsFor(m)[0]

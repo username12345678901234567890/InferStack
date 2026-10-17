@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { ArrowRight, Check, MessageSquare } from 'lucide-react'
 import { MODELS, ORGS, REGIONS, endpointsFor, findModel, weeklyTokens } from '../data/models'
 import { ARCHITECTURES } from '../data/architectures'
 import type { CatalogModel } from '../data/types'
 import { ModelFlags, OrgAvatar } from '../components/ModelBits'
-import { LogoMark } from '../components/Logo'
 import { ButtonLink, CopyButton, Segmented, buttonClass, cx, highlight } from '../components/ui'
 import { CONTAINER } from '../components/Layout'
-import { FallbackArt, LogosArt, MetricsArt, UploadArt } from './home/Illustrations'
 import { fmtCtx, fmtPrice, fmtTokens, fmtUSD } from '../lib/format'
 
 export default function Home() {
@@ -17,16 +15,14 @@ export default function Home() {
       <Hero />
       <Pulse />
       <Showcase />
-      <Features />
       <Start />
       <Upload />
-      <Global />
-      <Closing />
+      <Regions />
     </div>
   )
 }
 
-const SECTION = 'py-16 sm:py-24'
+const SECTION = 'py-16 sm:py-20'
 
 function useReducedMotion() {
   const [reduce, setReduce] = useState(false)
@@ -41,13 +37,12 @@ function useReducedMotion() {
 }
 
 /** Shared section heading: always left-aligned */
-function Head({ eyebrow, title, sub, action }: { eyebrow?: string; title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
+function Head({ title, sub, action }: { title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
       <div className="max-w-2xl">
-        {eyebrow && <div className="mb-3 text-[13px] font-medium text-accent">{eyebrow}</div>}
-        <h2 className="text-[30px] font-semibold leading-[1.15] tracking-[-0.025em] sm:text-[36px]">{title}</h2>
-        {sub && <p className="mt-3 text-[16px] leading-relaxed text-fg2">{sub}</p>}
+        <h2 className="text-[26px] font-semibold leading-[1.2] tracking-[-0.02em] sm:text-[30px]">{title}</h2>
+        {sub && <p className="mt-2 text-[15.5px] leading-relaxed text-fg2">{sub}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>
@@ -59,22 +54,16 @@ function Head({ eyebrow, title, sub, action }: { eyebrow?: string; title: React.
 /* ------------------------------------------------------------------ */
 
 function Hero() {
-  const newest = [...MODELS].sort((a, b) => b.released.localeCompare(a.released))[0]
   return (
     <section className={cx(CONTAINER, 'grid grid-cols-1 items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_540px] lg:gap-14')}>
       <div>
-        <Link to={`/models/${newest.slug}`} className="group inline-flex items-center gap-2 rounded-full border border-line bg-panel py-1 pl-1 pr-3 text-[13px] text-fg2 transition-colors hover:border-line2 hover:text-fg">
-          <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[12px] font-medium text-accent">New</span>
-          {newest.name} is live
-          <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-        </Link>
-        <h1 className="mt-6 text-[42px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[60px]">
+        <h1 className="text-[42px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[60px]">
           One API for
           <br />
           every open model
         </h1>
         <p className="mt-6 max-w-[34rem] text-[17px] leading-relaxed text-fg2 sm:text-[18px]">
-          Call {MODELS.length} open-weight models from DeepSeek, Qwen, Kimi, GLM and {ORGS.length - 4} more labs — or deploy your own fine-tune to the same endpoint. OpenAI-compatible, pay per token.
+          {MODELS.length} open-weight models from {ORGS.length} labs, and your own fine-tunes, behind one OpenAI-compatible endpoint. Pay per token.
         </p>
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
           <ButtonLink to="/keys" size="xl" className="w-full sm:w-auto">
@@ -84,13 +73,6 @@ function Hero() {
             Try it in chat
           </ButtonLink>
         </div>
-        <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13.5px] text-fg3">
-          {['$5 free credit', 'No card required', 'Works with the OpenAI SDK'].map((t) => (
-            <li key={t} className="flex items-center gap-1.5">
-              <Check size={14} className="text-fg2" /> {t}
-            </li>
-          ))}
-        </ul>
       </div>
       <LiveDemo />
     </section>
@@ -113,16 +95,15 @@ const DEMO = [
   },
   {
     model: 'z-ai/glm-5.3',
-    prompt: 'Three ways to cut LLM serving costs?',
-    answer:
-      '1. Quantize weights to FP8 or 4-bit.\n2. Batch requests continuously to keep GPUs busy.\n3. Send easy prompts to a smaller model.',
-    code: false,
+    prompt: 'Return as JSON: "Paid $1,240.50 to Acme on Oct 3"',
+    answer: '{\n  "payee": "Acme",\n  "amount": 1240.5,\n  "currency": "USD",\n  "date": "2026-10-03"\n}',
+    code: true,
   },
   {
     model: 'moonshotai/kimi-k3',
-    prompt: 'A haiku about open weights.',
-    answer: 'Weights laid in the open —\nanyone may lift the stone\nand hear the river.',
-    code: false,
+    prompt: 'Regex for a semantic version like 1.4.2',
+    answer: '^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$',
+    code: true,
   },
 ]
 
@@ -245,7 +226,7 @@ function Exchange({ prompt, answer, code, model, shown, phase }: { prompt: strin
 }
 
 /* ------------------------------------------------------------------ */
-/* Live numbers + model ticker                                         */
+/* Catalog numbers                                                     */
 /* ------------------------------------------------------------------ */
 
 function Pulse() {
@@ -268,31 +249,7 @@ function Pulse() {
           </div>
         ))}
       </dl>
-      <Ticker />
     </section>
-  )
-}
-
-function Ticker() {
-  const list = useMemo(() => [...MODELS].sort((a, b) => weeklyTokens(b) - weeklyTokens(a)), [])
-  return (
-    <div className="group relative overflow-hidden border-t border-line py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
-      <div className="flex w-max animate-marquee gap-2.5 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
-        {[...list, ...list].map((m, i) => (
-          <Link
-            key={m.slug + i}
-            to={`/models/${m.slug}`}
-            aria-hidden={i >= list.length}
-            tabIndex={i >= list.length ? -1 : 0}
-            className="flex shrink-0 items-center gap-2 rounded-full border border-line bg-panel py-1.5 pl-1.5 pr-3.5 text-[13px] transition-colors hover:border-line2"
-          >
-            <OrgAvatar org={m.org} name={m.orgName} size={20} className="!rounded-full" />
-            <span className="font-medium">{m.name}</span>
-            <span className="tabular text-fg3">{fmtPrice(m.price.output)}/M</span>
-          </Link>
-        ))}
-      </div>
-    </div>
   )
 }
 
@@ -320,12 +277,11 @@ function Showcase() {
   return (
     <section className={cx(CONTAINER, SECTION)}>
       <Head
-        title="Every major open model, one endpoint"
-        sub="New releases land the day they ship. Same request format, same key, priced per token."
+        title="Popular models"
         action={
-          <ButtonLink to="/models" variant="outline">
-            Browse all {MODELS.length} models <ArrowRight size={15} />
-          </ButtonLink>
+          <Link to="/models" className="flex items-center gap-1 text-[14px] font-medium text-fg2 transition-colors hover:text-fg">
+            All {MODELS.length} models <ArrowRight size={14} />
+          </Link>
         }
       />
       <div className="-mx-5 mb-6 overflow-x-auto px-5 sm:mx-0 sm:px-0">
@@ -372,40 +328,6 @@ function ModelCard({ m, className }: { m: CatalogModel; className?: string }) {
         <span>{fmtTokens(weeklyTokens(m))} tokens/wk</span>
       </div>
     </div>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Why InferStack                                                      */
-/* ------------------------------------------------------------------ */
-
-function Features() {
-  const items = [
-    { art: <LogosArt />, title: 'Every lab, one format', desc: `Models from ${ORGS.length} labs behind the same OpenAI-compatible request. Switch models by changing one string.`, link: ['Browse models', '/models'] },
-    { art: <FallbackArt />, title: 'Fails over, keeps answering', desc: 'If a region stops responding, the request moves to another region serving the same model.', link: ['How routing works', '/docs#routing'] },
-    { art: <MetricsArt />, title: 'Prices and speed in the open', desc: 'Token price, throughput and latency are published for every endpoint. Compare with numbers.', link: ['See rankings', '/rankings'] },
-    { art: <UploadArt />, title: 'Your models, same API', desc: 'Import weights from Hugging Face, ModelScope or the CLI and get a dedicated endpoint.', link: ['Deploy a model', '/deploy'] },
-  ]
-  return (
-    <section className="bg-raised/50">
-      <div className={cx(CONTAINER, SECTION)}>
-        <Head title="Built for production traffic" sub="The unglamorous parts of serving open models — routing, failover, metering — handled for you." />
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {items.map((it) => (
-            <Link key={it.title} to={it.link[1]} className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition-colors hover:border-line2">
-              <div className="flex h-[184px] items-center justify-center border-b border-line px-6">{it.art}</div>
-              <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
-                <h3 className="text-[15.5px] font-semibold tracking-[-0.01em]">{it.title}</h3>
-                <p className="mt-1.5 flex-1 text-[14px] leading-relaxed text-fg2">{it.desc}</p>
-                <span className="mt-4 flex items-center gap-1 text-[13.5px] font-medium text-fg2 transition-colors group-hover:text-fg">
-                  {it.link[0]} <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
   )
 }
 
@@ -459,29 +381,29 @@ console.log(res.choices[0].message.content)`,
 function Start() {
   const [lang, setLang] = useState<keyof typeof SNIPPETS>('python')
   const steps = [
-    { title: 'Create an account', desc: 'Sign in with GitHub or Google. You get $5 of credit to try any model.', to: '/signin', cta: 'Sign up' },
-    { title: 'Create an API key', desc: 'Set a spend limit, an expiry date or allowed models per key.', to: '/keys', cta: 'Create a key' },
-    { title: 'Change your base URL', desc: 'Point any OpenAI client at InferStack. The rest of your code stays the same.', to: '/docs#quickstart', cta: 'Read the quickstart' },
+    ['Create an API key', 'New accounts start with $5 of credit.'],
+    ['Set the base URL', 'https://api.inferstack.dev/v1 in any OpenAI SDK.'],
+    ['Pick a model', 'Use the model ID from its page, e.g. deepseek/deepseek-v4.1-flash.'],
   ]
   const s = SNIPPETS[lang]
   return (
     <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16')}>
       <div>
-        <Head title="Your first call in three steps" sub="If your code already talks to OpenAI, you are one line away." />
-        <ol className="space-y-1">
-          {steps.map((st, i) => (
-            <li key={st.title} className="-mx-3 flex gap-4 rounded-2xl p-3">
-              <span className="tabular flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line2 text-[13px] font-semibold">{i + 1}</span>
+        <Head title="Quickstart" />
+        <ol className="space-y-5">
+          {steps.map(([t, d], i) => (
+            <li key={t} className="flex gap-4">
+              <span className="tabular w-5 shrink-0 pt-px text-[15px] font-semibold text-fg3">{i + 1}.</span>
               <div className="min-w-0">
-                <h3 className="text-[16px] font-semibold tracking-[-0.01em]">{st.title}</h3>
-                <p className="mt-1 text-[14.5px] leading-relaxed text-fg2">{st.desc}</p>
-                <Link to={st.to} className="mt-2 inline-flex items-center gap-1 text-[13.5px] font-medium text-accent hover:underline hover:underline-offset-4">
-                  {st.cta} <ArrowRight size={13} />
-                </Link>
+                <div className="text-[15.5px] font-semibold">{t}</div>
+                <p className="mt-0.5 break-words text-[14.5px] text-fg2">{d}</p>
               </div>
             </li>
           ))}
         </ol>
+        <Link to="/docs" className="mt-8 inline-flex items-center gap-1 text-[14px] font-medium text-fg2 transition-colors hover:text-fg">
+          Read the docs <ArrowRight size={14} />
+        </Link>
       </div>
       <div className="code-panel min-w-0 self-center overflow-hidden rounded-2xl border border-line">
         <div className="flex items-center justify-between border-b border-line px-3 py-2">
@@ -529,23 +451,15 @@ function Upload() {
       <div className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16')}>
         <div>
           <Head
-            eyebrow="Bring your own model"
-            title="Your fine-tune, live in minutes"
-            sub="Paste a repo ID. We read the architecture and quantized files, pick the GPU and give you an endpoint. New architecture? Upload your inference code with it."
+            title="Deploy your own model"
+            sub={`Paste a Hugging Face or ModelScope repo ID. InferStack reads the architecture and quantized files, suggests a GPU and serves it on the same API. ${ARCHITECTURES.length} architectures are supported, and you can upload inference code for new ones.`}
           />
-          <ul className="-mt-2 space-y-2.5 text-[14.5px]">
-            {['Hugging Face, ModelScope or CLI upload', 'GGUF and safetensors, optional FP8 at deploy', `${ARCHITECTURES.length} architectures detected automatically`, 'Keep it private, or publish and earn 80% of revenue'].map((t) => (
-              <li key={t} className="flex items-center gap-2.5">
-                <Check size={15} className="shrink-0 text-fg3" /> {t}
-              </li>
-            ))}
-          </ul>
           <form
             onSubmit={(e) => {
               e.preventDefault()
               go()
             }}
-            className="mt-8 max-w-md"
+            className="max-w-md"
           >
             <Segmented
               value={source}
@@ -620,89 +534,28 @@ function Upload() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Global                                                              */
+/* Regions                                                             */
 /* ------------------------------------------------------------------ */
 
-function Global() {
-  const reduce = useReducedMotion()
-  const base = useMemo(() => REGIONS.map((_, i) => 38 + ((i * 47) % 120)), [])
-  const [lat, setLat] = useState(base)
-  const seed = useRef(7)
-  useEffect(() => {
-    if (reduce) return
-    const t = window.setInterval(() => {
-      setLat(
-        base.map((b) => {
-          seed.current = (seed.current * 9301 + 49297) % 233280
-          return Math.round(b * (0.92 + (seed.current / 233280) * 0.16))
-        }),
-      )
-    }, 2000)
-    return () => window.clearInterval(t)
-  }, [base, reduce])
-
+function Regions() {
+  // how many catalog models each region serves
+  const served = useMemo(() => {
+    const n: Record<string, number> = {}
+    for (const m of MODELS) for (const e of endpointsFor(m)) n[e.region] = (n[e.region] ?? 0) + 1
+    return n
+  }, [])
   return (
-    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16')}>
-      <div>
-        <Head
-          eyebrow="Global by default"
-          title="Close to your users, wherever they are"
-          sub={`Requests go to the nearest healthy region across ${REGIONS.length} locations on four continents, and fail over automatically when one slows down.`}
-        />
-        <ul className="-mt-2 space-y-2.5 text-[14.5px]">
-          {['Pay in USD with any major card', 'Monthly invoices for teams', 'Prompts are never logged unless you opt in', 'Pin a region when data residency matters'].map((t) => (
-            <li key={t} className="flex items-center gap-2.5">
-              <Check size={15} className="shrink-0 text-fg3" /> {t}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-panel">
-        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-          <span className="text-[14px] font-semibold">Edge latency</span>
-          <span className="flex items-center gap-1.5 text-[12.5px] text-fg3">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> All regions operational
-          </span>
-        </div>
-        <ul>
-          {REGIONS.map((r, i) => (
-            <li key={r.region} className="flex items-center gap-4 border-b border-line px-5 py-3 text-[14px] last:border-0">
-              <span className="w-24 shrink-0 font-medium">{r.location}</span>
-              <span className="hidden w-32 shrink-0 font-mono text-[12.5px] text-fg3 sm:block">{r.region}</span>
-              <span className="h-1 flex-1 overflow-hidden rounded-full bg-raised">
-                <span className="block h-full rounded-full bg-brand-x transition-[width] duration-700" style={{ width: `${Math.min(100, (lat[i] / 180) * 100)}%` }} />
-              </span>
-              <span className="tabular w-14 shrink-0 text-right text-fg2">{lat[i]} ms</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  )
-}
-
-/* ------------------------------------------------------------------ */
-/* Closing                                                             */
-/* ------------------------------------------------------------------ */
-
-function Closing() {
-  return (
-    <section className={cx(CONTAINER, 'pb-24')}>
-      <div className="relative overflow-hidden rounded-3xl bg-[#14164a] px-8 py-14 text-white ring-1 ring-inset ring-white/10 sm:px-14">
-        <LogoMark size={176} className="pointer-events-none absolute right-16 top-1/2 hidden -translate-y-1/2 lg:block" />
-        <div className="relative max-w-xl">
-          <h2 className="text-[32px] font-semibold leading-[1.12] tracking-[-0.03em] sm:text-[40px]">Start building in minutes</h2>
-          <p className="mt-4 text-[16.5px] leading-relaxed text-white/65">Get $5 of free credit and call any of {MODELS.length} models with the OpenAI client you already use.</p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/keys" className={buttonClass('primary', 'xl')}>
-              Get your API key <ArrowRight size={16} />
-            </Link>
-            <Link to="/docs" className={buttonClass('outline', 'xl', '!border-white/20 !text-white hover:!bg-white/10')}>
-              Read the docs
-            </Link>
-          </div>
-        </div>
-      </div>
+    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-16')}>
+      <Head title="Regions" sub="Requests go to the nearest healthy region and fail over automatically. Pin a region in settings if you need data residency." />
+      <ul className="min-w-0 divide-y divide-line border-y border-line text-[14px]">
+        {REGIONS.map((r) => (
+          <li key={r.region} className="flex items-center gap-4 py-3">
+            <span className="w-28 shrink-0 font-medium">{r.location}</span>
+            <span className="flex-1 font-mono text-[12.5px] text-fg3">{r.region}</span>
+            <span className="tabular text-fg2">{served[r.region] ?? 0} models</span>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

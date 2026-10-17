@@ -186,7 +186,7 @@ export function MyModelDetail() {
       {building && (
         <Card className="mt-6 p-5">
           <div className="mb-3 flex items-center justify-between text-sm">
-            <span className="font-medium">Deploying — {p.phases[Math.min(p.phaseIndex, p.phases.length - 1)]?.label}</span>
+            <span className="font-medium">Deploying: {p.phases[Math.min(p.phaseIndex, p.phases.length - 1)]?.label}</span>
             <span className="text-fg3">{Math.round(p.progress * 100)}%</span>
           </div>
           <Progress value={p.progress} />

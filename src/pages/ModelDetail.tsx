@@ -296,7 +296,7 @@ for await (const chunk of stream) {
   return (
     <div className="max-w-3xl">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[14px] text-fg2">Use the OpenAI SDK — just change the base URL.</span>
+        <span className="text-[14px] text-fg2">Works with the OpenAI SDK. Change the base URL and keep the rest.</span>
         <Segmented
           value={lang}
           onChange={setLang}

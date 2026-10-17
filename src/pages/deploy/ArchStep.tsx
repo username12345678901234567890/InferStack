@@ -38,7 +38,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           {det.known ? <CheckCircle2 size={18} className="mt-0.5 text-emerald-500" /> : <Sparkles size={18} className="mt-0.5 text-amber-500" />}
           <div>
             <div className="font-medium">
-              {det.known ? 'Detected' : 'Found'} <span className="font-mono">{det.name}</span> in {det.via === 'gguf' ? 'GGUF metadata' : 'config.json'}{det.known ? '' : ' — a new architecture not in the registry'}
+              {det.known ? 'Detected' : 'Found'} <span className="font-mono">{det.name}</span> in {det.via === 'gguf' ? 'GGUF metadata' : 'config.json'}{det.known ? '' : '. This architecture is not in the registry yet.'}
             </div>
             <div className="mt-0.5 text-fg2">
               {det.known
@@ -67,7 +67,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
               <div className="flex items-center gap-2 font-medium">
                 <Sparkles size={14} className="text-fg3" /> New architecture (custom inference code)
               </div>
-              <div className="text-xs text-fg3">Not in the registry — upload code from GitHub or your machine</div>
+              <div className="text-xs text-fg3">Not in the registry. Upload code from GitHub or your machine.</div>
             </ArchOption>
             {list.map((a) => {
               const compatible = a.formats.includes(s.format)
@@ -352,7 +352,7 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
               {manifestArchOk !== undefined && (
                 <div className="col-span-2 flex items-center gap-1.5">
                   {manifestArchOk ? <CheckCircle2 size={13} className="text-emerald-500" /> : <AlertTriangle size={13} className="text-amber-500" />}
-                  <span className="font-mono">{archName}</span> {manifestArchOk ? 'found in manifest architectures' : 'missing from manifest architectures — check it'}
+                  <span className="font-mono">{archName}</span> {manifestArchOk ? 'found in manifest architectures' : 'is missing from manifest architectures'}
                 </div>
               )}
             </div>
@@ -366,7 +366,7 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
             </div>
             {requiredOk && (
               <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 size={15} /> Package structure looks good — build and smoke tests run on deploy
+                <CheckCircle2 size={15} /> Package structure looks good. Build and smoke tests run on deploy.
               </div>
             )}
           </div>

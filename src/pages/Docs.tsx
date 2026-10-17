@@ -79,7 +79,7 @@ print(r.choices[0].message.content)`}
         <section>
           <h2 id="api">Chat Completions</h2>
           <p className="mt-3">
-            <Badge color="green">POST</Badge> <code className="font-mono">/v1/chat/completions</code> — Same schema as OpenAI Chat Completions.
+            <Badge color="green">POST</Badge> <code className="font-mono">/v1/chat/completions</code>. Same schema as OpenAI Chat Completions.
           </p>
           <Card className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
@@ -99,9 +99,9 @@ print(r.choices[0].message.content)`}
                   ['max_tokens', 'integer', 'Maximum number of tokens to generate'],
                   ['tools / tool_choice', 'array / string', 'Tool calls (function calling)'],
                   ['response_format', 'object', '{"type":"json_object"} (JSON mode) or json_schema'],
-                  ['reasoning', 'object', '{"effort":"low|medium|high"} — reasoning models only'],
+                  ['reasoning', 'object', '{"effort":"low|medium|high"}. Reasoning models only.'],
                   ['provider', 'object', 'Routing preferences (see below)'],
-                  ['models', 'string[]', 'Fallback models — tried in order if the first one fails'],
+                  ['models', 'string[]', 'Fallback models, tried in order if the first one fails'],
                 ].map(([a, b, c]) => (
                   <tr key={a}>
                     <td className="font-mono text-xs">{a}</td>
@@ -129,7 +129,7 @@ print(r.choices[0].message.content)`}
         <section>
           <h2 id="models-api">List models</h2>
           <p className="mt-3">
-            <Badge color="brand">GET</Badge> <code className="font-mono">/v1/models</code> — Returns catalog models together with the custom models you've deployed. Each item includes <code>pricing</code>, <code>context_length</code>, <code>architecture</code>, and <code>hugging_face_id</code>.
+            <Badge color="brand">GET</Badge> <code className="font-mono">/v1/models</code> returns catalog models together with the custom models you've deployed. Each item includes <code>pricing</code>, <code>context_length</code>, <code>architecture</code>, and <code>hugging_face_id</code>.
           </p>
         </section>
 
@@ -164,7 +164,7 @@ print(r.choices[0].message.content)`}
               ['403', 'Model not allowed for this key'],
               ['408', 'Request timed out'],
               ['429', 'Rate limited (free tier: 20 requests/min)'],
-              ['502', 'Upstream endpoint error — fallback attempted'],
+              ['502', 'Upstream endpoint error. Fallback attempted.'],
               ['503', 'No endpoint available (including custom model cold starts)'],
             ].map(([c, d]) => (
               <div key={c} className="flex gap-4 px-4 py-2">
@@ -248,7 +248,7 @@ inferstack code validate ./beam-inferstack/`}
           <pre className="mt-4 overflow-x-auto rounded-xl bg-raised p-4 font-mono text-xs">{SPEC_TREE}</pre>
           <h3>inferstack.yaml</h3>
           <CodeBlock className="mt-3" lang="yaml" code={manifestTemplate('BeamForCausalLM', 'beam')} />
-          <h3>model.py — InferStackModel interface</h3>
+          <h3>model.py: the InferStackModel interface</h3>
           <Card className="mt-3 divide-y divide-line text-sm">
             {[
               ['load(weights_dir, config, device_map)', 'Loads the weights. Tensor-parallel rank info is passed in device_map.'],

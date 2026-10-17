@@ -67,7 +67,6 @@ code, kbd, .font-mono {
   }
   .text-on-brand {
     color: #fff;
-    text-shadow: 0 1px 1px rgba(12, 15, 51, 0.28);
   }
 }
 .code-panel { background: var(--code-bg); color: var(--code-fg); }

@@ -111,7 +111,7 @@ export default function Models() {
       <header>
         <h1 className="text-[32px] font-semibold tracking-[-0.03em]">Models</h1>
         <p className="mt-2 max-w-2xl text-[15.5px] leading-relaxed text-fg2">
-          {all.length} models from {ORGS.length} labs behind one API. Not sure where to start? Pick one below, try it in chat, then call it with your key.
+          {all.length} models from {ORGS.length} labs, all on the same API. Try one in chat, then call it with its model ID.
         </p>
       </header>
 
@@ -261,7 +261,7 @@ export default function Models() {
   )
 }
 
-/** Opinionated starting points, so the catalog is never a blank wall */
+/** A few starting points above the full list */
 function StartHere() {
   const all = useAllModels()
   const fastest = [...all].filter((m) => !m.custom).sort((a, b) => speedOf(b) - speedOf(a))[0]

@@ -33,12 +33,11 @@ export default {
       },
       letterSpacing: { tightest: '-0.03em' },
       keyframes: {
-        marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
         'fade-in': { from: { opacity: 0 }, to: { opacity: 1 } },
         blink: { '50%': { opacity: 0 } },
         fill: { from: { transform: 'scaleX(0)' }, to: { transform: 'scaleX(1)' } },
       },
-      animation: { 'fade-in': 'fade-in .2s ease-out', blink: 'blink 1s step-end infinite', marquee: 'marquee 80s linear infinite' },
+      animation: { 'fade-in': 'fade-in .2s ease-out', blink: 'blink 1s step-end infinite' },
     },
   },
   plugins: [],

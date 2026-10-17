@@ -51,7 +51,7 @@ export function buildLogs(m: CustomModel, now = Date.now()): { t: number; line: 
     const step = (f: number) => s + ph.weight * f
     switch (ph.key) {
       case 'queue':
-        lines.push({ at: 0, line: `job ${m.id} accepted — region=us-east-1 gpu=${m.gpuCount}x${m.gpu}` })
+        lines.push({ at: 0, line: `job ${m.id} accepted region=us-east-1 gpu=${m.gpuCount}x${m.gpu}` })
         lines.push({ at: step(0.6), line: `scheduler: reserved ${m.gpuCount}x ${m.gpu} (spot=false)` })
         break
       case 'pull':

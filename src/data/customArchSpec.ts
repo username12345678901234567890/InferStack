@@ -44,7 +44,7 @@ spec:
 
 export function modelPyTemplate(arch = 'MyNewForCausalLM') {
   const cls = arch.replace(/ForCausalLM|ForConditionalGeneration/, '') + 'InferStack'
-  return `"""InferStack Architecture Package — ${arch}"""
+  return `"""InferStack architecture package: ${arch}"""
 from typing import Iterator
 
 import torch

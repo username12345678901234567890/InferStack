@@ -27,7 +27,7 @@ for chunk in resp:
 \`\`\`
 
 Key points:
-1. Change only \`base_url\` — your existing OpenAI code works as-is.
+1. Change only \`base_url\`. Your existing OpenAI code works as is.
 2. Set \`model\` to a catalog slug (e.g. \`${m}\`).
 3. Pass \`stream=True\` to receive tokens as they're generated.`,
   },
