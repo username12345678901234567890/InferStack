@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Pretendard Variable"', 'Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
@@ -27,17 +27,18 @@ export default {
           600: '#5c5c64', 700: '#3f3f46', 800: '#26262b', 900: '#18181b', 950: '#0d0d0f',
         },
         brand: {
-          50: '#fff4ed', 100: '#ffe6d5', 200: '#ffc9a8', 300: '#ffa370', 400: '#ff8540',
-          500: '#ea580c', 600: '#dc4f0a', 700: '#c9400a', 800: '#a0350f', 900: '#812f10',
+          50: '#f1f0ff', 100: '#e4e2fe', 200: '#cdc8fd', 300: '#aba2fb', 400: '#8b7ff7',
+          500: '#5b4cf0', 600: '#4c3de0', 700: '#3f31bd', 800: '#352b99', 900: '#2e2879',
         },
       },
       letterSpacing: { tightest: '-0.03em' },
       keyframes: {
+        marquee: { from: { transform: 'translateX(0)' }, to: { transform: 'translateX(-50%)' } },
         'fade-in': { from: { opacity: 0 }, to: { opacity: 1 } },
         blink: { '50%': { opacity: 0 } },
         fill: { from: { transform: 'scaleX(0)' }, to: { transform: 'scaleX(1)' } },
       },
-      animation: { 'fade-in': 'fade-in .2s ease-out', blink: 'blink 1s step-end infinite' },
+      animation: { 'fade-in': 'fade-in .2s ease-out', blink: 'blink 1s step-end infinite', marquee: 'marquee 80s linear infinite' },
     },
   },
   plugins: [],

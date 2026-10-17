@@ -86,7 +86,7 @@ export const initialState = (source: ImportSource, repo = ''): WizardState => ({
 
 export type Setter = (patch: Partial<WizardState> | ((s: WizardState) => Partial<WizardState>)) => void
 
-/** 가중치 바이트 수 추정 */
+/** Estimate weight size in bytes */
 export function weightBytes(s: WizardState, ggufSize?: number): number {
   const params = s.info?.params ?? s.cliParamsB * 1e9
   if (s.format === 'gguf') {
@@ -102,7 +102,7 @@ export function weightBytes(s: WizardState, ggufSize?: number): number {
   return (params * bits) / 8
 }
 
-/** 필요 VRAM(GB) 추정: 가중치 + 런타임 오버헤드 + KV 캐시 */
+/** Estimate required VRAM (GB): weights + runtime overhead + KV cache */
 export function vramNeededGB(s: WizardState, ggufSize?: number): number {
   const w = weightBytes(s, ggufSize) / 1e9
   const kv = Math.min(40, (s.contextLength / 32768) * Math.max(1.5, w * 0.04))

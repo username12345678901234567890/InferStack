@@ -8,17 +8,17 @@ import { fmtCtx, fmtPrice } from '../lib/format'
 
 export default function Pricing() {
   const plans = [
-    { name: '무료', price: '$0', desc: '가입만 하면 바로', features: ['무료 티어 모델 (분당 20회)', '가입 보너스 $5 크레딧', '플레이그라운드', '커뮤니티 지원'], cta: '시작하기', to: '/signin' },
-    { name: '종량제', price: '쓴 만큼', desc: '토큰 단위 과금', features: ['36+ 모델 전체 이용', '속도 제한 완화', 'API 키별 한도/권한', '커스텀 모델 배포', '자동 충전'], cta: '크레딧 충전', to: '/credits', hi: true },
-    { name: '엔터프라이즈', price: '문의', desc: '대규모 트래픽', features: ['전용 GPU 예약 용량', '볼륨 할인', 'SSO · 감사 로그', 'VPC 피어링 / 온프레미스', '99.9% SLA'], cta: '영업팀 문의', to: '/docs' },
+    { name: 'Free', price: '$0', desc: 'Start right after sign-up', features: ['Free-tier models (20 req/min)', '$5 in sign-up credits', 'Playground', 'Community support'], cta: 'Get started', to: '/signin' },
+    { name: 'Pay as you go', price: 'Usage-based', desc: 'Billed per token', features: ['All 36+ models', 'Higher rate limits', 'Per-key limits and permissions', 'Custom model deployment', 'Auto top-up'], cta: 'Add credits', to: '/credits', hi: true },
+    { name: 'Enterprise', price: 'Custom', desc: 'For high-volume traffic', features: ['Reserved dedicated GPU capacity', 'Volume discounts', 'SSO · audit logs', 'VPC peering / on-prem', '99.9% SLA', 'Invoiced billing'], cta: 'Contact sales', to: '/docs' },
   ]
   return (
     <div>
-      <PageHeader title="가격" description="구독 없이 사용한 토큰만큼만. 모든 가격은 USD / 100만 토큰 기준입니다." />
+      <PageHeader title="Pricing" description="No subscription — pay only for the tokens you use. All prices are in USD per 1M tokens." />
       <div className="grid gap-4 md:grid-cols-3">
         {plans.map((p) => (
           <Card key={p.name} className={p.hi ? 'relative border-fg/40 p-6 ring-1 ring-fg/10' : 'p-6'}>
-            {p.hi && <Badge color="brand" className="absolute right-4 top-4">인기</Badge>}
+            {p.hi && <Badge color="brand" className="absolute right-4 top-4">Popular</Badge>}
             <div className="font-semibold">{p.name}</div>
             <div className="mt-2 text-3xl font-bold tracking-tight">{p.price}</div>
             <div className="text-sm text-fg3">{p.desc}</div>
@@ -32,16 +32,16 @@ export default function Pricing() {
         ))}
       </div>
 
-      <h2 className="mb-3 mt-12 text-lg font-semibold">모델별 토큰 가격</h2>
+      <h2 className="mb-3 mt-12 text-lg font-semibold">Token pricing by model</h2>
       <Card className="overflow-x-auto">
         <table className="tabular w-full text-[14px]">
           <thead className="text-left text-xs text-fg3">
             <tr className="border-b border-line">
-              <th className="px-4 py-3 font-medium">모델</th>
-              <th className="px-3 py-3 font-medium">컨텍스트</th>
-              <th className="px-3 py-3 text-right font-medium">입력</th>
-              <th className="px-3 py-3 text-right font-medium">캐시 입력</th>
-              <th className="px-3 py-3 text-right font-medium">출력</th>
+              <th className="px-4 py-3 font-medium">Model</th>
+              <th className="px-3 py-3 font-medium">Context</th>
+              <th className="px-3 py-3 text-right font-medium">Input</th>
+              <th className="px-3 py-3 text-right font-medium">Cached input</th>
+              <th className="px-3 py-3 text-right font-medium">Output</th>
             </tr>
           </thead>
           <tbody>
@@ -49,7 +49,7 @@ export default function Pricing() {
               <tr key={m.slug} className="border-b border-line last:border-0">
                 <td className="px-4 py-2.5">
                   <Link to={`/models/${m.slug}`} className="flex items-center gap-2 hover:text-fg">
-                    <OrgAvatar org={m.org} name={m.orgName} size={20} /> {m.name} {m.free && <Badge color="green">무료 티어</Badge>}
+                    <OrgAvatar org={m.org} name={m.orgName} size={20} /> {m.name} {m.free && <Badge color="green">Free tier</Badge>}
                   </Link>
                 </td>
                 <td className="px-3 py-2.5 text-fg3">{fmtCtx(m.context)}</td>
@@ -62,15 +62,15 @@ export default function Pricing() {
         </table>
       </Card>
 
-      <h2 className="mb-3 mt-12 text-lg font-semibold">커스텀 모델 GPU 가격</h2>
+      <h2 className="mb-3 mt-12 text-lg font-semibold">Custom model GPU pricing</h2>
       <Card className="overflow-x-auto">
         <table className="tabular w-full text-[14px]">
           <thead className="text-left text-xs text-fg3">
             <tr className="border-b border-line">
               <th className="px-4 py-3 font-medium">GPU</th>
               <th className="px-3 py-3 font-medium">VRAM</th>
-              <th className="px-3 py-3 text-right font-medium">시간당</th>
-              <th className="px-3 py-3 text-right font-medium">초당</th>
+              <th className="px-3 py-3 text-right font-medium">Per hour</th>
+              <th className="px-3 py-3 text-right font-medium">Per second</th>
             </tr>
           </thead>
           <tbody>
@@ -84,7 +84,7 @@ export default function Pricing() {
             ))}
           </tbody>
         </table>
-        <div className="border-t border-line px-4 py-3 text-xs text-fg3">비공개 엔드포인트는 레플리카가 실행 중인 시간만 초 단위로 과금됩니다. 마켓플레이스 공개 모델은 GPU 비용 대신 호출자 토큰 매출의 80%를 정산받습니다.</div>
+        <div className="border-t border-line px-4 py-3 text-xs text-fg3">Private endpoints are billed per second, only while replicas are running. Public marketplace models pay no GPU costs and instead earn 80% of caller token revenue.</div>
       </Card>
     </div>
   )

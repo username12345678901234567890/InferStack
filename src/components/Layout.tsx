@@ -10,12 +10,12 @@ import { fmtUSD } from '../lib/format'
 import { buildProgress } from '../lib/build'
 
 const NAV = [
-  { to: '/models', label: '모델' },
-  { to: '/chat', label: '채팅' },
-  { to: '/rankings', label: '랭킹' },
-  { to: '/deploy', label: '모델 업로드' },
-  { to: '/docs', label: '문서' },
-  { to: '/pricing', label: '가격' },
+  { to: '/models', label: 'Models' },
+  { to: '/chat', label: 'Chat' },
+  { to: '/rankings', label: 'Rankings' },
+  { to: '/deploy', label: 'Deploy' },
+  { to: '/docs', label: 'Docs' },
+  { to: '/pricing', label: 'Pricing' },
 ]
 
 export const CONTAINER = 'mx-auto w-full max-w-[1200px] px-5 sm:px-8'
@@ -80,13 +80,13 @@ function GlobalSearch() {
           if (e.key === 'Enter') go(results[sel]?.slug)
           if (e.key === 'Escape') ref.current?.blur()
         }}
-        placeholder="모델 검색"
-        aria-label="모델 검색"
-        className="h-8 w-full rounded-lg border border-line bg-panel pl-8 pr-10 text-[13px] text-fg placeholder:text-fg3 focus:border-line2 focus:outline-none"
+        placeholder="Search models"
+        aria-label="Search models"
+        className="h-8 w-full rounded-full border border-line bg-raised/60 pl-8 pr-10 text-[13px] text-fg placeholder:text-fg3 focus:border-line2 focus:outline-none"
       />
-      <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-line px-1 text-[10.5px] text-fg3">⌘K</kbd>
+      <kbd className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 rounded border border-line px-1 text-[10.5px] text-fg3">⌘K</kbd>
       {open && results.length > 0 && (
-        <div className="absolute left-0 top-10 z-50 w-80 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
+        <div className="absolute left-0 top-10 z-50 w-80 overflow-hidden rounded-2xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
           {results.map((m, i) => (
             <button key={m.slug} onMouseDown={() => go(m.slug)} className={cx('flex w-full items-center gap-2.5 px-3 py-2 text-left', i === sel ? 'bg-raised' : 'hover:bg-raised')}>
               <OrgAvatar org={m.org} name={m.orgName} size={22} />
@@ -103,11 +103,11 @@ function GlobalSearch() {
 }
 
 const ACCOUNT_NAV = [
-  { to: '/credits', label: '크레딧', icon: CreditCard },
-  { to: '/keys', label: 'API 키', icon: KeyRound },
-  { to: '/activity', label: '활동', icon: Activity },
-  { to: '/my-models', label: '내 모델', icon: Boxes },
-  { to: '/settings', label: '설정', icon: Settings },
+  { to: '/credits', label: 'Credits', icon: CreditCard },
+  { to: '/keys', label: 'API keys', icon: KeyRound },
+  { to: '/activity', label: 'Activity', icon: Activity },
+  { to: '/my-models', label: 'My models', icon: Boxes },
+  { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
 function UserMenu() {
@@ -121,26 +121,26 @@ function UserMenu() {
     return (
       <div className="flex items-center gap-1">
         <ButtonLink to="/signin" variant="ghost" size="sm">
-          로그인
+          Sign in
         </ButtonLink>
         <ButtonLink to="/signin" size="sm">
-          시작하기
+          Get started
         </ButtonLink>
       </div>
     )
   return (
     <div className="relative flex items-center gap-1">
-      <Link to="/credits" className="tabular hidden h-8 items-center rounded-lg px-2.5 text-[13px] text-fg2 transition-colors hover:bg-raised hover:text-fg sm:flex">
+      <Link to="/credits" className="tabular hidden h-8 items-center rounded-full px-3 text-[13px] text-fg2 transition-colors hover:bg-raised hover:text-fg sm:flex">
         {fmtUSD(credits)}
       </Link>
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1 rounded-lg py-1 pl-1 pr-1.5 hover:bg-raised" aria-label="계정 메뉴">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1 rounded-full py-1 pl-1 pr-1.5 hover:bg-raised" aria-label="Account menu">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-raised text-[12px] font-semibold text-fg ring-1 ring-inset ring-line2">{user.name[0]}</span>
         <ChevronDown size={13} className="text-fg3" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
+          <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-2xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
             <div className="border-b border-line px-3.5 py-2.5">
               <div className="text-[14px] font-medium">{user.name}</div>
               <div className="text-[12px] text-fg3">{user.email}</div>
@@ -151,7 +151,7 @@ function UserMenu() {
               </Link>
             ))}
             <button onClick={signOut} className="flex w-full items-center gap-2.5 border-t border-line px-3.5 py-2 text-[13.5px] text-fg2 hover:bg-raised hover:text-fg">
-              <LogOut size={15} /> 로그아웃
+              <LogOut size={15} /> Sign out
             </button>
           </div>
         </>
@@ -175,12 +175,13 @@ export function Layout() {
   }, [theme])
   const isChat = loc.pathname.startsWith('/chat')
   const isHome = loc.pathname === '/'
+  const inAccount = ACCOUNT_NAV.some((a) => loc.pathname.startsWith(a.to))
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-40 border-b border-line bg-bg">
         <div className={cx(CONTAINER, 'flex h-14 items-center gap-4', isChat && 'max-w-none')}>
-          <Link to="/" className="mr-2 shrink-0" aria-label="InferStack 홈">
+          <Link to="/" className="mr-2 shrink-0" aria-label="InferStack home">
             <Logo />
           </Link>
           <GlobalSearch />
@@ -189,18 +190,23 @@ export function Layout() {
               <NavLink
                 key={n.to}
                 to={n.to}
-                className={({ isActive }) => cx('rounded-lg px-2.5 py-1.5 text-[14px] transition-colors', isActive ? 'text-fg' : 'text-fg2 hover:bg-raised hover:text-fg')}
+                className={({ isActive }) => cx('rounded-full px-3 py-1.5 text-[14px] transition-colors', isActive ? 'font-medium text-fg' : 'text-fg2 hover:bg-raised hover:text-fg')}
               >
                 {n.label}
               </NavLink>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-1 lg:ml-2">
-            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-lg p-2 text-fg3 hover:bg-raised hover:text-fg" title="테마 전환" aria-label="테마 전환">
+            <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-full p-2 text-fg3 hover:bg-raised hover:text-fg" title="Toggle theme" aria-label="Toggle theme">
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <UserMenu />
-            <button className="rounded-lg p-2 text-fg2 lg:hidden" onClick={() => setMobile(!mobile)} aria-label="메뉴">
+            {!inAccount && !isChat && (
+              <ButtonLink to="/keys" size="sm" className="ml-1 hidden sm:inline-flex">
+                Get API key
+              </ButtonLink>
+            )}
+            <button className="rounded-full p-2 text-fg2 lg:hidden" onClick={() => setMobile(!mobile)} aria-label="Menu">
               {mobile ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
@@ -226,7 +232,7 @@ export function Layout() {
   )
 }
 
-/** 계정 영역: 왼쪽 사이드바 + 본문 */
+/** Account area: left sidebar + content */
 export function AccountLayout() {
   const user = useStore((s) => s.user)
   const credits = useStore((s) => s.credits)
@@ -236,7 +242,7 @@ export function AccountLayout() {
         {user && (
           <div className="mb-5 hidden md:block">
             <div className="text-[14px] font-semibold">{user.name}</div>
-            <div className="tabular mt-0.5 text-[13px] text-fg3">잔액 {fmtUSD(credits)}</div>
+            <div className="tabular mt-0.5 text-[13px] text-fg3">Balance {fmtUSD(credits)}</div>
           </div>
         )}
         <nav className="-mx-2 flex gap-1 overflow-x-auto md:flex-col">
@@ -245,14 +251,15 @@ export function AccountLayout() {
               key={it.to}
               to={it.to}
               className={({ isActive }) =>
-                cx('flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px] transition-colors', isActive ? 'bg-raised font-medium text-fg' : 'text-fg2 hover:bg-raised/60 hover:text-fg')
+                cx('flex shrink-0 items-center gap-2.5 rounded-full px-3 py-2 text-[14px] transition-colors', isActive ? 'bg-raised font-medium text-fg' : 'text-fg2 hover:bg-raised/60 hover:text-fg')
               }
             >
               <it.icon size={16} /> {it.label}
             </NavLink>
           ))}
-          <NavLink to="/deploy" className="flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px] text-fg2 transition-colors hover:bg-raised/60 hover:text-fg md:mt-4 md:border-t md:border-line md:pt-4">
-            <Upload size={16} /> 모델 업로드
+          <div className="mx-3 my-3 hidden h-px bg-line md:block" />
+          <NavLink to="/deploy" className="flex shrink-0 items-center gap-2.5 rounded-full px-3 py-2 text-[14px] text-fg2 transition-colors hover:bg-raised/60 hover:text-fg">
+            <Upload size={16} /> Deploy a model
           </NavLink>
         </nav>
       </aside>
@@ -265,17 +272,17 @@ export function AccountLayout() {
 
 function Footer() {
   const cols = [
-    { title: '제품', links: [['모델', '/models'], ['채팅', '/chat'], ['랭킹', '/rankings'], ['가격', '/pricing']] },
-    { title: '개발자', links: [['빠른 시작', '/docs#quickstart'], ['API 레퍼런스', '/docs#api'], ['CLI', '/docs#cli'], ['아키텍처 패키지', '/docs#arch']] },
-    { title: '모델 업로드', links: [['Hugging Face', '/deploy/new?source=huggingface'], ['ModelScope', '/deploy/new?source=modelscope'], ['CLI 업로드', '/deploy/new?source=cli'], ['내 모델', '/my-models']] },
-    { title: '계정', links: [['API 키', '/keys'], ['크레딧', '/credits'], ['활동', '/activity'], ['설정', '/settings']] },
+    { title: 'Product', links: [['Models', '/models'], ['Chat', '/chat'], ['Rankings', '/rankings'], ['Pricing', '/pricing']] },
+    { title: 'Developers', links: [['Quickstart', '/docs#quickstart'], ['API reference', '/docs#api'], ['CLI', '/docs#cli'], ['Architecture packages', '/docs#arch']] },
+    { title: 'Deploy', links: [['From Hugging Face', '/deploy/new?source=huggingface'], ['From ModelScope', '/deploy/new?source=modelscope'], ['CLI upload', '/deploy/new?source=cli'], ['My models', '/my-models']] },
+    { title: 'Account', links: [['API keys', '/keys'], ['Credits', '/credits'], ['Activity', '/activity'], ['Settings', '/settings']] },
   ]
   return (
     <footer className="border-t border-line">
       <div className={cx(CONTAINER, 'grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(4,1fr)]')}>
         <div>
           <Logo />
-          <p className="mt-4 max-w-[17rem] text-[13.5px] leading-relaxed text-fg3">오픈 웨이트 모델을 위한 추론 API. 카탈로그 모델과 직접 올린 모델을 같은 엔드포인트에서 호출합니다.</p>
+          <p className="mt-4 max-w-[17rem] text-[13.5px] leading-relaxed text-fg3">The inference API for open-weight models. Call catalog models and your own fine-tunes from one endpoint.</p>
         </div>
         {cols.map((c) => (
           <div key={c.title}>
@@ -295,7 +302,7 @@ function Footer() {
       <div className="border-t border-line">
         <div className={cx(CONTAINER, 'flex flex-col justify-between gap-2 py-6 text-[12.5px] text-fg3 sm:flex-row')}>
           <span>© 2026 InferStack</span>
-          <span>프론트엔드 데모입니다. 추론, 결제, 배포는 시뮬레이션이며 사용량 수치는 예시 데이터입니다.</span>
+          <span>Frontend demo. Inference, billing and deployments are simulated; usage numbers are sample data.</span>
         </div>
       </div>
     </footer>

@@ -12,38 +12,38 @@ export default function SignIn() {
   const go = (name: string, mail: string) => {
     const username = mail.split('@')[0].replace(/[^a-z0-9-]/gi, '').toLowerCase() || 'demo'
     signIn({ name, email: mail, username, org: 'Personal' })
-    toast.ok(`${name}님, 환영합니다`)
+    toast.ok(`Welcome, ${name}`)
     nav('/')
   }
   return (
     <div className="mx-auto flex max-w-sm flex-col items-center py-10">
       <LogoMark size={48} />
-      <h1 className="mt-4 text-xl font-semibold">InferStack 시작하기</h1>
-      <p className="mt-1 text-sm text-fg3">가입 시 $5 무료 크레딧이 지급됩니다</p>
+      <h1 className="mt-4 text-xl font-semibold">Get started with InferStack</h1>
+      <p className="mt-1 text-sm text-fg3">Get $5 in free credits when you sign up</p>
       <Card className="mt-6 w-full space-y-3 p-6">
         <Button variant="outline" className="w-full" onClick={() => go('Demo User', 'demo@inferstack.dev')}>
-          <Github size={16} /> GitHub로 계속 (데모)
+          <Github size={16} /> Continue with GitHub (demo)
         </Button>
         <div className="flex items-center gap-3 text-xs text-fg3">
-          <span className="h-px flex-1 bg-raised" /> 또는 <span className="h-px flex-1 bg-raised" />
+          <span className="h-px flex-1 bg-raised" /> or <span className="h-px flex-1 bg-raised" />
         </div>
         <form
           onSubmit={(e) => {
             e.preventDefault()
-            if (!/^\S+@\S+\.\S+$/.test(email)) return toast.err('올바른 이메일을 입력하세요')
+            if (!/^\S+@\S+\.\S+$/.test(email)) return toast.err('Enter a valid email address')
             go(email.split('@')[0], email)
           }}
           className="space-y-3"
         >
           <div>
-            <Label>이메일</Label>
+            <Label>Email</Label>
             <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@company.com" />
           </div>
           <Button type="submit" className="w-full">
-            <Mail size={16} /> 매직 링크로 로그인 (데모)
+            <Mail size={16} /> Sign in with magic link (demo)
           </Button>
         </form>
-        <p className="text-center text-[11px] text-fg3">데모 환경: 실제 인증 없이 브라우저에만 로그인 상태가 저장됩니다.</p>
+        <p className="text-center text-[11px] text-fg3">Demo only: there's no real authentication. Your sign-in state is stored in this browser.</p>
       </Card>
     </div>
   )

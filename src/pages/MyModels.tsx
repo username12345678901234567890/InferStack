@@ -10,12 +10,12 @@ import { ApiSamples } from './ModelDetail'
 import { hourlyCost } from './deploy/state'
 
 const STATUS: Record<CustomModelStatus, { label: string; color: 'slate' | 'brand' | 'green' | 'amber' | 'rose' }> = {
-  awaiting_upload: { label: '업로드 대기', color: 'slate' },
-  queued: { label: '대기열', color: 'amber' },
-  building: { label: '빌드 중', color: 'brand' },
+  awaiting_upload: { label: 'Awaiting upload', color: 'slate' },
+  queued: { label: 'Queued', color: 'amber' },
+  building: { label: 'Building', color: 'brand' },
   live: { label: 'Live', color: 'green' },
-  paused: { label: '일시정지', color: 'slate' },
-  failed: { label: '실패', color: 'rose' },
+  paused: { label: 'Paused', color: 'slate' },
+  failed: { label: 'Failed', color: 'rose' },
 }
 
 export function StatusBadge({ s }: { s: CustomModelStatus }) {
@@ -44,12 +44,12 @@ export default function MyModels() {
   return (
     <div>
       <PageHeader
-        title="내 모델"
-        description="업로드·배포한 커스텀 모델을 관리합니다."
+        title="My models"
+        description="Manage the custom models you’ve deployed."
         actions={
           <Link to="/deploy">
             <Button>
-              <Plus size={16} /> 새 모델
+              <Plus size={16} /> New deployment
             </Button>
           </Link>
         }
@@ -57,11 +57,11 @@ export default function MyModels() {
       {models.length === 0 ? (
         <Empty
           icon={<Boxes size={32} />}
-          title="아직 배포한 모델이 없습니다"
-          description="Hugging Face, ModelScope 또는 CLI로 GGUF/Safetensors 모델을 업로드해 보세요."
+          title="No models deployed yet"
+          description="Deploy a GGUF or safetensors model from Hugging Face, ModelScope or the CLI."
           action={
             <Link to="/deploy">
-              <Button>모델 업로드</Button>
+              <Button>Deploy a model</Button>
             </Link>
           }
         />
@@ -73,15 +73,15 @@ export default function MyModels() {
               <Link key={m.id} to={`/my-models/${m.slug}`}>
                 <Card className="p-4 transition-colors hover:border-line2">
                   <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-raised text-fg2">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-line bg-raised text-fg2">
                       <Cpu size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="font-semibold">{m.displayName}</span>
                         <StatusBadge s={m.status} />
-                        {m.visibility === 'public' ? <Badge color="cyan">공개</Badge> : <Badge>비공개</Badge>}
-                        {m.newArchitecture && <Badge color="violet">커스텀 아키텍처</Badge>}
+                        {m.visibility === 'public' ? <Badge color="cyan">Public</Badge> : <Badge>Private</Badge>}
+                        {m.newArchitecture && <Badge color="violet">Custom architecture</Badge>}
                       </div>
                       <div className="font-mono text-xs text-fg3">
                         {username}/{m.slug}
@@ -129,10 +129,10 @@ export function MyModelDetail() {
   if (!m)
     return (
       <Empty
-        title="모델을 찾을 수 없습니다"
+        title="Model not found"
         action={
           <Link to="/my-models">
-            <Button variant="outline">내 모델</Button>
+            <Button variant="outline">My models</Button>
           </Link>
         }
       />
@@ -145,17 +145,17 @@ export function MyModelDetail() {
   return (
     <div>
       <Link to="/my-models" className="mb-4 inline-flex items-center gap-1 text-sm text-fg3 hover:text-fg">
-        <ArrowLeft size={14} /> 내 모델
+        <ArrowLeft size={14} /> My models
       </Link>
       <div className="flex flex-col gap-4 md:flex-row md:items-start">
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-line bg-raised text-fg2">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-line bg-raised text-fg2">
           <Cpu size={24} />
         </div>
         <div className="flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-2xl font-semibold tracking-tight">{m.displayName}</h1>
             <StatusBadge s={m.status} />
-            {m.visibility === 'public' ? <Badge color="cyan">마켓플레이스 공개</Badge> : <Badge>비공개</Badge>}
+            {m.visibility === 'public' ? <Badge color="cyan">Public on marketplace</Badge> : <Badge>Private</Badge>}
           </div>
           <div className="mt-1 flex items-center gap-1 font-mono text-sm text-fg3">
             {full} <CopyButton text={full} />
@@ -166,18 +166,18 @@ export function MyModelDetail() {
           {m.status === 'live' && (
             <>
               <Button variant="outline" onClick={() => update(m.id, { status: 'paused', pausedAt: Date.now() })}>
-                <Pause size={16} /> 일시정지
+                <Pause size={16} /> Pause
               </Button>
               <Link to={`/chat?model=${encodeURIComponent(full)}`}>
                 <Button>
-                  <MessageSquare size={16} /> 테스트
+                  <MessageSquare size={16} /> Try it
                 </Button>
               </Link>
             </>
           )}
           {m.status === 'paused' && (
             <Button onClick={() => update(m.id, { status: 'live' })}>
-              <Play size={16} /> 재개
+              <Play size={16} /> Resume
             </Button>
           )}
         </div>
@@ -186,7 +186,7 @@ export function MyModelDetail() {
       {building && (
         <Card className="mt-6 p-5">
           <div className="mb-3 flex items-center justify-between text-sm">
-            <span className="font-medium">배포 진행 중 — {p.phases[Math.min(p.phaseIndex, p.phases.length - 1)]?.label}</span>
+            <span className="font-medium">Deploying — {p.phases[Math.min(p.phaseIndex, p.phases.length - 1)]?.label}</span>
             <span className="text-fg3">{Math.round(p.progress * 100)}%</span>
           </div>
           <Progress value={p.progress} />
@@ -206,33 +206,33 @@ export function MyModelDetail() {
         value={tab}
         onChange={setTab}
         tabs={[
-          { id: 'overview', label: '개요' },
-          { id: 'logs', label: `빌드 로그 (${logs.length})` },
+          { id: 'overview', label: 'Overview' },
+          { id: 'logs', label: `Build logs (${logs.length})` },
           { id: 'api', label: 'API' },
-          { id: 'settings', label: '설정' },
+          { id: 'settings', label: 'Settings' },
         ]}
       />
       <div className="mt-6">
         {tab === 'overview' && (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              <Stat label="상태" value={STATUS[m.status].label} sub={m.status === 'live' ? `${m.minReplicas}–${m.maxReplicas} 레플리카` : undefined} />
-              <Stat label="하드웨어" value={`${m.gpuCount}x ${m.gpu}`} sub={`${fmtUSD(hourlyCost(m.gpu, m.gpuCount))}/hr · 레플리카당`} />
-              <Stat label="엔진" value={m.engine} sub={m.format.toUpperCase() + (m.weightFile ? ` · ${m.weightFile}` : '')} />
-              <Stat label="가격" value={m.visibility === 'public' ? `${fmtPrice(m.price.input)} / ${fmtPrice(m.price.output)}` : 'GPU 시간 과금'} sub={m.visibility === 'public' ? '입력 / 출력 per M' : '비공개 엔드포인트'} />
+              <Stat label="Status" value={STATUS[m.status].label} sub={m.status === 'live' ? `${m.minReplicas}–${m.maxReplicas} replicas` : undefined} />
+              <Stat label="Hardware" value={`${m.gpuCount}x ${m.gpu}`} sub={`${fmtUSD(hourlyCost(m.gpu, m.gpuCount))}/hr per replica`} />
+              <Stat label="Engine" value={m.engine} sub={m.format.toUpperCase() + (m.weightFile ? ` · ${m.weightFile}` : '')} />
+              <Stat label="Pricing" value={m.visibility === 'public' ? `${fmtPrice(m.price.input)} / ${fmtPrice(m.price.output)}` : 'Per GPU hour'} sub={m.visibility === 'public' ? 'input / output per M' : 'Private endpoint'} />
             </div>
             <Card className="divide-y divide-line text-sm">
               {(
                 [
-                  ['소스', m.source === 'cli' ? 'CLI 업로드' : `${m.source === 'huggingface' ? 'Hugging Face' : 'ModelScope'} · ${m.sourceRepo}${m.revision ? '@' + m.revision : ''}`],
-                  ['아키텍처', <span className="font-mono">{m.architecture}{m.newArchitecture ? ' (커스텀 패키지)' : ''}</span>],
-                  ...(m.customCode ? [['추론 코드', m.customCode.kind === 'github' ? `${m.customCode.repo} @ ${m.customCode.ref ?? 'main'}` : `로컬 업로드 · ${m.customCode.files?.length ?? 0}개 파일`]] : []),
-                  ['파라미터', fmtParams(m.params)],
-                  ['가중치 크기', m.sizeBytes ? fmtBytes(m.sizeBytes) : '—'],
-                  ['dtype / 양자화', m.format === 'gguf' ? m.weightFile : `${m.dtype} / ${m.quantization}`],
-                  ['컨텍스트', m.contextLength.toLocaleString()],
-                  ['채팅 템플릿', m.chatTemplate],
-                  ['생성', fmtDateTime(m.createdAt)],
+                  ['Source', m.source === 'cli' ? 'CLI upload' : `${m.source === 'huggingface' ? 'Hugging Face' : 'ModelScope'} · ${m.sourceRepo}${m.revision ? '@' + m.revision : ''}`],
+                  ['Architecture', <span className="font-mono">{m.architecture}{m.newArchitecture ? ' (custom package)' : ''}</span>],
+                  ...(m.customCode ? [['Inference code', m.customCode.kind === 'github' ? `${m.customCode.repo} @ ${m.customCode.ref ?? 'main'}` : `Local upload · ${m.customCode.files?.length ?? 0} files`]] : []),
+                  ['Parameters', fmtParams(m.params)],
+                  ['Weights size', m.sizeBytes ? fmtBytes(m.sizeBytes) : '—'],
+                  ['dtype / quant', m.format === 'gguf' ? m.weightFile : `${m.dtype} / ${m.quantization}`],
+                  ['Context', m.contextLength.toLocaleString()],
+                  ['Chat template', m.chatTemplate],
+                  ['Created', fmtDateTime(m.createdAt)],
                 ] as [string, React.ReactNode][]
               ).map(([k, v]) => (
                 <div key={k} className="flex gap-4 px-5 py-2.5">
@@ -245,11 +245,11 @@ export function MyModelDetail() {
         )}
 
         {tab === 'logs' && (
-          <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0c0d0f]">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0c0d0f]">
             <div className="max-h-[520px] overflow-y-auto p-4 font-mono text-[12px] leading-relaxed">
               {logs.map((l, i) => (
                 <div key={i} className={cx(l.level === 'ok' ? 'text-emerald-400' : l.level === 'warn' ? 'text-amber-400' : 'text-slate-300')}>
-                  <span className="mr-3 text-fg2">{new Date(l.t).toLocaleTimeString('ko-KR', { hour12: false })}</span>
+                  <span className="mr-3 text-fg2">{new Date(l.t).toLocaleTimeString('en-GB', { hour12: false })}</span>
                   {l.line}
                 </div>
               ))}
@@ -262,7 +262,7 @@ export function MyModelDetail() {
           (m.status === 'live' ? (
             <ApiSamples slug={full} />
           ) : (
-            <Card className="p-6 text-sm text-fg3">배포가 완료되면 API 예제가 활성화됩니다.</Card>
+            <Card className="p-6 text-sm text-fg3">API examples will be available once the deployment is live.</Card>
           ))}
 
         {tab === 'settings' && (
@@ -270,28 +270,28 @@ export function MyModelDetail() {
             <Card className="flex items-center justify-between gap-4 p-5">
               <div>
                 <div className="flex items-center gap-2 font-medium">
-                  {m.visibility === 'public' ? <Globe size={16} /> : <Lock size={16} />} 공개 범위
+                  {m.visibility === 'public' ? <Globe size={16} /> : <Lock size={16} />} Visibility
                 </div>
-                <div className="text-sm text-fg3">{m.visibility === 'public' ? '모든 사용자가 마켓플레이스에서 호출할 수 있습니다' : '내 API 키로만 호출할 수 있습니다'}</div>
+                <div className="text-sm text-fg3">{m.visibility === 'public' ? 'Anyone can call it from the marketplace' : 'Only callable with your API keys'}</div>
               </div>
               <Button
                 variant="outline"
                 onClick={() => {
                   const v = m.visibility === 'public' ? 'private' : 'public'
                   update(m.id, { visibility: v, price: v === 'public' && !m.price.output ? { input: 0.1, output: 0.4 } : m.price })
-                  toast.ok(v === 'public' ? '마켓플레이스에 공개했습니다' : '비공개로 전환했습니다')
+                  toast.ok(v === 'public' ? 'Published to the marketplace' : 'Made private')
                 }}
               >
-                <Settings2 size={15} /> {m.visibility === 'public' ? '비공개로 전환' : '공개하기'}
+                <Settings2 size={15} /> {m.visibility === 'public' ? 'Make private' : 'Publish'}
               </Button>
             </Card>
             <Card className="flex items-center justify-between gap-4 border-rose-500/30 p-5">
               <div>
-                <div className="font-medium text-rose-600 dark:text-rose-400">모델 삭제</div>
-                <div className="text-sm text-fg3">엔드포인트와 업로드된 가중치가 영구 삭제됩니다.</div>
+                <div className="font-medium text-rose-600 dark:text-rose-400">Delete model</div>
+                <div className="text-sm text-fg3">Permanently deletes the endpoint and uploaded weights.</div>
               </div>
               <Button variant="danger" onClick={() => setConfirm(true)}>
-                <Trash2 size={15} /> 삭제
+                <Trash2 size={15} /> Delete
               </Button>
             </Card>
           </div>
@@ -301,28 +301,28 @@ export function MyModelDetail() {
       <Modal
         open={confirm}
         onClose={() => setConfirm(false)}
-        title="모델을 삭제할까요?"
+        title="Delete this model?"
         size="sm"
         footer={
           <>
             <Button variant="ghost" onClick={() => setConfirm(false)}>
-              취소
+              Cancel
             </Button>
             <Button
               variant="danger"
               onClick={() => {
                 remove(m.id)
-                toast.ok('삭제했습니다')
+                toast.ok('Model deleted')
                 nav('/my-models')
               }}
             >
-              삭제
+              Delete
             </Button>
           </>
         }
       >
         <p className="text-sm">
-          <span className="font-mono">{full}</span> 를 삭제합니다. 이 작업은 되돌릴 수 없습니다.
+          This permanently deletes <span className="font-mono">{full}</span>. This can’t be undone.
         </p>
       </Modal>
     </div>

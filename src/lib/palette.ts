@@ -1,2 +1,3 @@
-/** 차트 계열 색. 1순위만 강조색, 나머지는 회색 단계로 둬서 화면이 시끄럽지 않게 한다 */
-export const SERIES = ['#ea580c', '#3f3f46', '#71717a', '#a1a1aa', '#c8c8ce', '#dcdce0', '#52525b', '#8e8e96']
+/** Chart series colors: only the first series gets the brand accent, the rest are gray steps */
+export const ACCENT = '#5b4cf0'
+export const SERIES = [ACCENT, '#3f3f46', '#71717a', '#a1a1aa', '#c8c8ce', '#dcdce0', '#52525b', '#8e8e96']

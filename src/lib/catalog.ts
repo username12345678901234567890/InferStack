@@ -27,7 +27,7 @@ export function customToCatalog(m: CustomModel, username: string): CatalogModel 
   }
 }
 
-/** 카탈로그 + (배포 완료된) 내 커스텀 모델 */
+/** Catalog plus the user's deployed custom models */
 export function useAllModels(opts: { includePrivate?: boolean } = {}) {
   const custom = useStore((s) => s.customModels)
   const username = useStore((s) => s.user?.username ?? 'me')

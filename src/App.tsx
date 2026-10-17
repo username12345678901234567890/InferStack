@@ -17,7 +17,7 @@ import MyModels, { MyModelDetail } from './pages/MyModels'
 import DeployHome from './pages/deploy/DeployHome'
 import DeployWizard from './pages/deploy/DeployWizard'
 
-/** ?source=…&repo=… 가 바뀌면 같은 라우트라도 마법사를 새로 시작 */
+/** Restart the wizard when ?source=…&repo=… changes, even on the same route */
 function KeyedDeployWizard() {
   const { search } = useLocation()
   return <DeployWizard key={search} />
@@ -50,10 +50,10 @@ export default function App() {
             path="*"
             element={
               <Empty
-                title="페이지를 찾을 수 없습니다"
+                title="Page not found"
                 action={
                   <Link to="/">
-                    <Button variant="outline">홈으로</Button>
+                    <Button variant="outline">Back to home</Button>
                   </Link>
                 }
               />

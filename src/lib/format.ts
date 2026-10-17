@@ -29,9 +29,9 @@ export function fmtUSD(n: number, digits = 2): string {
   return '$' + n.toLocaleString('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits })
 }
 
-/** $/1M 토큰 가격. 소수점은 최소 2자리, 필요할 때만 3자리 (0.08, 0.035, 1.10) */
+/** Price per 1M tokens: two decimals, three only when needed (0.08, 0.035, 1.10) */
 export function fmtPrice(perMillion: number): string {
-  if (perMillion === 0) return '무료'
+  if (perMillion === 0) return 'Free'
   const three = perMillion.toFixed(3)
   return '$' + (three.endsWith('0') ? perMillion.toFixed(2) : three)
 }
@@ -46,21 +46,21 @@ export function fmtBytes(n: number): string {
 
 export function fmtDate(d: string | number | Date): string {
   const dt = new Date(d)
-  return dt.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })
+  return dt.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
 }
 
 export function fmtDateTime(d: string | number | Date): string {
   const dt = new Date(d)
   const p = (n: number) => String(n).padStart(2, '0')
-  return `${p(dt.getMonth() + 1)}.${p(dt.getDate())} ${p(dt.getHours())}:${p(dt.getMinutes())}`
+  return `${dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}, ${p(dt.getHours())}:${p(dt.getMinutes())}`
 }
 
 export function timeAgo(d: string | number | Date): string {
   const s = Math.floor((Date.now() - new Date(d).getTime()) / 1000)
-  if (s < 60) return `${s}초 전`
-  if (s < 3600) return `${Math.floor(s / 60)}분 전`
-  if (s < 86400) return `${Math.floor(s / 3600)}시간 전`
-  if (s < 86400 * 30) return `${Math.floor(s / 86400)}일 전`
+  if (s < 60) return 'just now'
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`
+  if (s < 86400 * 30) return `${Math.floor(s / 86400)}d ago`
   return fmtDate(d)
 }
 

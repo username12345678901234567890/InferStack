@@ -11,7 +11,7 @@
   --fg: 24 24 27;
   --fg2: 82 82 91;
   --fg3: 113 113 122;
-  --accent: 234 88 12;
+  --accent: 91 76 240;
   --line: rgba(9, 9, 11, 0.075);
   --line2: rgba(9, 9, 11, 0.13);
   --code-bg: #f7f7f8;
@@ -30,7 +30,7 @@
   --fg: 236 236 239;
   --fg2: 161 161 170;
   --fg3: 120 120 130;
-  --accent: 245 130 60;
+  --accent: 150 140 255;
   --line: rgba(255, 255, 255, 0.07);
   --line2: rgba(255, 255, 255, 0.12);
   --code-bg: #0f0f11;
@@ -46,8 +46,8 @@ html {
 }
 body {
   @apply bg-bg text-fg antialiased;
-  font-feature-settings: 'ss06', 'tnum' 0;
-  word-break: keep-all;
+  font-feature-settings: 'cv11', 'ss01';
+  font-optical-sizing: auto;
 }
 h1, h2, h3 {
   text-wrap: balance;

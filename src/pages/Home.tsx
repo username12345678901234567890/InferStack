@@ -1,193 +1,519 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Check } from 'lucide-react'
-import { MODELS, ORGS, endpointsFor, findModel, weeklyTokens } from '../data/models'
+import { ArrowRight, Check, MessageSquare } from 'lucide-react'
+import { MODELS, ORGS, REGIONS, endpointsFor, findModel, weeklyTokens } from '../data/models'
 import { ARCHITECTURES } from '../data/architectures'
+import type { CatalogModel } from '../data/types'
 import { ModelFlags, OrgAvatar } from '../components/ModelBits'
-import { ButtonLink, Segmented, buttonClass, cx } from '../components/ui'
+import { LogoMark } from '../components/Logo'
+import { ButtonLink, CopyButton, Segmented, buttonClass, cx, highlight } from '../components/ui'
 import { CONTAINER } from '../components/Layout'
 import { FallbackArt, LogosArt, MetricsArt, UploadArt } from './home/Illustrations'
-import { fmtCtx, fmtPrice, fmtTokens } from '../lib/format'
+import { fmtCtx, fmtPrice, fmtTokens, fmtUSD } from '../lib/format'
 
 export default function Home() {
   return (
     <div>
       <Hero />
+      <Pulse />
+      <Showcase />
       <Features />
-      <Featured />
-      <Steps />
+      <Start />
       <Upload />
-      <Korea />
+      <Global />
+      <Closing />
+    </div>
+  )
+}
+
+const SECTION = 'py-16 sm:py-24'
+
+function useReducedMotion() {
+  const [reduce, setReduce] = useState(false)
+  useEffect(() => {
+    const q = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduce(q.matches)
+    const h = () => setReduce(q.matches)
+    q.addEventListener('change', h)
+    return () => q.removeEventListener('change', h)
+  }, [])
+  return reduce
+}
+
+/** Shared section heading: always left-aligned */
+function Head({ eyebrow, title, sub, action }: { eyebrow?: string; title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <div className="mb-10 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        {eyebrow && <div className="mb-3 text-[13px] font-medium text-accent">{eyebrow}</div>}
+        <h2 className="text-[30px] font-semibold leading-[1.15] tracking-[-0.025em] sm:text-[36px]">{title}</h2>
+        {sub && <p className="mt-3 text-[16px] leading-relaxed text-fg2">{sub}</p>}
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   )
 }
 
 /* ------------------------------------------------------------------ */
+/* Hero                                                                */
+/* ------------------------------------------------------------------ */
 
 function Hero() {
-  const maxCtx = Math.max(...MODELS.map((m) => m.context))
-  const stats = [
-    [String(MODELS.length), '오픈 모델'],
-    [String(ORGS.length), '모델 제작사'],
-    [String(ARCHITECTURES.length), '지원 아키텍처'],
-    [fmtCtx(maxCtx), '최대 컨텍스트'],
-  ]
+  const newest = [...MODELS].sort((a, b) => b.released.localeCompare(a.released))[0]
   return (
-    <section className={cx(CONTAINER, 'pb-16 pt-20 sm:pt-24')}>
-      <div className="flex flex-col items-center text-center">
-        <h1 className="text-[34px] font-bold leading-[1.25] tracking-[-0.025em] sm:text-[50px]">
-          오픈 모델과 내 모델을
+    <section className={cx(CONTAINER, 'grid grid-cols-1 items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_540px] lg:gap-14')}>
+      <div>
+        <Link to={`/models/${newest.slug}`} className="group inline-flex items-center gap-2 rounded-full border border-line bg-panel py-1 pl-1 pr-3 text-[13px] text-fg2 transition-colors hover:border-line2 hover:text-fg">
+          <span className="rounded-full bg-accent/10 px-2 py-0.5 text-[12px] font-medium text-accent">New</span>
+          {newest.name} is live
+          <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+        </Link>
+        <h1 className="mt-6 text-[42px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[60px]">
+          One API for
           <br />
-          하나의 API로
+          every open model
         </h1>
-        <p className="mt-5 text-[16px] leading-relaxed text-fg2 sm:text-[17px]">더 낮은 가격, 가까운 서울 리전, 구독 없이 쓴 만큼만.</p>
-        <div className="mt-8 flex flex-wrap justify-center gap-2.5">
-          <ButtonLink to="/keys" size="lg" className="min-w-[140px]">
-            API 키 받기
+        <p className="mt-6 max-w-[34rem] text-[17px] leading-relaxed text-fg2 sm:text-[18px]">
+          Call {MODELS.length} open-weight models from DeepSeek, Qwen, Kimi, GLM and {ORGS.length - 4} more labs — or deploy your own fine-tune to the same endpoint. OpenAI-compatible, pay per token.
+        </p>
+        <div className="mt-9 flex flex-wrap items-center gap-3">
+          <ButtonLink to="/keys" size="xl">
+            Get your API key <ArrowRight size={16} />
           </ButtonLink>
-          <ButtonLink to="/models" size="lg" variant="outline" className="min-w-[140px]">
-            모델 둘러보기
+          <ButtonLink to="/chat" size="xl" variant="outline">
+            Try it in chat
           </ButtonLink>
         </div>
+        <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-[13.5px] text-fg3">
+          {['$5 free credit', 'No card required', 'Works with the OpenAI SDK'].map((t) => (
+            <li key={t} className="flex items-center gap-1.5">
+              <Check size={14} className="text-fg2" /> {t}
+            </li>
+          ))}
+        </ul>
       </div>
-      <dl className="mt-16 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-4">
-        {stats.map(([v, k]) => (
-          <div key={k} className="text-center">
-            <dt className="tabular text-[28px] font-semibold tracking-[-0.02em]">{v}</dt>
-            <dd className="mt-1 text-[13.5px] text-fg3">{k}</dd>
-          </div>
-        ))}
-      </dl>
+      <LiveDemo />
     </section>
   )
 }
 
+const DEMO = [
+  {
+    model: 'deepseek/deepseek-v4.1-flash',
+    prompt: 'Explain the KV cache in two sentences.',
+    answer:
+      'A KV cache keeps the key and value tensors of tokens the model has already seen, so each new token attends to stored states instead of recomputing the whole prefix. Generation gets much faster, at the cost of GPU memory that grows with context length.',
+    code: false,
+  },
+  {
+    model: 'qwen/qwen3.8-27b',
+    prompt: 'SQL for daily active users from an events table.',
+    answer: "SELECT date_trunc('day', ts) AS day,\n       count(DISTINCT user_id) AS dau\nFROM events\nWHERE ts >= now() - interval '30 days'\nGROUP BY 1\nORDER BY 1;",
+    code: true,
+  },
+  {
+    model: 'z-ai/glm-5.3',
+    prompt: 'Three ways to cut LLM serving costs?',
+    answer:
+      '1. Quantize to FP8 or 4-bit — roughly half the memory, small quality loss.\n2. Batch continuously so GPUs stay busy between requests.\n3. Route easy prompts to a small model and keep the large one for hard ones.',
+    code: false,
+  },
+  {
+    model: 'moonshotai/kimi-k3',
+    prompt: 'A haiku about open weights.',
+    answer: 'Weights laid in the open —\nanyone may lift the stone\nand hear the river.',
+    code: false,
+  },
+]
+
+function LiveDemo() {
+  const reduce = useReducedMotion()
+  const [i, setI] = useState(0)
+  const [n, setN] = useState(0)
+  const [phase, setPhase] = useState<'wait' | 'stream' | 'done'>('wait')
+  const d = DEMO[i]
+  const m = findModel(d.model)!
+  const ep = useMemo(() => endpointsFor(m)[0], [m])
+
+  // play the current request: wait for the first token, then stream
+  useEffect(() => {
+    if (reduce) {
+      setN(d.answer.length)
+      setPhase('done')
+      return
+    }
+    setN(0)
+    setPhase('wait')
+    let count = 0
+    let tick: number | undefined
+    const start = window.setTimeout(() => {
+      setPhase('stream')
+      const step = Math.max(1, Math.round(ep.throughput / 40))
+      tick = window.setInterval(() => {
+        count = Math.min(d.answer.length, count + step)
+        setN(count)
+        if (count >= d.answer.length) {
+          window.clearInterval(tick)
+          setPhase('done')
+        }
+      }, 28)
+    }, Math.min(900, ep.latency))
+    return () => {
+      window.clearTimeout(start)
+      window.clearInterval(tick)
+    }
+  }, [i, reduce, d.answer, ep])
+
+  // then move on to the next model
+  useEffect(() => {
+    if (phase !== 'done' || reduce) return
+    const t = window.setTimeout(() => setI((x) => (x + 1) % DEMO.length), 3400)
+    return () => window.clearTimeout(t)
+  }, [phase, reduce])
+
+  const completion = Math.ceil(n / 4)
+  const cost = (14 * m.price.input + completion * m.price.output) / 1e6
+
+  return (
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_30px_70px_-35px_rgba(24,24,27,0.35)]">
+      <div className="flex items-center gap-1.5 overflow-x-auto border-b border-line px-3 py-2.5">
+        {DEMO.map((x, k) => {
+          const mm = findModel(x.model)!
+          return (
+            <button
+              key={x.model}
+              onClick={() => setI(k)}
+              className={cx('flex shrink-0 items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 text-[12.5px] transition-colors', k === i ? 'bg-raised font-medium text-fg ring-1 ring-inset ring-line2' : 'text-fg3 hover:text-fg')}
+            >
+              <OrgAvatar org={mm.org} name={mm.orgName} size={18} className="!rounded-full" />
+              {mm.name}
+            </button>
+          )
+        })}
+      </div>
+
+      <div className="h-[268px] px-5 py-5">
+        <div className="flex justify-end">
+          <div className="max-w-[85%] rounded-2xl rounded-br-md bg-raised px-3.5 py-2 text-[14px]">{d.prompt}</div>
+        </div>
+        <div className="mt-4 flex gap-3">
+          <OrgAvatar org={m.org} name={m.orgName} size={24} className="mt-0.5 shrink-0" />
+          <div className={cx('min-w-0 flex-1 whitespace-pre-wrap text-[14px] leading-relaxed', d.code && 'rounded-xl bg-raised px-3.5 py-3 font-mono text-[12.5px] leading-[1.7]')}>
+            {phase === 'wait' ? (
+              <span className="inline-flex gap-1 py-2">
+                {[0, 1, 2].map((k) => (
+                  <span key={k} className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg3" style={{ animationDelay: `${k * 150}ms` }} />
+                ))}
+              </span>
+            ) : (
+              <>
+                {d.code ? highlight(d.answer.slice(0, n), 'sql') : d.answer.slice(0, n)}
+                {phase === 'stream' && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-blink bg-fg" />}
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-4 border-t border-line px-5 py-3 text-[12.5px] text-fg3">
+        <span className="tabular">
+          <span className="text-fg2">{phase === 'wait' ? '—' : `${(ep.latency / 1000).toFixed(2)}s`}</span> latency
+        </span>
+        <span className="tabular hidden sm:inline">
+          <span className="text-fg2">{phase === 'wait' ? '—' : ep.throughput}</span> tok/s
+        </span>
+        <span className="tabular text-fg2">{fmtUSD(cost)}</span>
+        <Link to={`/chat?model=${encodeURIComponent(m.slug)}`} className="ml-auto flex items-center gap-1 font-medium text-fg transition-colors hover:text-accent">
+          Open in chat <ArrowRight size={13} />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Live numbers + model ticker                                         */
+/* ------------------------------------------------------------------ */
+
+function servedToday(perSec: number) {
+  const d = new Date()
+  const secs = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000
+  return Math.round(perSec * Math.max(secs, 1))
+}
+
+function Pulse() {
+  const reduce = useReducedMotion()
+  const perSec = useMemo(() => MODELS.reduce((a, m) => a + weeklyTokens(m), 0) / (7 * 86400), [])
+  const [served, setServed] = useState(() => servedToday(perSec))
+  useEffect(() => {
+    if (reduce) return
+    const t = window.setInterval(() => setServed(servedToday(perSec)), 120)
+    return () => window.clearInterval(t)
+  }, [reduce, perSec])
+
+  const stats = [
+    { v: served.toLocaleString('en-US'), k: 'Tokens served today', live: true },
+    { v: String(MODELS.length), k: 'Models' },
+    { v: String(ORGS.length), k: 'Labs' },
+    { v: String(REGIONS.length), k: 'Regions' },
+  ]
+  return (
+    <section className="border-y border-line">
+      <dl className={cx(CONTAINER, 'grid grid-cols-3 gap-y-6 py-8 lg:grid-cols-[1.6fr_1fr_1fr_1fr]')}>
+        {stats.map((s, i) => (
+          <div key={s.k} className={cx('min-w-0', i > 1 && 'border-l border-line pl-5 lg:pl-8', i === 1 && 'lg:border-l lg:border-line lg:pl-8', i === 0 && 'col-span-3 lg:col-span-1')}>
+            <dt className="tabular truncate text-[28px] font-semibold tracking-[-0.03em] sm:text-[32px]">{s.v}</dt>
+            <dd className="mt-1 flex items-center gap-1.5 text-[13.5px] text-fg3">
+              {s.live && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
+              {s.k}
+            </dd>
+          </div>
+        ))}
+      </dl>
+      <Ticker />
+    </section>
+  )
+}
+
+function Ticker() {
+  const list = useMemo(() => [...MODELS].sort((a, b) => weeklyTokens(b) - weeklyTokens(a)), [])
+  return (
+    <div className="group relative overflow-hidden border-t border-line py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)]">
+      <div className="flex w-max animate-marquee gap-2.5 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+        {[...list, ...list].map((m, i) => (
+          <Link
+            key={m.slug + i}
+            to={`/models/${m.slug}`}
+            aria-hidden={i >= list.length}
+            tabIndex={i >= list.length ? -1 : 0}
+            className="flex shrink-0 items-center gap-2 rounded-full border border-line bg-panel py-1.5 pl-1.5 pr-3.5 text-[13px] transition-colors hover:border-line2"
+          >
+            <OrgAvatar org={m.org} name={m.orgName} size={20} className="!rounded-full" />
+            <span className="font-medium">{m.name}</span>
+            <span className="tabular text-fg3">{fmtPrice(m.price.output)}/M</span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Catalog showcase                                                    */
+/* ------------------------------------------------------------------ */
+
+type Tab = 'trending' | 'new' | 'free' | 'coding' | 'vision' | 'long'
+
+const TABS: { id: Tab; label: string; pick: (m: CatalogModel) => boolean; sort?: (a: CatalogModel, b: CatalogModel) => number }[] = [
+  { id: 'trending', label: 'Trending', pick: () => true },
+  { id: 'new', label: 'New', pick: (m) => !!m.isNew, sort: (a, b) => b.released.localeCompare(a.released) },
+  { id: 'free', label: 'Free tier', pick: (m) => !!m.free },
+  { id: 'coding', label: 'Coding', pick: (m) => m.capabilities.includes('coding') },
+  { id: 'vision', label: 'Vision', pick: (m) => m.input.includes('image') },
+  { id: 'long', label: '1M context', pick: (m) => m.context >= 1_000_000 },
+]
+
+function Showcase() {
+  const [tab, setTab] = useState<Tab>('trending')
+  const t = TABS.find((x) => x.id === tab)!
+  const list = MODELS.filter(t.pick)
+    .sort(t.sort ?? ((a, b) => weeklyTokens(b) - weeklyTokens(a)))
+    .slice(0, 12)
+  return (
+    <section className={cx(CONTAINER, SECTION)}>
+      <Head
+        title="Every major open model, one endpoint"
+        sub="New releases land the day they ship. Same request format, same key, priced per token."
+        action={
+          <ButtonLink to="/models" variant="outline">
+            Browse all {MODELS.length} models <ArrowRight size={15} />
+          </ButtonLink>
+        }
+      />
+      <div className="-mx-5 mb-6 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <Segmented value={tab} onChange={setTab} options={TABS.map((x) => ({ id: x.id, label: x.label }))} className="[&>button]:px-3.5 [&>button]:py-1.5 [&>button]:text-[13px]" />
+      </div>
+      <div key={tab} className="grid animate-fade-in gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((m, i) => (
+          <ModelCard key={m.slug} m={m} className={i >= 6 ? 'hidden sm:flex' : undefined} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ModelCard({ m, className }: { m: CatalogModel; className?: string }) {
+  const nav = useNavigate()
+  return (
+    <div className={cx('group relative flex flex-col rounded-2xl border border-line bg-panel p-4 transition-[border-color,box-shadow] hover:border-line2 hover:shadow-[0_10px_30px_-18px_rgba(24,24,27,0.3)]', className)}>
+      <Link to={`/models/${m.slug}`} className="absolute inset-0 rounded-2xl" aria-label={m.name} />
+      <div className="flex items-center gap-3">
+        <OrgAvatar org={m.org} name={m.orgName} size={34} />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[14.5px] font-semibold tracking-[-0.01em]">{m.name}</div>
+          <div className="text-[12.5px] text-fg3">{m.orgName}</div>
+        </div>
+        <button
+          onClick={() => nav(`/chat?model=${encodeURIComponent(m.slug)}`)}
+          className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-fg3 opacity-0 transition hover:bg-raised hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+          title={`Chat with ${m.name}`}
+          aria-label={`Chat with ${m.name}`}
+        >
+          <MessageSquare size={15} />
+        </button>
+      </div>
+      <p className="mt-3 line-clamp-2 flex-1 text-[13px] leading-relaxed text-fg2">{m.description}</p>
+      <div className="mt-4 flex items-center gap-1.5">
+        <ModelFlags m={m} />
+        <span className="tabular ml-auto whitespace-nowrap text-[12.5px] text-fg2">
+          {fmtPrice(m.price.input)} <span className="text-fg3">in</span> · {fmtPrice(m.price.output)} <span className="text-fg3">out</span>
+        </span>
+      </div>
+      <div className="tabular mt-1.5 flex justify-between text-[12px] text-fg3">
+        <span>{fmtCtx(m.context)} context</span>
+        <span>{fmtTokens(weeklyTokens(m))} tokens/wk</span>
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Why InferStack                                                      */
 /* ------------------------------------------------------------------ */
 
 function Features() {
   const items = [
-    { art: <LogosArt />, title: '최신 오픈 모델을 한 곳에서', desc: 'DeepSeek, Qwen, GLM, Kimi 등 19개 제작사의 모델을 같은 형식으로 호출합니다.', link: ['모델 둘러보기', '/models'] },
-    { art: <FallbackArt />, title: '장애가 나도 멈추지 않게', desc: '리전 하나가 응답하지 않으면 같은 모델을 서빙하는 다른 리전으로 바로 넘어갑니다.', link: ['라우팅 알아보기', '/docs#routing'] },
-    { art: <MetricsArt />, title: '가격과 성능을 투명하게', desc: '모델마다 토큰 가격, 처리량, 첫 토큰 지연을 공개합니다. 숫자로 비교하고 고르세요.', link: ['랭킹 보기', '/rankings'] },
-    { art: <UploadArt />, title: '내 모델도 같은 API로', desc: 'Hugging Face, ModelScope, CLI로 가중치를 올리면 전용 엔드포인트가 만들어집니다.', link: ['모델 올리기', '/deploy'] },
+    { art: <LogosArt />, title: 'Every lab, one format', desc: `Models from ${ORGS.length} labs behind the same OpenAI-compatible request. Switch models by changing one string.`, link: ['Browse models', '/models'] },
+    { art: <FallbackArt />, title: 'Fails over, keeps answering', desc: 'If a region stops responding, the request moves to another region serving the same model.', link: ['How routing works', '/docs#routing'] },
+    { art: <MetricsArt />, title: 'Prices and speed in the open', desc: 'Token price, throughput and latency are published for every endpoint. Compare with numbers.', link: ['See rankings', '/rankings'] },
+    { art: <UploadArt />, title: 'Your models, same API', desc: 'Import weights from Hugging Face, ModelScope or the CLI and get a dedicated endpoint.', link: ['Deploy a model', '/deploy'] },
   ]
   return (
-    <section className={cx(CONTAINER, 'pb-14')}>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((it) => (
-          <Link key={it.title} to={it.link[1]} className="group flex flex-col overflow-hidden rounded-xl border border-line bg-panel transition-colors hover:border-line2">
-            <div className="flex h-[184px] items-center justify-center bg-raised/70 px-6">{it.art}</div>
-            <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
-              <h3 className="text-[15.5px] font-semibold">{it.title}</h3>
-              <p className="mt-1.5 flex-1 text-[14px] leading-relaxed text-fg2">{it.desc}</p>
-              <span className="mt-4 text-[13.5px] text-fg3 transition-colors group-hover:text-fg">{it.link[0]} →</span>
-            </div>
-          </Link>
-        ))}
+    <section className="bg-raised/50">
+      <div className={cx(CONTAINER, SECTION)}>
+        <Head title="Built for production traffic" sub="The unglamorous parts of serving open models — routing, failover, metering — handled for you." />
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {items.map((it) => (
+            <Link key={it.title} to={it.link[1]} className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-panel transition-colors hover:border-line2">
+              <div className="flex h-[184px] items-center justify-center border-b border-line px-6">{it.art}</div>
+              <div className="flex flex-1 flex-col px-5 pb-5 pt-4">
+                <h3 className="text-[15.5px] font-semibold tracking-[-0.01em]">{it.title}</h3>
+                <p className="mt-1.5 flex-1 text-[14px] leading-relaxed text-fg2">{it.desc}</p>
+                <span className="mt-4 flex items-center gap-1 text-[13.5px] font-medium text-fg2 transition-colors group-hover:text-fg">
+                  {it.link[0]} <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
+/* Get started                                                         */
+/* ------------------------------------------------------------------ */
 
-function Featured() {
-  const featured = ['deepseek/deepseek-v4.1-flash', 'z-ai/glm-5.3', 'qwen/qwen3.8-27b'].map((s) => findModel(s)!)
+const SNIPPETS = {
+  python: {
+    lang: 'python',
+    code: `from openai import OpenAI
+
+client = OpenAI(
+    base_url="https://api.inferstack.dev/v1",
+    api_key="sk-is-v1-...",
+)
+
+res = client.chat.completions.create(
+    model="deepseek/deepseek-v4.1-flash",
+    messages=[{"role": "user", "content": "Hello!"}],
+)
+print(res.choices[0].message.content)`,
+  },
+  typescript: {
+    lang: 'ts',
+    code: `import OpenAI from "openai"
+
+const client = new OpenAI({
+  baseURL: "https://api.inferstack.dev/v1",
+  apiKey: process.env.INFERSTACK_API_KEY,
+})
+
+const res = await client.chat.completions.create({
+  model: "deepseek/deepseek-v4.1-flash",
+  messages: [{ role: "user", content: "Hello!" }],
+})
+console.log(res.choices[0].message.content)`,
+  },
+  curl: {
+    lang: 'bash',
+    code: `curl https://api.inferstack.dev/v1/chat/completions \\
+  -H "Authorization: Bearer $INFERSTACK_API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "model": "deepseek/deepseek-v4.1-flash",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'`,
+  },
+}
+
+function Start() {
+  const [lang, setLang] = useState<keyof typeof SNIPPETS>('python')
+  const steps = [
+    { title: 'Create an account', desc: 'Sign in with GitHub or Google. You get $5 of credit to try any model.', to: '/signin', cta: 'Sign up' },
+    { title: 'Create an API key', desc: 'Set a spend limit, an expiry date or allowed models per key.', to: '/keys', cta: 'Create a key' },
+    { title: 'Change your base URL', desc: 'Point any OpenAI client at InferStack. The rest of your code stays the same.', to: '/docs#quickstart', cta: 'Read the quickstart' },
+  ]
+  const s = SNIPPETS[lang]
   return (
-    <section className={cx(CONTAINER, SECTION)}>
-      <Head title="주목할 모델" sub="새로 들어왔거나 많이 쓰이는 모델" link={['모든 모델', '/models']} />
-      <div className="grid gap-4 md:grid-cols-3">
-          {featured.map((m) => {
-            const ep = endpointsFor(m)[0]
-            return (
-              <Link key={m.slug} to={`/models/${m.slug}`} className="flex flex-col rounded-xl border border-line bg-panel transition-colors hover:border-line2">
-                <div className="flex items-start gap-3 p-5">
-                  <OrgAvatar org={m.org} name={m.orgName} size={40} />
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="truncate text-[15.5px] font-semibold">{m.name}</span>
-                      <ModelFlags m={m} />
-                    </div>
-                    <div className="mt-0.5 text-[13px] text-fg3">by {m.orgName}</div>
-                  </div>
-                </div>
-                <p className="line-clamp-2 px-5 text-[13.5px] leading-relaxed text-fg2">{m.description}</p>
-                <dl className="tabular mt-5 grid grid-cols-3 border-t border-line">
-                  {[
-                    [fmtTokens(weeklyTokens(m)), '주간 토큰'],
-                    [`${(ep.latency / 1000).toFixed(2)}s`, '첫 토큰'],
-                    [fmtPrice(m.price.output), '출력 / 1M'],
-                  ].map(([v, k], i) => (
-                    <div key={k} className={cx('px-5 py-4', i > 0 && 'border-l border-line')}>
-                      <dt className="text-[16px] font-semibold">{v}</dt>
-                      <dd className="mt-0.5 text-[12.5px] text-fg3">{k}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </Link>
-            )
-          })}
+    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16')}>
+      <div>
+        <Head title="Your first call in three steps" sub="If your code already talks to OpenAI, you are one line away." />
+        <ol className="space-y-1">
+          {steps.map((st, i) => (
+            <li key={st.title} className="-mx-3 flex gap-4 rounded-2xl p-3">
+              <span className="tabular flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-line2 text-[13px] font-semibold">{i + 1}</span>
+              <div className="min-w-0">
+                <h3 className="text-[16px] font-semibold tracking-[-0.01em]">{st.title}</h3>
+                <p className="mt-1 text-[14.5px] leading-relaxed text-fg2">{st.desc}</p>
+                <Link to={st.to} className="mt-2 inline-flex items-center gap-1 text-[13.5px] font-medium text-accent hover:underline hover:underline-offset-4">
+                  {st.cta} <ArrowRight size={13} />
+                </Link>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="code-panel min-w-0 self-center overflow-hidden rounded-2xl border border-line">
+        <div className="flex items-center justify-between border-b border-line px-3 py-2">
+          <Segmented
+            value={lang}
+            onChange={setLang}
+            options={[
+              { id: 'python', label: 'Python' },
+              { id: 'typescript', label: 'TypeScript' },
+              { id: 'curl', label: 'cURL' },
+            ]}
+          />
+          <CopyButton text={s.code} label="Copy" className="hover:bg-fg/[0.06]" />
+        </div>
+        <pre className="overflow-x-auto py-5 font-mono text-[13px] leading-[1.75]">
+          <code className="block min-w-max">
+            {s.code.split('\n').map((l, i) => (
+              <span key={i} className={cx('block px-5', /base_url|baseURL|api\.inferstack\.dev/.test(l) && 'bg-accent/[0.08]')}>
+                {highlight(l, s.lang)}
+              </span>
+            ))}
+          </code>
+        </pre>
       </div>
     </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
-
-function Steps() {
-  return (
-    <section className={cx(CONTAINER, SECTION)}>
-      <Head title="3단계로 시작하기" sub="가입부터 첫 호출까지 몇 분이면 됩니다" />
-      <div className="grid gap-4 md:grid-cols-3">
-          <Step n={1} title="가입하기" desc="GitHub 계정이나 이메일로 가입하면 체험용 크레딧 $5가 들어옵니다.">
-            <div className="flex flex-col gap-2">
-              <div className="flex h-9 items-center justify-center rounded-lg bg-fg text-[13px] font-medium text-bg">GitHub로 계속</div>
-              <div className="flex h-9 items-center justify-center rounded-lg border border-line2 text-[13px] font-medium text-fg2">이메일로 계속</div>
-            </div>
-          </Step>
-          <Step n={2} title="크레딧 충전" desc="원화로 충전하고, 쓴 토큰만큼만 차감됩니다. 무료 모델은 차감되지 않습니다.">
-            <div className="flex items-center justify-between rounded-lg bg-raised px-4 py-3">
-              <div>
-                <div className="text-[12px] text-fg3">잔액</div>
-                <div className="tabular text-[20px] font-bold">$48.25</div>
-              </div>
-              <div className="flex gap-1.5">
-                {['+$10', '+$25'].map((a) => (
-                  <span key={a} className="rounded-md bg-panel px-2 py-1 text-[12.5px] text-fg2 ring-1 ring-inset ring-line">
-                    {a}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </Step>
-          <Step n={3} title="키 발급 후 호출" desc="API 키를 만들고 기존 코드의 base URL만 바꾸면 끝입니다.">
-            <div className="overflow-hidden rounded-lg bg-raised px-4 py-3 font-mono text-[11.5px] leading-[1.9] text-fg">
-              <div className="truncate">
-                <span className="text-fg3">base_url=</span>"https://api.inferstack.dev/v1"
-              </div>
-              <div className="truncate">
-                <span className="text-fg3">api_key=</span>"sk-is-v1-••••"
-              </div>
-            </div>
-          </Step>
-      </div>
-    </section>
-  )
-}
-
-function Step({ n, title, desc, children }: { n: number; title: string; desc: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col rounded-xl border border-line bg-panel p-5">
-      <div className="flex items-center gap-3">
-        <span className="tabular flex h-6 w-6 items-center justify-center rounded-full bg-raised text-[12.5px] font-semibold text-fg2">{n}</span>
-        <h3 className="text-[15.5px] font-semibold">{title}</h3>
-      </div>
-      <p className="mt-2.5 flex-1 text-[14px] leading-relaxed text-fg2">{desc}</p>
-      <div className="mt-5">{children}</div>
-    </div>
-  )
-}
-
+/* Bring your own model                                                */
 /* ------------------------------------------------------------------ */
 
 function Upload() {
@@ -201,16 +527,16 @@ function Upload() {
     ['Q4_K_M', '14.5 GB'],
   ]
   return (
-    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16')}>
+    <section className="bg-raised/50">
+      <div className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16')}>
         <div>
-          <h2 className="text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">
-            직접 학습한 모델도
-            <br />
-            몇 분 만에 API로
-          </h2>
-          <p className="mt-4 max-w-md text-[15px] leading-[1.7] text-fg2">Repo ID만 넣으면 아키텍처와 양자화 파일을 읽고, 필요한 GPU까지 골라 드립니다. 목록에 없는 새 아키텍처는 추론 코드를 함께 올리면 됩니다.</p>
-          <ul className="mt-7 space-y-2.5 text-[14.5px]">
-            {['Hugging Face · ModelScope · CLI 업로드', 'GGUF와 Safetensors, 배포 시 FP8 양자화', `${ARCHITECTURES.length}개 아키텍처 자동 감지`, '비공개로 쓰거나 공개해서 매출의 80% 정산'].map((t) => (
+          <Head
+            eyebrow="Bring your own model"
+            title="Your fine-tune, live in minutes"
+            sub="Paste a repo ID. We read the architecture and quantized files, pick the GPU and give you an endpoint. New architecture? Upload your inference code with it."
+          />
+          <ul className="-mt-2 space-y-2.5 text-[14.5px]">
+            {['Hugging Face, ModelScope or CLI upload', 'GGUF and safetensors, optional FP8 at deploy', `${ARCHITECTURES.length} architectures detected automatically`, 'Keep it private, or publish and earn 80% of revenue'].map((t) => (
               <li key={t} className="flex items-center gap-2.5">
                 <Check size={15} className="shrink-0 text-fg3" /> {t}
               </li>
@@ -236,32 +562,32 @@ function Upload() {
                 value={repo}
                 onChange={(e) => setRepo(e.target.value)}
                 placeholder="Qwen/Qwen3.8-27B"
-                aria-label="리포지토리 ID"
-                className="h-10 min-w-0 flex-1 rounded-lg border border-line2 bg-panel px-3.5 text-[14px] text-fg placeholder:text-fg3 focus:border-fg/35 focus:outline-none"
+                aria-label="Repository ID"
+                className="h-11 min-w-0 flex-1 rounded-full border border-line2 bg-panel px-4 text-[14px] text-fg placeholder:text-fg3 focus:border-fg/35 focus:outline-none"
               />
-              <button type="submit" className={buttonClass('primary', 'md', 'h-10 shrink-0 px-5')}>
-                불러오기
+              <button type="submit" className={buttonClass('primary', 'lg', 'shrink-0')}>
+                Import
               </button>
             </div>
           </form>
         </div>
 
-        <div className="min-w-0 overflow-hidden rounded-xl border border-line bg-panel shadow-[0_8px_30px_-12px_rgba(0,0,0,0.12)]">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_20px_50px_-30px_rgba(24,24,27,0.3)]">
           <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
             <OrgAvatar org="liquid" name="Liquid AI" size={28} />
             <div className="min-w-0">
               <div className="truncate font-mono text-[13px] font-medium">LiquidAI/LFM2.5-24B-A2B-GGUF</div>
-              <div className="text-[12px] text-fg3">Hugging Face에서 불러옴</div>
+              <div className="text-[12px] text-fg3">Imported from Hugging Face</div>
             </div>
             <span className="ml-auto flex shrink-0 items-center gap-1 text-[12.5px] font-medium text-emerald-600 dark:text-emerald-400">
-              <Check size={14} /> 분석 완료
+              <Check size={14} /> Analyzed
             </span>
           </div>
           <dl className="tabular grid grid-cols-3 border-b border-line">
             {[
-              ['아키텍처', 'Lfm2Moe'],
-              ['파라미터', '24B'],
-              ['컨텍스트', '131K'],
+              ['Architecture', 'Lfm2Moe'],
+              ['Parameters', '24B'],
+              ['Context', '131K'],
             ].map(([k, v], i) => (
               <div key={k} className={cx('px-5 py-3.5', i > 0 && 'border-l border-line')}>
                 <dt className="text-[12px] text-fg3">{k}</dt>
@@ -269,15 +595,15 @@ function Upload() {
               </div>
             ))}
           </dl>
-          <div className="px-5 pb-2 pt-4 text-[12.5px] font-medium text-fg3">양자화 파일</div>
+          <div className="px-5 pb-2 pt-4 text-[12.5px] font-medium text-fg3">Quantized files</div>
           <div className="px-3 pb-3">
             {quants.map(([q, size]) => {
               const on = q === 'Q4_K_M'
               return (
-                <div key={q} className={cx('flex items-center gap-3 rounded-lg px-3 py-2.5 text-[13.5px]', on && 'bg-raised')}>
+                <div key={q} className={cx('flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px]', on && 'bg-raised')}>
                   <span className={cx('h-4 w-4 shrink-0 rounded-full border', on ? 'border-[5px] border-fg' : 'border-line2')} />
                   <span className="w-20 font-mono">{q}</span>
-                  <span className="flex-1 text-fg3">{on ? '추천' : ''}</span>
+                  <span className="flex-1 text-fg3">{on ? 'Recommended' : ''}</span>
                   <span className="tabular text-fg2">{size}</span>
                 </div>
               )
@@ -285,85 +611,100 @@ function Upload() {
           </div>
           <div className="flex items-center justify-between border-t border-line px-5 py-3.5 text-[13.5px]">
             <span className="text-fg2">
-              추천 GPU <span className="font-semibold text-fg">1× L40S</span>
+              Suggested GPU <span className="font-semibold text-fg">1× L40S</span>
             </span>
-            <span className="tabular font-semibold">$1.60 / 시간</span>
+            <span className="tabular font-semibold">$1.60 / hr</span>
           </div>
         </div>
+      </div>
     </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
+/* Global                                                              */
+/* ------------------------------------------------------------------ */
 
-function Korea() {
+function Global() {
+  const reduce = useReducedMotion()
+  const base = useMemo(() => REGIONS.map((_, i) => 38 + ((i * 47) % 120)), [])
+  const [lat, setLat] = useState(base)
+  const seed = useRef(7)
+  useEffect(() => {
+    if (reduce) return
+    const t = window.setInterval(() => {
+      setLat(
+        base.map((b) => {
+          seed.current = (seed.current * 9301 + 49297) % 233280
+          return Math.round(b * (0.92 + (seed.current / 233280) * 0.16))
+        }),
+      )
+    }, 2000)
+    return () => window.clearInterval(t)
+  }, [base, reduce])
+
   return (
-    <>
-      <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16')}>
-        <div>
-          <div className="text-[13.5px] font-medium text-fg3">한국 팀을 위한 결제</div>
-          <h2 className="mt-2 text-[28px] font-bold leading-[1.3] tracking-[-0.02em]">
-            해외 AI API 결제,
-            <br />
-            세금계산서 때문에 막히셨나요?
-          </h2>
-          <p className="mt-4 max-w-md text-[15px] leading-[1.7] text-fg2">해외 모델 회사에 카드로 직접 결제하면 국내 세금계산서를 받을 수 없습니다. InferStack은 원화로 충전하고 매월 세금계산서를 발행합니다.</p>
-          <div className="mt-8 flex gap-2.5">
-            <ButtonLink to="/signin">무료로 시작하기</ButtonLink>
-            <ButtonLink to="/pricing" variant="outline">
-              가격 보기
-            </ButtonLink>
-          </div>
-        </div>
-        <dl className="lg:pt-7">
-          {[
-            ['세금계산서 자동 발행', '사용한 만큼 원화로 정산하고 매월 초 전자세금계산서를 보내 드립니다.'],
-            ['원화 충전, 법인카드', '카드, 계좌이체, 법인카드로 충전합니다. 잔액이 줄면 자동으로 충전할 수도 있습니다.'],
-            ['서울 리전 우선', '요청은 서울 리전에서 먼저 처리하고, 응답이 없으면 도쿄 리전으로 넘깁니다.'],
-          ].map(([t, d]) => (
-            <div key={t} className="border-t border-line py-6 first:border-0 first:pt-1 last:pb-0">
-              <dt className="text-[15.5px] font-semibold">{t}</dt>
-              <dd className="mt-1.5 text-[14px] leading-relaxed text-fg2">{d}</dd>
-            </div>
+    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16')}>
+      <div>
+        <Head
+          eyebrow="Global by default"
+          title="Close to your users, wherever they are"
+          sub={`Requests go to the nearest healthy region across ${REGIONS.length} locations on four continents, and fail over automatically when one slows down.`}
+        />
+        <ul className="-mt-2 space-y-2.5 text-[14.5px]">
+          {['Pay in USD with any major card', 'Monthly invoices for teams', 'Prompts are never logged unless you opt in', 'Pin a region when data residency matters'].map((t) => (
+            <li key={t} className="flex items-center gap-2.5">
+              <Check size={15} className="shrink-0 text-fg3" /> {t}
+            </li>
           ))}
-        </dl>
-      </section>
-
-      <section className={cx(CONTAINER, 'pb-20 pt-6')}>
-        <div className="flex flex-col items-center rounded-2xl bg-raised px-6 py-14 text-center">
-          <h2 className="text-[26px] font-bold tracking-[-0.02em]">지금 바로 호출해 보세요</h2>
-          <p className="mt-2.5 text-[15px] text-fg2">가입하면 체험용 크레딧 $5와 무료 모델을 바로 쓸 수 있습니다.</p>
-          <div className="mt-7 flex flex-wrap justify-center gap-2.5">
-            <ButtonLink to="/keys" size="lg">
-              API 키 받기
-            </ButtonLink>
-            <ButtonLink to="/chat" size="lg" variant="outline" className="bg-panel">
-              채팅으로 써보기
-            </ButtonLink>
-          </div>
+        </ul>
+      </div>
+      <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-panel">
+        <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+          <span className="text-[14px] font-semibold">Edge latency</span>
+          <span className="flex items-center gap-1.5 text-[12.5px] text-fg3">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> All regions operational
+          </span>
         </div>
-      </section>
-    </>
+        <ul>
+          {REGIONS.map((r, i) => (
+            <li key={r.region} className="flex items-center gap-4 border-b border-line px-5 py-3 text-[14px] last:border-0">
+              <span className="w-24 shrink-0 font-medium">{r.location}</span>
+              <span className="hidden w-32 shrink-0 font-mono text-[12.5px] text-fg3 sm:block">{r.region}</span>
+              <span className="h-1 flex-1 overflow-hidden rounded-full bg-raised">
+                <span className="block h-full rounded-full bg-fg/25 transition-[width] duration-700" style={{ width: `${Math.min(100, (lat[i] / 180) * 100)}%` }} />
+              </span>
+              <span className="tabular w-14 shrink-0 text-right text-fg2">{lat[i]} ms</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
+/* Closing                                                             */
+/* ------------------------------------------------------------------ */
 
-const SECTION = 'py-12 sm:py-14'
-
-/** 홈 섹션 제목. 모든 섹션이 같은 모양을 쓴다 */
-function Head({ title, sub, link }: { title: string; sub?: string; link?: [string, string] }) {
+function Closing() {
   return (
-    <div className="mb-7 flex items-end justify-between gap-4">
-      <div>
-        <h2 className="text-[24px] font-bold tracking-[-0.02em]">{title}</h2>
-        {sub && <p className="mt-1.5 text-[15px] text-fg2">{sub}</p>}
+    <section className={cx(CONTAINER, 'pb-24')}>
+      <div className="relative overflow-hidden rounded-3xl bg-[#0d0d12] px-8 py-14 text-white sm:px-14">
+        <LogoMark size={300} className="pointer-events-none absolute -right-6 top-1/2 hidden -translate-y-1/2 lg:block" />
+        <div className="relative max-w-xl">
+          <h2 className="text-[32px] font-semibold leading-[1.12] tracking-[-0.03em] sm:text-[40px]">Start building in minutes</h2>
+          <p className="mt-4 text-[16.5px] leading-relaxed text-white/65">Get $5 of free credit and call any of {MODELS.length} models with the OpenAI client you already use.</p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link to="/keys" className={buttonClass('primary', 'xl', '!bg-white !text-[#0d0d12] hover:!bg-white/90')}>
+              Get your API key <ArrowRight size={16} />
+            </Link>
+            <Link to="/docs" className={buttonClass('outline', 'xl', '!border-white/20 !text-white hover:!bg-white/10')}>
+              Read the docs
+            </Link>
+          </div>
+        </div>
       </div>
-      {link && (
-        <Link to={link[1]} className="shrink-0 text-[14px] text-fg3 transition-colors hover:text-fg">
-          {link[0]} →
-        </Link>
-      )}
-    </div>
+    </section>
   )
 }

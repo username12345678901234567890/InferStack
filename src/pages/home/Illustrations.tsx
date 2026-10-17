@@ -3,7 +3,7 @@ import { ORGS, findModel, endpointsFor } from '../../data/models'
 import { OrgAvatar } from '../../components/ModelBits'
 import { rng } from '../../lib/rand'
 
-/** 1. 제작사 로고 격자 */
+/** 1. Grid of lab logos */
 export function LogosArt() {
   return (
     <div className="grid grid-cols-6 gap-2.5">
@@ -14,13 +14,13 @@ export function LogosArt() {
   )
 }
 
-/** 2. 한 모델 → 세 리전. 서울이 응답하지 않아 도쿄로 넘어간 상태 */
+/** 2. One model → three regions. Virginia stopped responding, Frankfurt took over */
 export function FallbackArt() {
   const m = findModel('deepseek/deepseek-v4.1-flash')!
   const regions = [
-    { name: '서울', state: 'down' },
-    { name: '도쿄', state: 'active' },
-    { name: '버지니아', state: 'idle' },
+    { name: 'Virginia', state: 'down' },
+    { name: 'Frankfurt', state: 'active' },
+    { name: 'Tokyo', state: 'idle' },
   ] as const
   return (
     <div className="flex w-full max-w-[230px] flex-col items-center">
@@ -38,14 +38,14 @@ export function FallbackArt() {
           <div
             key={r.name}
             className={
-'flex flex-col items-center gap-1 rounded-lg border bg-panel py-2 text-[12.5px] ' +
+'flex flex-col items-center gap-1 rounded-xl border bg-panel py-2 text-[12.5px] ' +
               (r.state === 'active' ? 'border-fg/40 font-medium text-fg shadow-sm' : 'border-line text-fg3')
             }
           >
             {r.name}
             <span className="flex items-center gap-1 text-[11px] font-normal text-fg3">
               <span className={'h-1.5 w-1.5 rounded-full ' + (r.state === 'down' ? 'bg-rose-400' : r.state === 'active' ? 'bg-emerald-500' : 'bg-fg/20')} />
-              {r.state === 'down' ? '응답 없음' : r.state === 'active' ? '처리 중' : '대기'}
+              {r.state === 'down' ? 'Down' : r.state === 'active' ? 'Serving' : 'Standby'}
             </span>
           </div>
         ))}
@@ -54,7 +54,7 @@ export function FallbackArt() {
   )
 }
 
-/** 3. 처리량 / 지연 미니 차트 */
+/** 3. Throughput / latency mini chart */
 export function MetricsArt() {
   const m = findModel('qwen/qwen3.8-27b')!
   const ep = endpointsFor(m)[0]
@@ -64,7 +64,7 @@ export function MetricsArt() {
     const lat = Array.from({ length: 12 }, (_, i) => ep.latency * (0.92 + 0.08 * Math.cos(i / 2.5) + r() * 0.03))
     return { tps, lat }
   }, [ep])
-  /** 점들을 지나는 부드러운 곡선 (catmull-rom → bezier) */
+  /** Smooth curve through the points (catmull-rom → bezier) */
   const line = (arr: number[], h: number) => {
     const max = Math.max(...arr)
     const min = Math.min(...arr)
@@ -77,15 +77,15 @@ export function MetricsArt() {
     return d
   }
   return (
-    <div className="w-full max-w-[230px] overflow-hidden rounded-lg border border-line bg-panel shadow-sm">
+    <div className="w-full max-w-[230px] overflow-hidden rounded-xl border border-line bg-panel shadow-sm">
       <div className="flex items-center justify-between border-b border-line px-3 py-2 text-[12px]">
         <span className="font-medium">{m.name}</span>
-        <span className="text-fg3">최근 24시간</span>
+        <span className="text-fg3">Last 24h</span>
       </div>
       <div className="space-y-3 px-3 py-3">
         <div>
           <div className="flex items-baseline justify-between text-[12px]">
-            <span className="text-fg3">처리량</span>
+            <span className="text-fg3">Throughput</span>
             <span className="tabular font-semibold">{ep.throughput} tok/s</span>
           </div>
           <svg viewBox="0 0 200 30" className="mt-1 h-[30px] w-full" preserveAspectRatio="none" aria-hidden>
@@ -94,7 +94,7 @@ export function MetricsArt() {
         </div>
         <div>
           <div className="flex items-baseline justify-between text-[12px]">
-            <span className="text-fg3">첫 토큰 지연</span>
+            <span className="text-fg3">Latency</span>
             <span className="tabular font-semibold">{(ep.latency / 1000).toFixed(2)}s</span>
           </div>
           <svg viewBox="0 0 200 30" className="mt-1 h-[30px] w-full" preserveAspectRatio="none" aria-hidden>
@@ -106,7 +106,7 @@ export function MetricsArt() {
   )
 }
 
-/** 4. 세 가지 업로드 경로 → 하나의 엔드포인트 */
+/** 4. Three upload paths → one endpoint */
 export function UploadArt() {
   return (
     <div className="flex w-full max-w-[224px] items-center gap-2">
@@ -120,7 +120,7 @@ export function UploadArt() {
       <svg viewBox="0 0 20 90" className="h-[90px] w-5 shrink-0" aria-hidden>
         <path d="M0 15 C10 15 10 45 20 45 M0 45 H20 M0 75 C10 75 10 45 20 45" fill="none" strokeWidth="1.25" className="stroke-fg/25" />
       </svg>
-      <div className="min-w-0 flex-1 rounded-lg border border-line bg-panel px-2.5 py-2.5 shadow-sm">
+      <div className="min-w-0 flex-1 rounded-xl border border-line bg-panel px-2.5 py-2.5 shadow-sm">
         <div className="flex items-center gap-1.5 text-[11.5px] font-medium text-emerald-600 dark:text-emerald-400">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Live
         </div>

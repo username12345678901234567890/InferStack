@@ -1,7 +1,7 @@
 /**
- * InferStack 런타임이 기본 지원하는 아키텍처 레지스트리.
- * name 은 Hugging Face config.json 의 `architectures[0]` 값과 1:1 매칭됩니다.
- * gguf 는 llama.cpp GGUF 메타데이터의 `general.architecture` 값입니다.
+ * Registry of architectures supported natively by the InferStack runtime.
+ * `name` maps 1:1 to `architectures[0]` in a Hugging Face config.json.
+ * `gguf` is the `general.architecture` value from llama.cpp GGUF metadata.
  */
 export interface ArchSpec {
   name: string
@@ -15,8 +15,8 @@ export interface ArchSpec {
   moe?: boolean
 }
 
-// Mistral 3 아키텍처 이름은 32자 영숫자여서 GitHub 시크릿 스캐너가
-// "mistral" 키워드와 함께 Mistral API 키로 오탐합니다. 그래서 문자열을 나눠 둡니다.
+// The Mistral 3 architecture name is 32 alphanumeric chars, so GitHub's secret scanner
+// flags it as a Mistral API key next to the "mistral" keyword. Hence the split string.
 export const MISTRAL3_ARCH = 'Mistral3' + 'ForConditionalGeneration'
 
 const V = 'vLLM'
@@ -84,7 +84,7 @@ export function findArchByGguf(gguf?: string | null): ArchSpec | undefined {
   return ARCHITECTURES.find((a) => a.gguf === gguf)
 }
 
-/** 이름 기반 아키텍처 추정 (config.json을 얻지 못한 경우의 폴백) */
+/** Guess architecture from the repo name (fallback when config.json is unavailable) */
 export function guessArchFromName(repo: string): string | undefined {
   const n = repo.toLowerCase()
   const rules: [RegExp, string][] = [
@@ -141,9 +141,9 @@ export const GGUF_QUANTS: Record<string, number> = {
 }
 
 export const SERVE_QUANTS = [
-  { id: 'none', label: '원본 그대로 (No quantization)', bits: 0 },
+  { id: 'none', label: 'None (original weights)', bits: 0 },
   { id: 'fp8', label: 'FP8 (dynamic, W8A8)', bits: 8 },
-  { id: 'nvfp4', label: 'NVFP4 (Blackwell 전용)', bits: 4.5 },
+  { id: 'nvfp4', label: 'NVFP4 (Blackwell only)', bits: 4.5 },
   { id: 'awq', label: 'AWQ INT4', bits: 4.25 },
   { id: 'gptq', label: 'GPTQ INT4', bits: 4.25 },
 ]

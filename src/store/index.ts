@@ -65,7 +65,7 @@ function seedLogs(): ActivityLog[] {
       ts: now - Math.floor(r() * 30 * 86400_000),
       model: m.slug,
       keyName: r() > 0.35 ? 'production' : 'dev-local',
-      endpoint: ['ap-seoul-1', 'us-east-1', 'ap-tokyo-1', 'eu-central-1'][Math.floor(r() * 4)],
+      endpoint: ['us-east-1', 'us-east-1', 'eu-central-1', 'us-west-2', 'ap-northeast-1', 'ap-southeast-1'][Math.floor(r() * 6)],
       promptTokens: pt,
       completionTokens: ct,
       cost: (pt * m.price.input + ct * m.price.output) / 1e6,
@@ -94,9 +94,9 @@ function initial() {
     keys: seedKeys(),
     logs: seedLogs(),
     transactions: [
-      { id: 't1', ts: now - 41 * 86400_000, amount: 5, kind: 'bonus', note: '가입 보너스 크레딧' },
-      { id: 't2', ts: now - 40 * 86400_000, amount: 50, kind: 'purchase', note: '크레딧 구매' },
-      { id: 't3', ts: now - 14 * 86400_000, amount: 25, kind: 'purchase', note: '크레딧 구매' },
+      { id: 't1', ts: now - 41 * 86400_000, amount: 5, kind: 'bonus', note: 'Sign-up bonus' },
+      { id: 't2', ts: now - 40 * 86400_000, amount: 50, kind: 'purchase', note: 'Credit purchase' },
+      { id: 't3', ts: now - 14 * 86400_000, amount: 25, kind: 'purchase', note: 'Credit purchase' },
     ] as Transaction[],
     customModels: [] as CustomModel[],
     settings: {
@@ -138,7 +138,7 @@ export const useStore = create<State>()(
       updateKey: (id, patch) => set((s) => ({ keys: s.keys.map((k) => (k.id === id ? { ...k, ...patch } : k)) })),
       deleteKey: (id) => set((s) => ({ keys: s.keys.filter((k) => k.id !== id) })),
 
-      addCredits: (amount, note = '크레딧 구매') =>
+      addCredits: (amount, note = 'Credit purchase') =>
         set((s) => ({
           credits: +(s.credits + amount).toFixed(6),
           transactions: [{ id: uid('t_'), ts: Date.now(), amount, kind: 'purchase', note }, ...s.transactions],
@@ -153,7 +153,7 @@ export const useStore = create<State>()(
         }))
         const after = get().credits
         if (settings.autoTopUp.enabled && after < settings.autoTopUp.threshold) {
-          get().addCredits(settings.autoTopUp.amount, '자동 충전')
+          get().addCredits(settings.autoTopUp.amount, 'Auto top-up')
         }
       },
       updateSettings: (p) => set((s) => ({ settings: { ...s.settings, ...p } })),
@@ -164,6 +164,11 @@ export const useStore = create<State>()(
 
       resetDemo: () => set({ ...initial() }),
     }),
-    { name: 'inferstack-demo', version: 2, migrate: (s) => ({ ...(s as State), theme: 'light' }) },
+    {
+      name: 'inferstack-demo',
+      version: 3,
+      // v3 reseeds demo data in English; v1 users also move to the light theme
+      migrate: (s, v) => ({ ...(s as State), ...initial(), theme: v < 2 ? 'light' : (s as State).theme }),
+    },
   ),
 )

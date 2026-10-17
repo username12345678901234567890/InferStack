@@ -4,9 +4,6 @@ import { fmtDateTime, fmtUSD } from '../lib/format'
 import { useStore } from '../store'
 
 const PRESETS = [10, 25, 50, 100]
-const KRW_PER_USD = 1380
-
-const krw = (usd: number) => '₩' + Math.round(usd * KRW_PER_USD).toLocaleString('ko-KR')
 
 export default function Credits() {
   const credits = useStore((s) => s.credits)
@@ -30,14 +27,14 @@ export default function Credits() {
 
   return (
     <div>
-      <PageHeader title="크레딧" description="충전한 크레딧에서 사용한 토큰만큼 차감됩니다. 원화로 결제하고 매월 세금계산서가 발행됩니다." />
+      <PageHeader title="Credits" description="Prepay for credits and pay only for the tokens you use. Pay with card — every purchase comes with an invoice and receipt." />
 
       <Card className="flex flex-col gap-6 p-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="text-[13.5px] text-fg3">잔액</div>
+          <div className="text-[13.5px] text-fg3">Balance</div>
           <div className="tabular mt-1 text-[44px] font-bold leading-none tracking-[-0.02em]">{fmtUSD(credits)}</div>
           <div className="tabular mt-3 text-[13.5px] text-fg2">
-            최근 30일 {fmtUSD(spent30)} 사용{daysLeft !== null && daysLeft < 365 && <> · 지금 속도면 약 {daysLeft}일 사용 가능</>}
+            {fmtUSD(spent30)} spent in the last 30 days{daysLeft !== null && daysLeft < 365 && <> · about {daysLeft} days left at this rate</>}
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -46,7 +43,7 @@ export default function Credits() {
               +${p}
             </Button>
           ))}
-          <Button onClick={() => openTopUp(25)}>충전하기</Button>
+          <Button onClick={() => openTopUp(25)}>Add credits</Button>
         </div>
       </Card>
 
@@ -55,35 +52,35 @@ export default function Credits() {
           <Toggle
             checked={settings.autoTopUp.enabled}
             onChange={(v) => updateSettings({ autoTopUp: { ...settings.autoTopUp, enabled: v } })}
-            label="자동 충전"
-            description="잔액이 기준 아래로 내려가면 정해 둔 금액을 자동으로 충전합니다."
+            label="Auto top-up"
+            description="Automatically add credits when your balance drops below a threshold."
           />
           <div className={cx('mt-5 grid grid-cols-2 gap-3', !settings.autoTopUp.enabled && 'opacity-50')}>
             <div>
-              <Label>기준 잔액 ($)</Label>
+              <Label>Threshold ($)</Label>
               <Input type="number" min={1} value={settings.autoTopUp.threshold} disabled={!settings.autoTopUp.enabled} onChange={(e) => updateSettings({ autoTopUp: { ...settings.autoTopUp, threshold: +e.target.value } })} />
             </div>
             <div>
-              <Label>충전 금액 ($)</Label>
+              <Label>Top-up amount ($)</Label>
               <Input type="number" min={5} value={settings.autoTopUp.amount} disabled={!settings.autoTopUp.enabled} onChange={(e) => updateSettings({ autoTopUp: { ...settings.autoTopUp, amount: +e.target.value } })} />
             </div>
           </div>
         </Card>
         <Card className="p-6">
-          <div className="text-[14px] font-medium">프로모션 코드</div>
-          <div className="mt-0.5 text-[12.5px] text-fg3">데모 코드: INFERSTACK2026</div>
+          <div className="text-[14px] font-medium">Promo code</div>
+          <div className="mt-0.5 text-[12.5px] text-fg3">Demo code: INFERSTACK2026</div>
           <PromoForm />
         </Card>
       </div>
 
-      <h2 className="mb-4 mt-12 text-[17px] font-semibold">거래 내역</h2>
+      <h2 className="mb-4 mt-12 text-[17px] font-semibold">Transactions</h2>
       <div className={tbl.wrap}>
         <table className={tbl.table}>
           <thead>
             <tr>
-              <th className={tbl.th}>일시</th>
-              <th className={tbl.th}>내용</th>
-              <th className={tbl.thR}>금액</th>
+              <th className={tbl.th}>Date</th>
+              <th className={tbl.th}>Description</th>
+              <th className={tbl.thR}>Amount</th>
             </tr>
           </thead>
           <tbody>
@@ -104,21 +101,21 @@ export default function Credits() {
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title="크레딧 충전"
+        title="Add credits"
         footer={
           <>
             <Button variant="ghost" onClick={() => setOpen(false)}>
-              취소
+              Cancel
             </Button>
             <Button
               disabled={amount < 5}
               onClick={() => {
                 addCredits(amount)
                 setOpen(false)
-                toast.ok(`${fmtUSD(amount)} 충전했습니다 (데모)`)
+                toast.ok(`Added ${fmtUSD(amount)} in credits (demo)`)
               }}
             >
-              {krw(amount + fee)} 결제
+              Pay {fmtUSD(amount + fee)}
             </Button>
           </>
         }
@@ -128,33 +125,31 @@ export default function Credits() {
             <button
               key={p}
               onClick={() => setAmount(p)}
-              className={cx('h-10 rounded-lg border text-[14px] font-medium transition-colors', amount === p ? 'border-fg bg-fg text-bg' : 'border-line2 hover:bg-raised')}
+              className={cx('h-10 rounded-full border text-[14px] font-medium transition-colors', amount === p ? 'border-fg bg-fg text-bg' : 'border-line2 hover:bg-raised')}
             >
               ${p}
             </button>
           ))}
         </div>
         <div className="mt-4">
-          <Label hint="최소 $5">직접 입력 ($)</Label>
+          <Label hint="Min. $5">Custom amount ($)</Label>
           <Input type="number" min={5} value={amount} onChange={(e) => setAmount(Math.max(0, +e.target.value))} />
         </div>
         <dl className="tabular mt-5 space-y-2 rounded-lg bg-raised p-4 text-[14px]">
           <div className="flex justify-between">
-            <dt className="text-fg2">크레딧</dt>
+            <dt className="text-fg2">Credits</dt>
             <dd>{fmtUSD(amount)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-fg2">수수료 (5%, 최소 $0.80)</dt>
+            <dt className="text-fg2">Fee (5%, min. $0.80)</dt>
             <dd>{fmtUSD(fee)}</dd>
           </div>
           <div className="flex justify-between border-t border-line pt-2 font-semibold">
-            <dt>결제 금액</dt>
-            <dd>
-              {krw(amount + fee)} <span className="font-normal text-fg3">({fmtUSD(amount + fee)})</span>
-            </dd>
+            <dt>Total</dt>
+            <dd>{fmtUSD(amount + fee)}</dd>
           </div>
         </dl>
-        <p className="mt-3 text-[12.5px] text-fg3">데모에서는 실제 결제 없이 크레딧만 추가됩니다. 환율은 1달러 = {KRW_PER_USD.toLocaleString()}원으로 계산했습니다.</p>
+        <p className="mt-3 text-[12.5px] text-fg3">Demo only: credits are added without charging a card. All amounts are in USD.</p>
       </Modal>
     </div>
   )
@@ -170,16 +165,16 @@ function PromoForm() {
       onSubmit={(e) => {
         e.preventDefault()
         if (code === 'INFERSTACK2026' && !used) {
-          add(10, '프로모션 코드 INFERSTACK2026')
+          add(10, 'Promo code INFERSTACK2026')
           setUsed(true)
-          toast.ok('$10 크레딧을 받았습니다')
-        } else toast.err(used ? '이미 사용한 코드입니다' : '유효하지 않은 코드입니다')
+          toast.ok('$10 in credits added')
+        } else toast.err(used ? 'This code has already been used' : 'Invalid promo code')
         setCode('')
       }}
     >
-      <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="코드 입력" className="font-mono" aria-label="프로모션 코드" />
+      <Input value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="Enter code" className="uppercase placeholder:normal-case" aria-label="Promo code" />
       <Button type="submit" variant="outline" disabled={!code}>
-        적용
+        Apply
       </Button>
     </form>
   )

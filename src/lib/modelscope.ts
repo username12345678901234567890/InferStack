@@ -3,20 +3,20 @@ import { guessArchFromName } from '../data/architectures'
 import { rng } from './rand'
 
 /**
- * ModelScope 연동 (데모).
- * ModelScope OpenAPI는 브라우저 CORS를 허용하지 않으므로 실제 서비스에서는
- * InferStack 백엔드가 프록시합니다. 데모에서는
- *   1) ModelScope API 직접 시도 →
- *   2) 동일 ID의 Hugging Face 미러 메타데이터 →
- *   3) 이름 기반 추정
- * 순서로 메타데이터를 구성합니다.
+ * ModelScope integration (demo).
+ * The ModelScope OpenAPI doesn't allow browser CORS, so in production the
+ * InferStack backend proxies it. In the demo, metadata is resolved by
+ *   1) trying the ModelScope API directly →
+ *   2) Hugging Face mirror metadata for the same ID →
+ *   3) name-based heuristics
+ * in that order.
  */
 export interface MSResult {
   info: HFModelInfo
   resolvedVia: 'modelscope' | 'hf-mirror' | 'heuristic'
 }
 
-/** ModelScope 조직명 → Hugging Face 조직명 (HF 미러 메타데이터 조회용) */
+/** ModelScope org → Hugging Face org (for HF mirror metadata lookup) */
 const MS_TO_HF_ORG: Record<string, string> = {
   ZhipuAI: 'zai-org',
   'deepseek-ai': 'deepseek-ai',

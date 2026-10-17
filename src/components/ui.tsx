@@ -7,15 +7,16 @@ import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttribute
 export const cx = clsx
 
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline' | 'accent' | 'inverse'
-type Size = 'sm' | 'md' | 'lg'
+type Size = 'sm' | 'md' | 'lg' | 'xl'
 
-/** 버튼 모양. Link 에도 같은 모양을 쓰기 위해 분리 */
+/** Button styles, shared with links */
 export function buttonClass(variant: Variant = 'primary', size: Size = 'md', className?: string) {
   return cx(
-    'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-medium transition-colors disabled:pointer-events-none disabled:opacity-40',
-    size === 'sm' && 'h-8 px-3 text-[13px]',
+    'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-full font-medium transition-colors disabled:pointer-events-none disabled:opacity-40',
+    size === 'sm' && 'h-8 px-3.5 text-[13px]',
     size === 'md' && 'h-9 px-4 text-[14px]',
-    size === 'lg' && 'h-11 px-5 text-[15px]',
+    size === 'lg' && 'h-11 px-6 text-[15px]',
+    size === 'xl' && 'h-12 px-7 text-[15.5px]',
     (variant === 'primary' || variant === 'inverse') && 'bg-fg text-bg hover:bg-fg/85',
     variant === 'accent' && 'bg-accent text-white hover:bg-accent/90',
     variant === 'secondary' && 'bg-raised text-fg hover:bg-fg/[0.08]',
@@ -44,7 +45,7 @@ export function ButtonLink({ to, variant = 'primary', size = 'md', className, ch
 
 export function Card({ className, children, ...rest }: { className?: string; children: ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cx('rounded-xl border border-line bg-panel', className)} {...rest}>
+    <div className={cx('rounded-2xl border border-line bg-panel', className)} {...rest}>
       {children}
     </div>
   )
@@ -63,9 +64,9 @@ export function Badge({ children, color = 'slate', className }: { children: Reac
   return <span className={cx('inline-flex h-5 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 text-[11px] font-medium leading-none', map[color], className)}>{children}</span>
 }
 
-const fieldBase = 'rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/35 focus:outline-none'
+const fieldBase = 'rounded-2xl border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/35 focus:outline-none'
 
-/** 너비 클래스를 넘기지 않으면 w-full */
+/** Full width unless a width class is passed */
 const width = (className?: string) => (/(^|\s)(w-|min-w-|flex-1)/.test(className ?? '') ? '' : 'w-full')
 
 export function Input({ className, ...rest }: InputHTMLAttributes<HTMLInputElement>) {
@@ -126,10 +127,10 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className={cx('relative w-full animate-fade-in rounded-xl border border-line2 bg-panel shadow-2xl shadow-black/20', size === 'sm' && 'max-w-md', size === 'md' && 'max-w-lg', size === 'lg' && 'max-w-2xl')}>
+      <div className={cx('relative w-full animate-fade-in rounded-2xl border border-line2 bg-panel shadow-2xl shadow-black/20', size === 'sm' && 'max-w-md', size === 'md' && 'max-w-lg', size === 'lg' && 'max-w-2xl')}>
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
           <h3 className="text-[15px] font-semibold">{title}</h3>
-          <button onClick={onClose} className="rounded-md p-1 text-fg3 hover:bg-raised hover:text-fg">
+          <button onClick={onClose} className="rounded-full p-1 text-fg3 hover:bg-raised hover:text-fg">
             <X size={16} />
           </button>
         </div>
@@ -158,14 +159,14 @@ export function Tabs<T extends string>({ tabs, value, onChange, className }: { t
 
 export function Segmented<T extends string>({ options, value, onChange, className, size = 'sm' }: { options: { id: T; label: ReactNode }[]; value: T; onChange: (v: T) => void; className?: string; size?: 'sm' | 'xs' }) {
   return (
-    <div className={cx('inline-flex rounded-lg border border-line bg-raised/60 p-0.5', className)}>
+    <div className={cx('inline-flex rounded-full border border-line bg-raised/60 p-0.5', className)}>
       {options.map((o) => (
         <button
           key={o.id}
           onClick={() => onChange(o.id)}
           className={cx(
-            'rounded-md font-medium transition-colors',
-            size === 'sm' ? 'px-2.5 py-1 text-xs' : 'px-2 py-0.5 text-[11.5px]',
+            'rounded-full font-medium transition-colors',
+            size === 'sm' ? 'px-3 py-1 text-xs' : 'px-2.5 py-0.5 text-[11.5px]',
             value === o.id ? 'bg-panel text-fg shadow-sm ring-1 ring-line' : 'text-fg3 hover:text-fg',
           )}
         >
@@ -189,24 +190,24 @@ export function CopyButton({ text, className, label }: { text: string; className
         setOk(true)
         setTimeout(() => setOk(false), 1400)
       }}
-      className={cx('inline-flex items-center gap-1 rounded-md px-1.5 py-1 text-xs text-fg3 transition-colors hover:bg-raised hover:text-fg', className)}
-      title="복사"
+      className={cx('inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs text-fg3 transition-colors hover:bg-raised hover:text-fg', className)}
+      title="Copy"
     >
       {ok ? <Check size={13} className="text-emerald-500" /> : <Copy size={13} />}
-      {label && <span>{ok ? '복사됨' : label}</span>}
+      {label && <span>{ok ? 'Copied' : label}</span>}
     </button>
   )
 }
 
-/** 코드 패널. 테마를 따라간다 (index.css 의 --code-*) */
+/** Code panel. Follows the theme (--code-* in index.css) */
 export function CodeBlock({ code, lang, className, lineNumbers = true, header = true }: { code: string; lang?: string; className?: string; lineNumbers?: boolean; header?: boolean }) {
   const lines = code.split('\n')
   return (
-    <div className={cx('code-panel overflow-hidden rounded-xl border border-line', className)}>
+    <div className={cx('code-panel overflow-hidden rounded-2xl border border-line', className)}>
       {header && (
         <div className="flex items-center justify-between border-b border-line py-1 pl-3.5 pr-1.5">
           <span className="code-muted font-mono text-[11px]">{lang ?? 'code'}</span>
-          <CopyButton text={code} className="hover:bg-fg/[0.06]" label="복사" />
+          <CopyButton text={code} className="hover:bg-fg/[0.06]" label="Copy" />
         </div>
       )}
       <pre className="overflow-x-auto py-3.5 font-mono text-[12.5px] leading-[1.75]">
@@ -223,7 +224,7 @@ export function CodeBlock({ code, lang, className, lineNumbers = true, header = 
   )
 }
 
-/** 가벼운 하이라이터: 문자열 / 주석 / 키워드 / 숫자 */
+/** Tiny highlighter: strings / comments / keywords / numbers */
 export function highlight(code: string, lang?: string): ReactNode[] {
   if (!code) return [' ']
   const kw =
@@ -265,7 +266,7 @@ export function Stat({ label, value, sub, icon }: { label: ReactNode; value: Rea
 
 export function Empty({ icon, title, description, action }: { icon?: ReactNode; title: ReactNode; description?: ReactNode; action?: ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-line2 px-6 py-14 text-center">
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-line2 px-6 py-14 text-center">
       {icon && <div className="mb-3 text-fg3">{icon}</div>}
       <div className="font-medium">{title}</div>
       {description && <div className="mt-1 max-w-md text-sm text-fg3">{description}</div>}
@@ -294,7 +295,7 @@ export function PageHeader({ title, description, actions }: { title: ReactNode; 
   )
 }
 
-/** 섹션 제목 + 오른쪽 링크 */
+/** Section title with an optional link on the right */
 export function SectionHead({ title, sub, link }: { title: ReactNode; sub?: ReactNode; link?: { to: string; label: string } }) {
   return (
     <div className="mb-5 flex items-end justify-between gap-4">
@@ -311,14 +312,14 @@ export function SectionHead({ title, sub, link }: { title: ReactNode; sub?: Reac
   )
 }
 
-/** 표 공통 클래스 */
+/** Shared table classes */
 export const tbl = {
-  wrap: 'overflow-x-auto rounded-xl border border-line bg-panel',
-  table: 'tabular w-full text-[14px]',
+  wrap: 'overflow-x-auto rounded-2xl border border-line bg-panel',
+  table: 'w-full text-[14px]',
   th: 'whitespace-nowrap border-b border-line px-4 py-3 text-left text-[12.5px] font-medium text-fg3',
   thR: 'whitespace-nowrap border-b border-line px-4 py-3 text-right text-[12.5px] font-medium text-fg3',
   td: 'border-b border-line px-4 py-3.5 align-middle',
-  tdR: 'border-b border-line px-4 py-3.5 text-right align-middle',
+  tdR: 'tabular border-b border-line px-4 py-3.5 text-right align-middle',
   tr: 'transition-colors hover:bg-raised/50 [&:last-child>td]:border-0',
 }
 
@@ -348,7 +349,7 @@ export function Toaster() {
   return (
     <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex flex-col gap-2">
       {items.map((t) => (
-        <div key={t.id} className="pointer-events-auto flex animate-fade-in items-center gap-2.5 rounded-lg border border-line2 bg-panel px-3.5 py-2.5 text-sm shadow-xl shadow-black/30">
+        <div key={t.id} className="pointer-events-auto flex animate-fade-in items-center gap-2.5 rounded-xl border border-line2 bg-panel px-3.5 py-2.5 text-sm shadow-xl shadow-black/30">
           <span className={cx('h-1.5 w-1.5 rounded-full', t.kind === 'ok' && 'bg-emerald-500', t.kind === 'err' && 'bg-rose-500', t.kind === 'info' && 'bg-fg3')} />
           {t.text}
         </div>

@@ -9,10 +9,10 @@ import { CopyButton, cx } from './ui'
 export type SortKey = 'popular' | 'newest' | 'cheap' | 'fast'
 
 export const SORTS: { id: SortKey; label: string }[] = [
-  { id: 'popular', label: '많이 쓰는' },
-  { id: 'newest', label: '최신' },
-  { id: 'cheap', label: '저렴한' },
-  { id: 'fast', label: '빠른' },
+  { id: 'popular', label: 'Popular' },
+  { id: 'newest', label: 'Newest' },
+  { id: 'cheap', label: 'Cheapest' },
+  { id: 'fast', label: 'Fastest' },
 ]
 
 export function speedOf(m: CatalogModel) {
@@ -28,7 +28,7 @@ export function sortModels(list: CatalogModel[], key: SortKey) {
   return s
 }
 
-/** 홈과 모델 목록이 함께 쓰는 표. 이름과 숫자가 주인공이고, 회색은 라벨에만 쓴다. */
+/** Model table. Names and numbers lead; gray is only for labels. */
 export function ModelTable({ models, onCode, codeSlug }: { models: CatalogModel[]; onCode?: (slug: string) => void; codeSlug?: string }) {
   const nav = useNavigate()
   const maxTok = Math.max(1, ...models.map(weeklyTokens))
@@ -38,12 +38,12 @@ export function ModelTable({ models, onCode, codeSlug }: { models: CatalogModel[
       <table className="tabular hidden w-full md:table">
         <thead>
           <tr className="text-left text-[12px] text-fg3">
-            <th className="pb-3 font-normal">모델</th>
-            <th className="w-[92px] pb-3 text-right font-normal">컨텍스트</th>
-            <th className="w-[96px] pb-3 text-right font-normal">입력 $/1M</th>
-            <th className="w-[96px] pb-3 text-right font-normal">출력 $/1M</th>
-            <th className="w-[88px] pb-3 text-right font-normal">속도</th>
-            <th className="w-[150px] pb-3 pl-6 font-normal">주간 토큰</th>
+            <th className="pb-3 font-normal">Model</th>
+            <th className="w-[92px] pb-3 text-right font-normal">Context</th>
+            <th className="w-[96px] pb-3 text-right font-normal">Input $/M</th>
+            <th className="w-[96px] pb-3 text-right font-normal">Output $/M</th>
+            <th className="w-[88px] pb-3 text-right font-normal">Speed</th>
+            <th className="w-[150px] pb-3 pl-6 font-normal">Tokens/wk</th>
             <th className="w-[92px] pb-3" />
           </tr>
         </thead>
@@ -89,13 +89,13 @@ export function ModelTable({ models, onCode, codeSlug }: { models: CatalogModel[
                   </div>
                 </td>
                 <td className="py-3.5 pr-3" onClick={(e) => e.stopPropagation()}>
-                  <div className="flex justify-end gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+                  <div className="flex justify-end gap-0.5">
                     {onCode && (
-                      <button onClick={() => onCode(m.slug)} className="rounded-md p-1.5 text-fg2 hover:bg-panel hover:text-fg" title="호출 코드 보기" aria-label={`${m.name} 호출 코드`}>
+                      <button onClick={() => onCode(m.slug)} className="rounded-full p-1.5 text-fg3 hover:bg-panel hover:text-fg" title="Show API code" aria-label={`API code for ${m.name}`}>
                         <Code2 size={16} />
                       </button>
                     )}
-                    <Link to={`/chat?model=${encodeURIComponent(m.slug)}`} className="rounded-md p-1.5 text-fg2 hover:bg-panel hover:text-fg" title="채팅으로 써보기" aria-label={`${m.name} 채팅`}>
+                    <Link to={`/chat?model=${encodeURIComponent(m.slug)}`} className="rounded-full p-1.5 text-fg3 hover:bg-panel hover:text-fg" title="Try in chat" aria-label={`Chat with ${m.name}`}>
                       <MessageSquare size={16} />
                     </Link>
                   </div>

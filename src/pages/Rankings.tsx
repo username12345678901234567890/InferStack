@@ -45,22 +45,24 @@ export default function Rankings() {
 
   return (
     <div>
-      <PageHeader title="랭킹" description="InferStack 전체 트래픽 기준 모델 사용량 순위 (주간 토큰)" />
-      <Segmented
-        value={cat}
-        onChange={setCat}
-        options={[
-          { id: 'all', label: '전체' },
-          { id: 'coding', label: '코딩' },
-          { id: 'reasoning', label: '추론' },
-          { id: 'agent', label: '에이전트' },
-          { id: 'vision', label: '비전' },
-          { id: 'multilingual', label: '다국어' },
-        ]}
-      />
+      <PageHeader title="Rankings" description="Models ranked by weekly token usage across all InferStack traffic" />
+      <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <Segmented
+          value={cat}
+          onChange={setCat}
+          options={[
+            { id: 'all', label: 'All' },
+            { id: 'coding', label: 'Coding' },
+            { id: 'reasoning', label: 'Reasoning' },
+            { id: 'agent', label: 'Agents' },
+            { id: 'vision', label: 'Vision' },
+            { id: 'multilingual', label: 'Multilingual' },
+          ]}
+        />
+      </div>
 
       <Card className="mt-4 p-5">
-        <div className="mb-2 text-sm font-semibold">최근 12주 토큰 사용량 (상위 8개)</div>
+        <div className="mb-2 text-sm font-semibold">Token usage, last 12 weeks (top 8)</div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chart}>
@@ -105,7 +107,7 @@ export default function Rankings() {
 
         <div className="space-y-6">
           <Card className="p-5">
-            <div className="text-sm font-semibold">제공자별 점유율</div>
+            <div className="text-sm font-semibold">Share by provider</div>
             <div className="mt-4 flex h-3 overflow-hidden rounded-full">
               {orgs.map((o, i) => (
                 <div key={o.id} style={{ width: `${o.share * 100}%`, background: COLORS[i % COLORS.length] }} title={o.name} />
@@ -122,7 +124,7 @@ export default function Rankings() {
             </div>
           </Card>
           <Card className="p-5">
-            <div className="text-sm font-semibold">가장 빠른 모델 (tok/s)</div>
+            <div className="text-sm font-semibold">Fastest models (tok/s)</div>
             <div className="mt-3 space-y-2 text-sm">
               {fastest.map(({ m, tps }) => (
                 <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
@@ -133,7 +135,7 @@ export default function Rankings() {
             </div>
           </Card>
           <Card className="p-5">
-            <div className="text-sm font-semibold">가성비 (출력 $/M 낮은순)</div>
+            <div className="text-sm font-semibold">Best value (lowest output $/M)</div>
             <div className="mt-3 space-y-2 text-sm">
               {[...MODELS]
                 .sort((a, b) => a.price.output - b.price.output)

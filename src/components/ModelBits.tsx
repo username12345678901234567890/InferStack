@@ -6,7 +6,7 @@ import { fmtCtx, fmtParams, fmtPrice, fmtTokens } from '../lib/format'
 import { Badge, Card, cx } from './ui'
 import { useStore } from '../store'
 
-/** 제공사 로고 (Hugging Face 조직 아바타를 public/logos 에 내려받아 사용) */
+/** Provider logo (Hugging Face org avatars downloaded to public/logos) */
 export function OrgAvatar({ org, name, size = 32, className }: { org: string; name?: string; size?: number; className?: string }) {
   const known = org in ORG_COLORS
   const r = Math.max(4, Math.round(size * 0.22))
@@ -26,9 +26,9 @@ export function OrgAvatar({ org, name, size = 32, className }: { org: string; na
 export function ModelFlags({ m }: { m: CatalogModel }) {
   return (
     <>
-      {m.custom && <Badge color="violet">내 모델</Badge>}
+      {m.custom && <Badge color="violet">My model</Badge>}
       {m.isNew && <Badge color="brand">New</Badge>}
-      {m.free && <Badge color="green">무료</Badge>}
+      {m.free && <Badge color="green">Free</Badge>}
       {m.preview && <Badge color="amber">Preview</Badge>}
     </>
   )
@@ -51,7 +51,7 @@ export function ModelRow({ m }: { m: CatalogModel }) {
           </Link>
           <ModelFlags m={m} />
           <span className="tabular ml-auto hidden font-mono text-[12.5px] text-fg2 sm:inline">{fmtTokens(weeklyTokens(m))} tokens/wk</span>
-          <button onClick={() => toggle(m.slug)} className="text-fg3 opacity-0 transition-opacity hover:text-fg group-hover:opacity-100 data-[on=true]:opacity-100" data-on={fav} title="즐겨찾기">
+          <button onClick={() => toggle(m.slug)} className="text-fg3 opacity-0 transition-opacity hover:text-fg group-hover:opacity-100 data-[on=true]:opacity-100" data-on={fav} title="Favorite">
             <Star size={15} className={cx(fav && 'fill-fg text-fg')} />
           </button>
         </div>

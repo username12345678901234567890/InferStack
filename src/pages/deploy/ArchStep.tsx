@@ -34,23 +34,23 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
   return (
     <div className="space-y-6">
       {det.name ? (
-        <div className={cx('flex items-start gap-3 rounded-xl border p-4 text-sm', det.known ? 'border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10' : 'border-amber-500/30 bg-amber-50 dark:bg-amber-500/10')}>
+        <div className={cx('flex items-start gap-3 rounded-2xl border p-4 text-sm', det.known ? 'border-emerald-500/30 bg-emerald-50 dark:bg-emerald-500/10' : 'border-amber-500/30 bg-amber-50 dark:bg-amber-500/10')}>
           {det.known ? <CheckCircle2 size={18} className="mt-0.5 text-emerald-500" /> : <Sparkles size={18} className="mt-0.5 text-amber-500" />}
           <div>
             <div className="font-medium">
-              {det.via === 'gguf' ? 'GGUF 메타데이터' : 'config.json'}에서 <span className="font-mono">{det.name}</span> {det.known ? '아키텍처를 감지했습니다' : '— 레지스트리에 없는 새 아키텍처입니다'}
+              {det.known ? 'Detected' : 'Found'} <span className="font-mono">{det.name}</span> in {det.via === 'gguf' ? 'GGUF metadata' : 'config.json'}{det.known ? '' : ' — a new architecture not in the registry'}
             </div>
             <div className="mt-0.5 text-fg2">
               {det.known
-                ? `InferStack 기본 런타임(${findArch(det.name)?.engines.join(' / ')})으로 바로 배포할 수 있습니다.`
-                : '아래 규격에 맞는 추론 코드를 GitHub 또는 로컬에서 업로드하면 이 아키텍처로 배포할 수 있습니다.'}
+                ? `Ready to deploy on the built-in InferStack runtime (${findArch(det.name)?.engines.join(' / ')}).`
+                : 'Upload inference code that follows the spec below, from GitHub or your machine, to deploy this architecture.'}
             </div>
           </div>
         </div>
       ) : (
-        <div className="flex items-start gap-3 rounded-xl border border-line p-4 text-sm">
+        <div className="flex items-start gap-3 rounded-2xl border border-line p-4 text-sm">
           <Cpu size={18} className="mt-0.5 text-fg3" />
-          <div>아키텍처를 자동 감지하지 못했습니다. 목록에서 직접 선택하거나 새 아키텍처로 등록하세요.</div>
+          <div>Couldn’t detect the architecture. Pick one from the list or register a new architecture.</div>
         </div>
       )}
 
@@ -59,15 +59,15 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           <div className="border-b border-line p-3">
             <div className="relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg3" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`지원 아키텍처 ${ARCHITECTURES.length}종 검색`} className="h-9 pl-8" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${ARCHITECTURES.length} supported architectures`} className="h-9 pl-8" />
             </div>
           </div>
           <div className="flex-1 overflow-y-auto">
             <ArchOption selected={s.arch === CUSTOM_ARCH} onClick={() => set({ arch: CUSTOM_ARCH, newArchName: s.newArchName || det.name || '' })}>
               <div className="flex items-center gap-2 font-medium">
-                <Sparkles size={14} className="text-fg3" /> 새 아키텍처 (커스텀 추론 코드)
+                <Sparkles size={14} className="text-fg3" /> New architecture (custom inference code)
               </div>
-              <div className="text-xs text-fg3">레지스트리에 없는 아키텍처 — GitHub / 로컬에서 코드 업로드</div>
+              <div className="text-xs text-fg3">Not in the registry — upload code from GitHub or your machine</div>
             </ArchOption>
             {list.map((a) => {
               const compatible = a.formats.includes(s.format)
@@ -76,13 +76,13 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
                   <div className="flex items-center gap-2">
                     <span className="truncate font-mono text-[13px] font-medium">{a.name}</span>
                     {a.status === 'beta' && <Badge color="amber">beta</Badge>}
-                    {a.name === det.name && <Badge color="green">감지됨</Badge>}
+                    {a.name === det.name && <Badge color="green">Detected</Badge>}
                   </div>
                   <div className="flex flex-wrap items-center gap-x-2 text-xs text-fg3">
                     <span>{a.family}</span>·<span>{a.formats.join(', ')}</span>
                     {a.moe && <span>· MoE</span>}
-                    {a.multimodal && <span>· 멀티모달</span>}
-                    {!compatible && <span className="text-rose-500">· {s.format.toUpperCase()} 미지원</span>}
+                    {a.multimodal && <span>· Multimodal</span>}
+                    {!compatible && <span className="text-rose-500">· No {s.format.toUpperCase()} support</span>}
                   </div>
                 </ArchOption>
               )
@@ -96,7 +96,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           ) : s.arch ? (
             <SelectedArch name={s.arch} s={s} set={set} />
           ) : (
-            <Card className="flex h-full items-center justify-center p-10 text-sm text-fg3">왼쪽에서 아키텍처를 선택하세요</Card>
+            <Card className="flex h-full items-center justify-center p-10 text-sm text-fg3">Select an architecture on the left</Card>
           )}
         </div>
       </div>
@@ -130,7 +130,7 @@ function SelectedArch({ name, s, set }: { name: string; s: WizardState; set: Set
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <dt className="text-xs text-fg3">계열</dt>
+          <dt className="text-xs text-fg3">Family</dt>
           <dd>{a.family}</dd>
         </div>
         <div>
@@ -142,12 +142,12 @@ function SelectedArch({ name, s, set }: { name: string; s: WizardState; set: Set
           <dd className="font-mono">{a.gguf ?? '—'}</dd>
         </div>
         <div>
-          <dt className="text-xs text-fg3">상태</dt>
-          <dd>{a.status === 'stable' ? '정식 지원' : '베타'}</dd>
+          <dt className="text-xs text-fg3">Status</dt>
+          <dd>{a.status === 'stable' ? 'Stable' : 'Beta'}</dd>
         </div>
       </dl>
       <div className="mt-5">
-        <Label>추론 엔진</Label>
+        <Label>Inference engine</Label>
         <Segmented value={engines.includes(s.engine) ? s.engine : engines[0]} onChange={(v) => set({ engine: v })} options={engines.map((e) => ({ id: e, label: e }))} />
       </div>
       <a
@@ -156,7 +156,7 @@ function SelectedArch({ name, s, set }: { name: string; s: WizardState; set: Set
         rel="noreferrer"
         className="mt-5 inline-flex items-center gap-1 text-xs text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg"
       >
-        Hugging Face에서 {a.modelType} 아키텍처 모델 보기 <ExternalLink size={11} />
+        Browse {a.modelType} models on Hugging Face <ExternalLink size={11} />
       </a>
     </Card>
   )
@@ -209,13 +209,13 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
     )
     const all = [...code.files.filter((x) => !files.some((f) => f.name === x.name)), ...files]
     const ok = validateLocalFiles(all.map((f) => f.name)).filter((c) => c.required).every((c) => c.ok)
-    setCode({ files: all, checked: ok, error: ok ? undefined : '필수 파일이 누락되었습니다' })
+    setCode({ files: all, checked: ok, error: ok ? undefined : 'Required files are missing' })
   }
 
   const checkGithub = async () => {
     const p = parseGithubUrl(code.repo)
     if (!p) {
-      setCode({ error: 'GitHub URL 또는 owner/repo 형식으로 입력하세요', checked: false })
+      setCode({ error: 'Enter a GitHub URL or owner/repo', checked: false })
       return
     }
     setCode({ checking: true, error: undefined })
@@ -234,7 +234,7 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
       }
     }
     const ok = res.ok && validateLocalFiles(files.map((f) => f.name)).filter((c) => c.required).every((c) => c.ok)
-    setCode({ checking: false, files, checked: ok, error: res.error ?? (res.ok && !ok ? `필수 파일(${REQUIRED_FILES.join(', ')})이 경로에 없습니다` : undefined) })
+    setCode({ checking: false, files, checked: ok, error: res.error ?? (res.ok && !ok ? `Required files (${REQUIRED_FILES.join(', ')}) not found at this path` : undefined) })
   }
 
   const useDemoPackage = () => {
@@ -254,19 +254,19 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
   return (
     <div className="space-y-4">
       <Card className="p-5">
-        <Label hint="config.json 의 architectures[0] 값">새 아키텍처 이름</Label>
+        <Label hint="architectures[0] in config.json">New architecture name</Label>
         <Input value={s.newArchName} onChange={(e) => set({ newArchName: e.target.value.replace(/[^\w]/g, '') })} placeholder="MyNewForCausalLM" className="font-mono" />
       </Card>
 
       <Card className="p-5">
         <div className="mb-3 flex items-center justify-between">
-          <div className="text-sm font-semibold">추론 코드 업로드</div>
+          <div className="text-sm font-semibold">Upload inference code</div>
           <Segmented
             value={code.kind}
             onChange={(v) => setCode({ kind: v, files: [], checked: false, error: undefined })}
             options={[
               { id: 'github', label: <span className="flex items-center gap-1"><Github size={13} /> GitHub</span> },
-              { id: 'local', label: <span className="flex items-center gap-1"><FolderUp size={13} /> 로컬</span> },
+              { id: 'local', label: <span className="flex items-center gap-1"><FolderUp size={13} /> Local</span> },
             ]}
           />
         </div>
@@ -274,29 +274,29 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
         {code.kind === 'github' ? (
           <div className="space-y-3">
             <div>
-              <Label>리포지토리</Label>
+              <Label>Repository</Label>
               <Input value={code.repo} onChange={(e) => setCode({ repo: e.target.value, checked: false })} placeholder="https://github.com/acme/beam-inferstack" className="font-mono" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label>브랜치 / 태그 / 커밋</Label>
+                <Label>Branch / tag / commit</Label>
                 <Input value={code.ref} onChange={(e) => setCode({ ref: e.target.value, checked: false })} placeholder="main" className="font-mono" />
               </div>
               <div>
-                <Label hint="선택">하위 디렉터리</Label>
+                <Label hint="optional">Subdirectory</Label>
                 <Input value={code.subdir} onChange={(e) => setCode({ subdir: e.target.value, checked: false })} placeholder="inferstack/" className="font-mono" />
               </div>
             </div>
             <div>
-              <Label hint="비공개 리포지토리">GitHub 토큰</Label>
+              <Label hint="private repos">GitHub token</Label>
               <Input type="password" value={code.token} onChange={(e) => setCode({ token: e.target.value })} placeholder="github_pat_…" className="font-mono" />
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="secondary" onClick={checkGithub} disabled={!code.repo || code.checking}>
-                {code.checking ? <Loader2 size={15} className="animate-spin" /> : <Github size={15} />} 리포지토리 검증
+                {code.checking ? <Loader2 size={15} className="animate-spin" /> : <Github size={15} />} Validate repository
               </Button>
               <Button variant="ghost" onClick={useDemoPackage}>
-                데모 패키지 사용
+                Use demo package
               </Button>
             </div>
           </div>
@@ -312,22 +312,22 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
               setDrag(false)
               handleFiles(e.dataTransfer.files)
             }}
-            className={cx('rounded-xl border-2 border-dashed p-6 text-center transition-colors', drag ? 'border-brand-500 bg-brand-500/5' : 'border-line2')}
+            className={cx('rounded-2xl border-2 border-dashed p-6 text-center transition-colors', drag ? 'border-brand-500 bg-brand-500/5' : 'border-line2')}
           >
             <FolderUp size={28} className="mx-auto text-fg3" />
-            <div className="mt-2 text-sm font-medium">파일을 끌어다 놓거나 선택하세요</div>
-            <div className="mt-1 text-xs text-fg3">inferstack.yaml, model.py 필수 · 폴더 단위 선택 가능</div>
+            <div className="mt-2 text-sm font-medium">Drag and drop files, or browse</div>
+            <div className="mt-1 text-xs text-fg3">inferstack.yaml and model.py required · folders supported</div>
             <div className="mt-3 flex justify-center gap-2">
               <input ref={fileRef} type="file" multiple hidden onChange={(e) => handleFiles(e.target.files)} />
               <input ref={dirRef} type="file" multiple hidden onChange={(e) => handleFiles(e.target.files)} {...({ webkitdirectory: '' } as Record<string, string>)} />
               <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
-                파일 선택
+                Choose files
               </Button>
               <Button size="sm" variant="outline" onClick={() => dirRef.current?.click()}>
-                폴더 선택
+                Choose folder
               </Button>
               <Button size="sm" variant="ghost" onClick={useDemoPackage}>
-                데모 패키지
+                Demo package
               </Button>
             </div>
           </div>
@@ -346,13 +346,13 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
                 <div key={c.file} className="flex items-center gap-1.5">
                   {c.ok ? <CheckCircle2 size={13} className="text-emerald-500" /> : c.required ? <XCircle size={13} className="text-rose-500" /> : <span className="h-[13px] w-[13px] rounded-full border border-line2" />}
                   <span className="font-mono">{c.file}</span>
-                  {!c.required && <span className="text-fg3">(선택)</span>}
+                  {!c.required && <span className="text-fg3">(optional)</span>}
                 </div>
               ))}
               {manifestArchOk !== undefined && (
                 <div className="col-span-2 flex items-center gap-1.5">
                   {manifestArchOk ? <CheckCircle2 size={13} className="text-emerald-500" /> : <AlertTriangle size={13} className="text-amber-500" />}
-                  매니페스트 architectures에 <span className="font-mono">{archName}</span> {manifestArchOk ? '포함' : '없음 — 확인 필요'}
+                  <span className="font-mono">{archName}</span> {manifestArchOk ? 'found in manifest architectures' : 'missing from manifest architectures — check it'}
                 </div>
               )}
             </div>
@@ -366,7 +366,7 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
             </div>
             {requiredOk && (
               <div className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
-                <CheckCircle2 size={15} /> 패키지 구조 검증 통과 — 배포 시 빌드·스모크 테스트가 실행됩니다
+                <CheckCircle2 size={15} /> Package structure looks good — build and smoke tests run on deploy
               </div>
             )}
           </div>
@@ -376,11 +376,11 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
       <Card className="overflow-hidden">
         <div className="flex items-center justify-between px-5 pt-4">
           <div>
-            <div className="text-sm font-semibold">InferStack Architecture Package 규격 v1</div>
-            <div className="text-xs text-fg3">아래 구조와 인터페이스를 따라야 합니다</div>
+            <div className="text-sm font-semibold">InferStack Architecture Package spec v1</div>
+            <div className="text-xs text-fg3">Your package must follow this layout and interface</div>
           </div>
           <Button size="sm" variant="outline" onClick={() => Object.values(templates).forEach((t) => downloadText(t.file.split('/').pop()!, t.body))}>
-            <Download size={14} /> 템플릿 받기
+            <Download size={14} /> Download templates
           </Button>
         </div>
         <pre className="mx-5 mt-3 overflow-x-auto rounded-lg bg-raised p-3 font-mono text-[11.5px] leading-relaxed text-fg2">{SPEC_TREE}</pre>

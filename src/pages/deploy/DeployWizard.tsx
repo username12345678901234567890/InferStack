@@ -14,7 +14,7 @@ import { SourceStep } from './SourceStep'
 import { fitsGpu, hourlyCost, initialState, vramNeededGB, weightBytes, type WizardState } from './state'
 import { safetensorsFiles } from '../../lib/hf'
 
-const STEPS = ['소스', '가중치 포맷', '아키텍처', '배포 설정', '검토']
+const STEPS = ['Source', 'Weights', 'Architecture', 'Configure', 'Review']
 
 export default function DeployWizard() {
   const [sp] = useSearchParams()
@@ -40,16 +40,16 @@ export default function DeployWizard() {
   ][step]
 
   const blockReason = [
-'먼저 모델을 불러오세요',
-    s.format === 'gguf' ? 'GGUF 양자화 파일을 선택하세요' : '이 리포지토리에 safetensors 파일이 없습니다',
-    s.arch === CUSTOM_ARCH ? '새 아키텍처 이름과 추론 코드 검증이 필요합니다' : '아키텍처를 선택하세요',
-    slugTaken ? '이미 사용 중인 모델 ID입니다' : !s.slug ? '모델 ID를 입력하세요' : 'VRAM이 부족합니다',
+'Import a model first',
+    s.format === 'gguf' ? 'Select a GGUF quant file' : 'No safetensors files in this repository',
+    s.arch === CUSTOM_ARCH ? 'Enter an architecture name and validate the inference code' : 'Select an architecture',
+    slugTaken ? 'Model ID is already taken' : !s.slug ? 'Enter a model ID' : 'Not enough VRAM',
 '',
   ][step]
 
   const deploy = () => {
     if (!user) {
-      toast.err('배포하려면 로그인하세요')
+      toast.err('Sign in to deploy')
       nav('/signin')
       return
     }
@@ -90,16 +90,16 @@ export default function DeployWizard() {
       status: 'queued',
     }
     addCustomModel(m)
-    toast.ok(`${m.displayName} 배포를 시작했습니다`)
+    toast.ok(`Deploying ${m.displayName}`)
     nav(`/my-models/${m.slug}`)
   }
 
   return (
     <div className="mx-auto max-w-6xl">
       <Link to="/deploy" className="mb-4 inline-flex items-center gap-1 text-sm text-fg3 hover:text-fg">
-        <ArrowLeft size={14} /> 모델 업로드
+        <ArrowLeft size={14} /> Deploy
       </Link>
-      <h1 className="text-2xl font-semibold tracking-tight">새 모델 배포</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">New deployment</h1>
 
       <ol className="mt-6 flex flex-wrap items-center gap-2">
         {STEPS.map((label, i) => (
@@ -134,17 +134,17 @@ export default function DeployWizard() {
 
       <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-3 border-t border-line bg-bg/90 py-4 backdrop-blur">
         <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
-          <ArrowLeft size={16} /> 이전
+          <ArrowLeft size={16} /> Back
         </Button>
         <div className="flex items-center gap-3">
           {!canNext && blockReason && <span className="hidden text-xs text-fg3 sm:inline">{blockReason}</span>}
           {step < STEPS.length - 1 ? (
             <Button onClick={() => setStep(step + 1)} disabled={!canNext}>
-              다음 <ArrowRight size={16} />
+              Next <ArrowRight size={16} />
             </Button>
           ) : (
             <Button onClick={deploy}>
-              <Rocket size={16} /> 배포하기
+              <Rocket size={16} /> Deploy
             </Button>
           )}
         </div>
@@ -158,20 +158,20 @@ function Review({ s, need }: { s: WizardState; need: number }) {
   const isNew = s.arch === CUSTOM_ARCH
   const hourly = hourlyCost(s.gpu, s.gpuCount)
   const rows: [string, React.ReactNode][] = [
-    ['모델 ID', <span className="font-mono">{username}/{s.slug}</span>],
-    ['소스', s.source === 'cli' ? 'CLI 업로드' : `${s.source === 'huggingface' ? 'Hugging Face' : 'ModelScope'} · ${s.repo}${s.revision ? `@${s.revision}` : ''}`],
-    ['포맷', s.format === 'gguf' ? `GGUF · ${s.ggufQuant}` : `Safetensors · dtype ${s.dtype}${s.quantization !== 'none' ? ` → ${s.quantization.toUpperCase()}` : ''}`],
-    ['가중치 크기', fmtBytes(s.format === 'gguf' ? selectedGgufSize(s) ?? weightBytes(s) : weightBytes(s))],
-    ['파라미터', fmtParams(s.info?.params ?? s.cliParamsB * 1e9)],
-    ['아키텍처', <span className="font-mono">{isNew ? s.newArchName : s.arch} {isNew && <Badge color="violet">커스텀 코드</Badge>}</span>],
-    ...(isNew ? ([['추론 코드', s.code.kind === 'github' ? `${s.code.repo} (${s.code.ref || 'main'})${s.code.subdir ? ` /${s.code.subdir}` : ''}` : `로컬 ${s.code.files.length}개 파일`]] as [string, React.ReactNode][]) : []),
-    ['엔진', s.format === 'gguf' ? 'llama.cpp' : s.engine],
-    ['하드웨어', `${s.gpuCount}x ${s.gpu} · 필요 VRAM ~${need}GB`],
-    ['오토스케일', `${s.minReplicas}–${s.maxReplicas} 레플리카${s.scaleToZero ? ' · scale to zero' : ''}`],
-    ['컨텍스트', fmtNum(s.contextLength)],
-    ['채팅 템플릿', s.chatTemplate],
-    ['공개 범위', s.visibility === 'public' ? `마켓플레이스 공개 · ${fmtPrice(s.priceIn)}/${fmtPrice(s.priceOut)} per M` : '비공개'],
-    ['예상 비용', `${fmtUSD(hourly)}/hr · 레플리카당`],
+    ['Model ID', <span className="font-mono">{username}/{s.slug}</span>],
+    ['Source', s.source === 'cli' ? 'CLI upload' : `${s.source === 'huggingface' ? 'Hugging Face' : 'ModelScope'} · ${s.repo}${s.revision ? `@${s.revision}` : ''}`],
+    ['Format', s.format === 'gguf' ? `GGUF · ${s.ggufQuant}` : `Safetensors · dtype ${s.dtype}${s.quantization !== 'none' ? ` → ${s.quantization.toUpperCase()}` : ''}`],
+    ['Weights size', fmtBytes(s.format === 'gguf' ? selectedGgufSize(s) ?? weightBytes(s) : weightBytes(s))],
+    ['Parameters', fmtParams(s.info?.params ?? s.cliParamsB * 1e9)],
+    ['Architecture', <span className="font-mono">{isNew ? s.newArchName : s.arch} {isNew && <Badge color="violet">Custom code</Badge>}</span>],
+    ...(isNew ? ([['Inference code', s.code.kind === 'github' ? `${s.code.repo} (${s.code.ref || 'main'})${s.code.subdir ? ` /${s.code.subdir}` : ''}` : `${s.code.files.length} local files`]] as [string, React.ReactNode][]) : []),
+    ['Engine', s.format === 'gguf' ? 'llama.cpp' : s.engine],
+    ['Hardware', `${s.gpuCount}x ${s.gpu} · ~${need} GB VRAM required`],
+    ['Autoscaling', `${s.minReplicas}–${s.maxReplicas} replicas${s.scaleToZero ? ' · scale to zero' : ''}`],
+    ['Context', fmtNum(s.contextLength)],
+    ['Chat template', s.chatTemplate],
+    ['Visibility', s.visibility === 'public' ? `Public on marketplace · ${fmtPrice(s.priceIn)}/${fmtPrice(s.priceOut)} per M` : 'Private'],
+    ['Estimated cost', `${fmtUSD(hourly)}/hr per replica`],
   ]
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
@@ -184,15 +184,15 @@ function Review({ s, need }: { s: WizardState; need: number }) {
         ))}
       </Card>
       <Card className="h-fit p-5 text-sm">
-        <div className="font-semibold">배포 후 진행 과정</div>
+        <div className="font-semibold">What happens next</div>
         <ol className="mt-3 space-y-2 text-fg2">
-          <li>1. GPU 예약 및 가중치 {s.source === 'cli' ? '검증' : '다운로드'}</li>
-          <li>2. 포맷·아키텍처·토크나이저 검증</li>
-          {isNew && <li>3. 커스텀 추론 코드 빌드 & 스모크 테스트</li>}
-          <li>{isNew ? 4 : 3}. 런타임 이미지 생성 및 GPU 로딩</li>
-          <li>{isNew ? 5 : 4}. 헬스체크 후 엔드포인트 활성화</li>
+          <li>1. Reserve GPUs and {s.source === 'cli' ? 'verify' : 'download'} weights</li>
+          <li>2. Validate format, architecture and tokenizer</li>
+          {isNew && <li>3. Build custom inference code and run smoke tests</li>}
+          <li>{isNew ? 4 : 3}. Build runtime image and load onto GPUs</li>
+          <li>{isNew ? 5 : 4}. Health check, then activate the endpoint</li>
         </ol>
-        <p className="mt-4 text-xs text-fg3">배포가 완료되면 채팅 플레이그라운드와 API에서 즉시 사용할 수 있습니다.</p>
+        <p className="mt-4 text-xs text-fg3">Once live, your model is available in the chat playground and via the API.</p>
       </Card>
     </div>
   )

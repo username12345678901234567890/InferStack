@@ -38,7 +38,7 @@ export default function Activity() {
       const row: Record<string, number | string> = { day: `${new Date(start).getMonth() + 1}/${new Date(start).getDate()}` }
       for (const l of filtered) {
         if (l.ts < start || l.ts >= end) continue
-        const k = topModels.includes(l.model) ? l.model : '기타'
+        const k = topModels.includes(l.model) ? l.model : 'Other'
         const v = metric === 'cost' ? l.cost : metric === 'tokens' ? l.promptTokens + l.completionTokens : 1
         row[k] = ((row[k] as number) ?? 0) + v
       }
@@ -47,7 +47,7 @@ export default function Activity() {
     return out
   }, [filtered, days, topModels, metric])
 
-  const series = [...topModels, '기타']
+  const series = [...topModels, 'Other']
   const keys = Array.from(new Set(logs.map((l) => l.keyName)))
   const models = Array.from(new Set(logs.map((l) => l.model)))
   const totalCost = filtered.reduce((a, l) => a + l.cost, 0)
@@ -70,8 +70,8 @@ export default function Activity() {
   return (
     <div>
       <PageHeader
-        title="활동"
-        description="요청 단위 사용량, 비용, 지연시간을 확인합니다."
+        title="Activity"
+        description="Per-request usage, cost, and latency."
         actions={
           <>
             <Segmented
@@ -81,8 +81,8 @@ export default function Activity() {
                 setPage(0)
               }}
               options={[
-                { id: '7', label: '7일' },
-                { id: '30', label: '30일' },
+                { id: '7', label: '7 days' },
+                { id: '30', label: '30 days' },
               ]}
             />
             <Button variant="outline" size="sm" onClick={exportCsv}>
@@ -92,10 +92,10 @@ export default function Activity() {
         }
       />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Stat label="비용" value={fmtUSD(totalCost)} />
-        <Stat label="토큰" value={fmtTokens(totalTok)} />
-        <Stat label="요청" value={filtered.length.toLocaleString()} />
-        <Stat label="평균 첫 토큰 지연" value={`${Math.round(avgLat)}ms`} />
+        <Stat label="Cost" value={fmtUSD(totalCost)} />
+        <Stat label="Tokens" value={fmtTokens(totalTok)} />
+        <Stat label="Requests" value={filtered.length.toLocaleString('en-US')} />
+        <Stat label={<span title="Average time to first token">Avg. latency</span>} value={`${Math.round(avgLat)}ms`} />
       </div>
 
       <Card className="mt-6 p-5">
@@ -104,22 +104,22 @@ export default function Activity() {
             value={metric}
             onChange={setMetric}
             options={[
-              { id: 'cost', label: '비용' },
-              { id: 'tokens', label: '토큰' },
-              { id: 'requests', label: '요청 수' },
+              { id: 'cost', label: 'Cost' },
+              { id: 'tokens', label: 'Tokens' },
+              { id: 'requests', label: 'Requests' },
             ]}
           />
           <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
-            <Select value={model} onChange={(e) => (setModel(e.target.value), setPage(0))} className="h-9 min-w-0 flex-1 text-[13px] sm:w-52 sm:flex-none" aria-label="모델 필터">
-              <option value="all">모든 모델</option>
+            <Select value={model} onChange={(e) => (setModel(e.target.value), setPage(0))} className="h-9 min-w-0 flex-1 text-[13px] sm:w-52 sm:flex-none" aria-label="Filter by model">
+              <option value="all">All models</option>
               {models.map((m) => (
                 <option key={m} value={m}>
                   {findModel(m)?.name ?? m}
                 </option>
               ))}
             </Select>
-            <Select value={key} onChange={(e) => (setKey(e.target.value), setPage(0))} className="h-9 min-w-0 flex-1 text-[13px] sm:w-36 sm:flex-none" aria-label="키 필터">
-              <option value="all">모든 키</option>
+            <Select value={key} onChange={(e) => (setKey(e.target.value), setPage(0))} className="h-9 min-w-0 flex-1 text-[13px] sm:w-36 sm:flex-none" aria-label="Filter by key">
+              <option value="all">All keys</option>
               {keys.map((k) => (
                 <option key={k} value={k}>
                   {k}
@@ -148,18 +148,18 @@ export default function Activity() {
         </div>
       </Card>
 
-      <div className="mt-6 overflow-hidden rounded-xl border border-line bg-panel">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-line bg-panel">
         <div className="overflow-x-auto">
         <table className={tbl.table}>
           <thead>
             <tr>
-              <th className={tbl.th}>시간</th>
-              <th className={tbl.th}>모델</th>
-              <th className={tbl.th}>키</th>
-              <th className={tbl.thR}>입력 → 출력</th>
-              <th className={tbl.thR}>비용</th>
-              <th className={tbl.thR}>첫 토큰</th>
-              <th className={tbl.th}>종료</th>
+              <th className={tbl.th}>Time</th>
+              <th className={tbl.th}>Model</th>
+              <th className={tbl.th}>Key</th>
+              <th className={tbl.thR}>Input → Output</th>
+              <th className={tbl.thR}>Cost</th>
+              <th className={tbl.thR} title="Time to first token">Latency</th>
+              <th className={tbl.th}>Finish</th>
             </tr>
           </thead>
           <tbody>
@@ -172,9 +172,9 @@ export default function Activity() {
                     {l.endpoint} · {l.throughput} tok/s
                   </div>
                 </td>
-                <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{l.source === 'playground' ? '채팅' : l.keyName}</td>
+                <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{l.source === 'playground' ? 'Chat' : l.keyName}</td>
                 <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>
-                  {l.promptTokens.toLocaleString()} → {l.completionTokens.toLocaleString()}
+                  {l.promptTokens.toLocaleString('en-US')} → {l.completionTokens.toLocaleString('en-US')}
                 </td>
                 <td className={tbl.tdR}>{fmtUSD(l.cost, 4)}</td>
                 <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>{l.latency}ms</td>
@@ -188,14 +188,14 @@ export default function Activity() {
         </div>
         <div className="flex items-center justify-between border-t border-line px-4 py-3 text-[13px] text-fg3">
           <span>
-            {filtered.length ? page * PAGE + 1 : 0}–{Math.min(filtered.length, (page + 1) * PAGE)} / {filtered.length}
+            {filtered.length ? page * PAGE + 1 : 0}–{Math.min(filtered.length, (page + 1) * PAGE)} of {filtered.length.toLocaleString('en-US')}
           </span>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage(page - 1)}>
-              이전
+              Previous
             </Button>
             <Button size="sm" variant="outline" disabled={(page + 1) * PAGE >= filtered.length} onClick={() => setPage(page + 1)}>
-              다음
+              Next
             </Button>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { Fragment, type ReactNode } from 'react'
 import { CodeBlock } from './ui'
 
-/** 채팅용 초경량 마크다운 렌더러 (코드블록, 표, 목록, 굵게, 인라인 코드) */
+/** Tiny markdown renderer for chat (code blocks, tables, lists, bold, inline code) */
 export function Markdown({ text }: { text: string }) {
   const blocks: ReactNode[] = []
   const lines = text.split('\n')
@@ -60,7 +60,7 @@ export function Markdown({ text }: { text: string }) {
       i++
       continue
     }
-    // 첫 줄은 항상 소비 (스트리밍 중 미완성 표 헤더 등에서 무한 루프 방지)
+    // Always consume the first line (avoids an infinite loop on a half-streamed table header)
     const para: string[] = [lines[i++]]
     while (i < lines.length && lines[i].trim() !== '' && !lines[i].startsWith('```') && !/^\s*([-*]|\d+\.)\s/.test(lines[i]) && !lines[i].startsWith('|')) para.push(lines[i++])
     blocks.push(<p key={k++} className="my-2 leading-relaxed">{para.map((p, j) => <Fragment key={j}>{j > 0 && <br />}{inline(p)}</Fragment>)}</p>)

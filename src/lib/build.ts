@@ -9,16 +9,16 @@ export interface BuildPhase {
 
 export function phasesFor(m: CustomModel): BuildPhase[] {
   const p: BuildPhase[] = [
-    { key: 'queue', label: '대기열', weight: 0.05 },
-    { key: 'pull', label: m.source === 'cli' ? '업로드 검증' : '가중치 다운로드', weight: 0.3 },
-    { key: 'validate', label: '포맷·아키텍처 검증', weight: 0.1 },
+    { key: 'queue', label: 'Queued', weight: 0.05 },
+    { key: 'pull', label: m.source === 'cli' ? 'Verify upload' : 'Download weights', weight: 0.3 },
+    { key: 'validate', label: 'Validate format & architecture', weight: 0.1 },
   ]
-  if (m.newArchitecture) p.push({ key: 'code', label: '커스텀 추론 코드 빌드', weight: 0.2 })
-  if (m.quantization && m.quantization !== 'none') p.push({ key: 'quant', label: '양자화 변환', weight: 0.12 })
+  if (m.newArchitecture) p.push({ key: 'code', label: 'Build custom inference code', weight: 0.2 })
+  if (m.quantization && m.quantization !== 'none') p.push({ key: 'quant', label: 'Quantize', weight: 0.12 })
   p.push(
-    { key: 'image', label: '런타임 이미지 생성', weight: 0.1 },
-    { key: 'load', label: 'GPU 로딩', weight: 0.15 },
-    { key: 'health', label: '헬스체크', weight: 0.05 },
+    { key: 'image', label: 'Build runtime image', weight: 0.1 },
+    { key: 'load', label: 'Load onto GPU', weight: 0.15 },
+    { key: 'health', label: 'Health check', weight: 0.05 },
   )
   const total = p.reduce((s, x) => s + x.weight, 0)
   return p.map((x) => ({ ...x, weight: x.weight / total }))
@@ -51,7 +51,7 @@ export function buildLogs(m: CustomModel, now = Date.now()): { t: number; line: 
     const step = (f: number) => s + ph.weight * f
     switch (ph.key) {
       case 'queue':
-        lines.push({ at: 0, line: `job ${m.id} accepted — region=ap-seoul-1 gpu=${m.gpuCount}x${m.gpu}` })
+        lines.push({ at: 0, line: `job ${m.id} accepted — region=us-east-1 gpu=${m.gpuCount}x${m.gpu}` })
         lines.push({ at: step(0.6), line: `scheduler: reserved ${m.gpuCount}x ${m.gpu} (spot=false)` })
         break
       case 'pull':
