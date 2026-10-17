@@ -109,12 +109,12 @@ export default function DeployWizard() {
               onClick={() => setStep(i)}
               className={cx(
 'flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors',
-                i === step && 'border-fg/50 bg-raised font-medium text-fg',
+                i === step && 'border-accent/60 bg-accent/[0.05] font-medium text-fg',
                 i < step && 'border-line2 text-fg2 hover:text-fg',
                 i > step && 'border-line text-fg3 ',
               )}
             >
-              <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-fg text-bg' : i === step ? 'border border-fg text-fg' : 'border border-line2 text-fg3')}>
+              <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-brand text-white' : i === step ? 'border border-accent text-accent' : 'border border-line2 text-fg3')}>
                 {i < step ? <Check size={12} /> : i + 1}
               </span>
               {label}

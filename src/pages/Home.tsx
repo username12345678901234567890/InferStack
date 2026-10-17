@@ -599,7 +599,7 @@ function Upload() {
               const on = q === 'Q4_K_M'
               return (
                 <div key={q} className={cx('flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px]', on && 'bg-raised')}>
-                  <span className={cx('h-4 w-4 shrink-0 rounded-full border', on ? 'border-[5px] border-fg' : 'border-line2')} />
+                  <span className={cx('h-4 w-4 shrink-0 rounded-full border', on ? 'border-[5px] border-accent' : 'border-line2')} />
                   <span className="w-20 font-mono">{q}</span>
                   <span className="flex-1 text-fg3">{on ? 'Recommended' : ''}</span>
                   <span className="tabular text-fg2">{size}</span>
@@ -670,7 +670,7 @@ function Global() {
               <span className="w-24 shrink-0 font-medium">{r.location}</span>
               <span className="hidden w-32 shrink-0 font-mono text-[12.5px] text-fg3 sm:block">{r.region}</span>
               <span className="h-1 flex-1 overflow-hidden rounded-full bg-raised">
-                <span className="block h-full rounded-full bg-fg/25 transition-[width] duration-700" style={{ width: `${Math.min(100, (lat[i] / 180) * 100)}%` }} />
+                <span className="block h-full rounded-full bg-brand opacity-70 transition-[width] duration-700" style={{ width: `${Math.min(100, (lat[i] / 180) * 100)}%` }} />
               </span>
               <span className="tabular w-14 shrink-0 text-right text-fg2">{lat[i]} ms</span>
             </li>
@@ -688,13 +688,13 @@ function Global() {
 function Closing() {
   return (
     <section className={cx(CONTAINER, 'pb-24')}>
-      <div className="relative overflow-hidden rounded-3xl bg-[#0d0d12] px-8 py-14 text-white sm:px-14">
+      <div className="relative overflow-hidden rounded-3xl bg-[#14164a] px-8 py-14 text-white sm:px-14">
         <LogoMark size={176} className="pointer-events-none absolute right-16 top-1/2 hidden -translate-y-1/2 lg:block" />
         <div className="relative max-w-xl">
           <h2 className="text-[32px] font-semibold leading-[1.12] tracking-[-0.03em] sm:text-[40px]">Start building in minutes</h2>
           <p className="mt-4 text-[16.5px] leading-relaxed text-white/65">Get $5 of free credit and call any of {MODELS.length} models with the OpenAI client you already use.</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/keys" className={buttonClass('primary', 'xl', '!bg-white !text-[#0d0d12] hover:!bg-white/90')}>
+            <Link to="/keys" className={buttonClass('primary', 'xl')}>
               Get your API key <ArrowRight size={16} />
             </Link>
             <Link to="/docs" className={buttonClass('outline', 'xl', '!border-white/20 !text-white hover:!bg-white/10')}>

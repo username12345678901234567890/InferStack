@@ -64,7 +64,7 @@ export default function Keys() {
                       </div>
                       {k.limit ? (
                         <div className="mt-1.5 h-1 w-28 overflow-hidden rounded-full bg-raised">
-                          <div className={pct > 0.9 ? 'h-full bg-rose-500' : 'h-full bg-fg/60'} style={{ width: `${pct * 100}%` }} />
+                          <div className={pct > 0.9 ? 'h-full bg-rose-500' : 'h-full bg-brand'} style={{ width: `${pct * 100}%` }} />
                         </div>
                       ) : null}
                     </td>
@@ -232,7 +232,7 @@ function KeyForm({ open, onClose, onSubmit, initial }: { open: boolean; onClose:
           <div className="max-h-48 space-y-1 overflow-y-auto rounded-xl border border-line p-2">
             {MODELS.map((m) => (
               <label key={m.slug} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm hover:bg-raised">
-                <input type="checkbox" className="accent-fg" checked={allowed.includes(m.slug)} onChange={() => setAllowed(allowed.includes(m.slug) ? allowed.filter((x) => x !== m.slug) : [...allowed, m.slug])} />
+                <input type="checkbox" className="accent-[rgb(var(--accent))]" checked={allowed.includes(m.slug)} onChange={() => setAllowed(allowed.includes(m.slug) ? allowed.filter((x) => x !== m.slug) : [...allowed, m.slug])} />
                 <span className="font-mono text-xs">{m.slug}</span>
               </label>
             ))}

@@ -83,7 +83,7 @@ export function ModelTable({ models, onCode, codeSlug }: { models: CatalogModel[
                 <td className="py-3.5 pl-6">
                   <div className="flex items-center gap-2.5">
                     <span className="h-[5px] w-16 overflow-hidden rounded-full bg-line">
-                      <span className="block h-full rounded-full bg-fg/70" style={{ width: `${Math.max(4, (tok / maxTok) * 100)}%` }} />
+                      <span className="block h-full rounded-full bg-brand" style={{ width: `${Math.max(4, (tok / maxTok) * 100)}%` }} />
                     </span>
                     <span className="text-[13.5px] text-fg2">{fmtTokens(tok)}</span>
                   </div>

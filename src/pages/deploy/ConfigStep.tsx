@@ -59,7 +59,7 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
                   onClick={() => set({ gpu: g.id })}
                   className={cx(
 'flex items-center justify-between rounded-xl border px-3 py-2.5 text-left text-sm transition-colors',
-                    s.gpu === g.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-line hover:border-line2',
+                    s.gpu === g.id ? 'border-accent/60 bg-accent/[0.04] ring-1 ring-accent/20' : 'border-line hover:border-line2',
                   )}
                 >
                   <div>
@@ -140,7 +140,7 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
               <button
                 key={o.id}
                 onClick={() => set({ visibility: o.id })}
-                className={cx('rounded-xl border p-3 text-left text-sm', s.visibility === o.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-line')}
+                className={cx('rounded-xl border p-3 text-left text-sm', s.visibility === o.id ? 'border-accent/60 bg-accent/[0.04] ring-1 ring-accent/20' : 'border-line')}
               >
                 <div className="flex items-center gap-2 font-medium">
                   <o.icon size={15} /> {o.title}

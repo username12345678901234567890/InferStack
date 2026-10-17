@@ -38,7 +38,7 @@ export function FormatStep({ s, set }: { s: WizardState; set: Setter }) {
             onClick={() => set({ format: o.id, engine: o.id === 'gguf' ? 'llama.cpp' : 'vLLM' })}
             className={cx(
 'rounded-2xl border p-5 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-              s.format === o.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-line hover:border-line2',
+              s.format === o.id ? 'border-accent/60 bg-accent/[0.04] ring-1 ring-accent/20' : 'border-line hover:border-line2',
             )}
           >
             <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ export function FormatStep({ s, set }: { s: WizardState; set: Setter }) {
               const rec = g.quant === 'Q4_K_M' || g.quant === 'UD-Q4_K_XL'
               return (
                 <label key={g.quant} className={cx('flex cursor-pointer items-center gap-3 border-b border-line px-5 py-2.5 text-sm last:border-0 ', s.ggufQuant === g.quant ? 'bg-brand-500/5' : 'hover:bg-raised/60')}>
-                  <input type="radio" name="quant" checked={s.ggufQuant === g.quant} onChange={() => set({ ggufQuant: g.quant })} className="accent-fg" />
+                  <input type="radio" name="quant" checked={s.ggufQuant === g.quant} onChange={() => set({ ggufQuant: g.quant })} className="accent-[rgb(var(--accent))]" />
                   <span className="w-28 font-mono font-medium">{g.quant}</span>
                   <span className="min-w-0 flex-1 truncate font-mono text-xs text-fg3">{g.label}</span>
                   {rec && <Badge color="green">Recommended</Badge>}

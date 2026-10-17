@@ -300,7 +300,7 @@ function Slider({ label, value, min, max, step, onChange }: { label: string; val
         <span className="font-medium">{label}</span>
         <span className="font-mono text-xs text-fg3">{value}</span>
       </div>
-      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(+e.target.value)} className="w-full accent-fg" />
+      <input type="range" min={min} max={max} step={step} value={value} onChange={(e) => onChange(+e.target.value)} className="w-full accent-[rgb(var(--accent))]" />
     </div>
   )
 }

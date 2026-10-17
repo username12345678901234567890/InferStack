@@ -56,7 +56,7 @@ export default function ModelDetail() {
         </div>
         <div className="flex shrink-0 gap-2">
           <button onClick={() => toggleFav(m.slug)} className="flex h-9 w-9 items-center justify-center rounded-full border border-line2 text-fg2 hover:bg-raised hover:text-fg" aria-label="Favorite" title="Favorite">
-            <Star size={16} className={cx(fav && 'fill-fg text-fg')} />
+            <Star size={16} className={cx(fav && 'fill-accent text-accent')} />
           </button>
           <ButtonLink to={`/deploy/new?source=huggingface&repo=${encodeURIComponent(m.hfId)}`} variant="outline">
             <Rocket size={15} /> Dedicated deploy

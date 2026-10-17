@@ -207,7 +207,7 @@ export default function Models() {
                 onClick={() => applyPreset(p)}
                 className={cx(
                   'h-8 shrink-0 rounded-full border px-3.5 text-[13px] transition-colors',
-                  presetActive(p) ? 'border-fg bg-fg text-bg' : 'border-line2 text-fg2 hover:border-fg/40 hover:text-fg',
+                  presetActive(p) ? 'border-transparent bg-brand text-white' : 'border-line2 text-fg2 hover:border-fg/40 hover:text-fg',
                 )}
               >
                 {p.label}
@@ -399,7 +399,7 @@ function Group({ title, value, children, defaultOpen = true }: { title: string; 
 function Check({ checked, onChange, children }: { checked: boolean; onChange: () => void; children: React.ReactNode }) {
   return (
     <label className="flex cursor-pointer items-center gap-2.5 rounded-md px-1 py-1.5 text-[13.5px] text-fg2 hover:text-fg">
-      <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 accent-fg" />
+      <input type="checkbox" checked={checked} onChange={onChange} className="h-4 w-4 accent-[rgb(var(--accent))]" />
       {children}
     </label>
   )
@@ -408,7 +408,7 @@ function Check({ checked, onChange, children }: { checked: boolean; onChange: ()
 function Range({ value, max, onChange, labels }: { value: number; max: number; onChange: (v: number) => void; labels: [string, string] }) {
   return (
     <div className="px-1">
-      <input type="range" min={0} max={max} step={1} value={value} onChange={(e) => onChange(+e.target.value)} className="w-full accent-fg" />
+      <input type="range" min={0} max={max} step={1} value={value} onChange={(e) => onChange(+e.target.value)} className="w-full accent-[rgb(var(--accent))]" />
       <div className="mt-1 flex justify-between text-[12px] text-fg3">
         <span>{labels[0]}</span>
         <span>{labels[1]}</span>

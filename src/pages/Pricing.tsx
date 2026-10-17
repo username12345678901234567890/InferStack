@@ -17,7 +17,7 @@ export default function Pricing() {
       <PageHeader title="Pricing" description="No subscription — pay only for the tokens you use. All prices are in USD per 1M tokens." />
       <div className="grid gap-4 md:grid-cols-3">
         {plans.map((p) => (
-          <Card key={p.name} className={p.hi ? 'relative border-fg/40 p-6 ring-1 ring-fg/10' : 'p-6'}>
+          <Card key={p.name} className={p.hi ? 'relative border-accent/50 p-6 ring-1 ring-accent/15' : 'p-6'}>
             {p.hi && <Badge color="brand" className="absolute right-4 top-4">Popular</Badge>}
             <div className="font-semibold">{p.name}</div>
             <div className="mt-2 text-3xl font-bold tracking-tight">{p.price}</div>

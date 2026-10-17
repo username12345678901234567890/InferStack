@@ -396,7 +396,7 @@ function RepoSummary({ s }: { s: WizardState }) {
         {info.gated ? <Badge color="rose">gated</Badge> : null}
         {info.license && <Badge>{info.license}</Badge>}
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-5">
+      <div className="mt-4 grid grid-cols-2 gap-4 text-sm sm:grid-cols-[1.6fr_1fr_1fr_1fr_1fr]">
         <Info k="Architecture" v={<span className="font-mono text-xs">{info.architecture ?? info.ggufArchitecture ?? 'Unknown'}</span>} />
         <Info k="Parameters" v={fmtParams(info.params)} />
         <Info k="Context" v={info.contextLength ? fmtNum(info.contextLength) : '—'} />
@@ -422,9 +422,9 @@ function RepoSummary({ s }: { s: WizardState }) {
 
 function Info({ k, v }: { k: string; v: React.ReactNode }) {
   return (
-    <div>
+    <div className="min-w-0">
       <div className="text-xs text-fg3">{k}</div>
-      <div className="mt-0.5 font-medium">{v}</div>
+      <div className="mt-0.5 break-words font-medium [overflow-wrap:anywhere]">{v}</div>
     </div>
   )
 }

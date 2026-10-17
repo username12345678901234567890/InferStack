@@ -92,7 +92,7 @@ export default function Rankings() {
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{m.name}</div>
                   <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-raised">
-                    <div className="h-full rounded-full bg-fg/70" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
+                    <div className="h-full rounded-full bg-brand" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
                   </div>
                 </div>
                 <div className="w-20 text-right text-sm font-medium">{fmtTokens(weeklyTokens(m))}</div>
