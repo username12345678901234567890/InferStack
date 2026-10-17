@@ -17,7 +17,7 @@ export function buttonClass(variant: Variant = 'primary', size: Size = 'md', cla
     size === 'md' && 'h-9 px-4 text-[14px]',
     size === 'lg' && 'h-11 px-6 text-[15px]',
     size === 'xl' && 'h-12 px-7 text-[15.5px]',
-    (variant === 'primary' || variant === 'accent') && 'bg-brand text-on-brand hover:brightness-105',
+    (variant === 'primary' || variant === 'accent') && 'bg-brand text-on-brand hover:brightness-95',
     variant === 'inverse' && 'bg-fg text-bg hover:bg-fg/85',
     variant === 'secondary' && 'bg-raised text-fg hover:bg-fg/[0.08]',
     variant === 'outline' && 'border border-line2 text-fg hover:bg-raised',

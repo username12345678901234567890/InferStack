@@ -56,12 +56,12 @@ code, kbd, .font-mono {
   font-feature-settings: 'zero' 0, 'calt' 0;
 }
 @layer utilities {
-  /* The logo gradient, same stops and the same direction as the mark (teal top → violet bottom).
-     On buttons the text sits on the blue middle band. */
+  /* Fill for anything with white text on it: the logo's teal → violet run in the mark's direction,
+     with the middle stops taken deeper and the teal kept to the corner, so labels stay above 4.5:1. */
   .bg-brand {
-    background-image: linear-gradient(169deg, #0ff0cf 0%, #1ba6f2 38%, #5560f4 70%, #8b2cf5 100%);
+    background-image: linear-gradient(169deg, #0ad3bb 0%, #177ce6 16%, #4a50ee 52%, #7c25e8 100%);
   }
-  /* the same stops laid along a bar, for meters and progress */
+  /* the exact logo stops laid along a bar, for meters and progress (no text on top) */
   .bg-brand-x {
     background-image: linear-gradient(90deg, #0ff0cf 0%, #1ba6f2 38%, #5560f4 70%, #8b2cf5 100%);
   }
