@@ -248,24 +248,11 @@ function Exchange({ prompt, answer, code, model, shown, phase }: { prompt: strin
 /* Live numbers + model ticker                                         */
 /* ------------------------------------------------------------------ */
 
-function servedToday(perSec: number) {
-  const d = new Date()
-  const secs = d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds() + d.getMilliseconds() / 1000
-  return Math.round(perSec * Math.max(secs, 1))
-}
-
 function Pulse() {
-  const reduce = useReducedMotion()
-  const perSec = useMemo(() => MODELS.reduce((a, m) => a + weeklyTokens(m), 0) / (7 * 86400), [])
-  const [served, setServed] = useState(() => servedToday(perSec))
-  useEffect(() => {
-    if (reduce) return
-    const t = window.setInterval(() => setServed(servedToday(perSec)), 1000)
-    return () => window.clearInterval(t)
-  }, [reduce, perSec])
-
+  // all four numbers come straight from the catalog
+  const cheapest = Math.min(...MODELS.map((m) => m.price.input))
   const stats = [
-    { v: served.toLocaleString('en-US'), k: 'Tokens served today', live: true },
+    { v: `${fmtPrice(cheapest)}/M`, k: 'Starting price' },
     { v: String(MODELS.length), k: 'Models' },
     { v: String(ORGS.length), k: 'Labs' },
     { v: String(REGIONS.length), k: 'Regions' },
@@ -273,14 +260,11 @@ function Pulse() {
   return (
     <section className="border-y border-line">
       {/* same 4-column grid as the catalog cards below, so the columns line up */}
-      <dl className={cx(CONTAINER, 'grid grid-cols-3 gap-x-3 gap-y-6 py-9 lg:grid-cols-4 lg:gap-x-4')}>
-        {stats.map((s, i) => (
-          <div key={s.k} className={cx('min-w-0', i === 0 && 'col-span-3 lg:col-span-1')}>
+      <dl className={cx(CONTAINER, 'grid grid-cols-2 gap-x-3 gap-y-6 py-9 lg:grid-cols-4 lg:gap-x-4')}>
+        {stats.map((s) => (
+          <div key={s.k} className="min-w-0">
             <dt className="tabular truncate text-[28px] font-semibold tracking-[-0.03em]">{s.v}</dt>
-            <dd className="mt-1 flex items-center gap-1.5 text-[13.5px] text-fg3">
-              {s.live && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
-              {s.k}
-            </dd>
+            <dd className="mt-1 text-[13.5px] text-fg3">{s.k}</dd>
           </div>
         ))}
       </dl>
