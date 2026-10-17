@@ -18,7 +18,7 @@ export function OrgAvatar({ org, name, size = 32, className }: { org: string; na
     )
   return (
     <span className={cx('inline-flex shrink-0 overflow-hidden bg-white ring-1 ring-black/10 dark:ring-white/10', className)} style={{ width: size, height: size, borderRadius: r }} title={name ?? org}>
-      <img src={`./logos/${org}.png`} alt={name ?? org} width={size} height={size} loading="lazy" className="h-full w-full object-cover" />
+      <img src={`./logos/${org}.png`} alt={name ?? org} width={size} height={size} className="h-full w-full object-cover" />
     </span>
   )
 }
@@ -28,7 +28,7 @@ export function ModelFlags({ m }: { m: CatalogModel }) {
     <>
       {m.custom && <Badge color="violet">내 모델</Badge>}
       {m.isNew && <Badge color="brand">New</Badge>}
-      {m.free && <Badge>Free</Badge>}
+      {m.free && <Badge color="green">무료</Badge>}
       {m.preview && <Badge color="amber">Preview</Badge>}
     </>
   )

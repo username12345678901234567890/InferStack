@@ -73,19 +73,19 @@ export function ModelTable({ models, onCode, codeSlug }: { models: CatalogModel[
                     </div>
                   </div>
                 </td>
-                <td className="py-3.5 text-right font-mono text-[13.5px] text-fg">{fmtCtx(m.context)}</td>
-                <td className="py-3.5 text-right font-mono text-[13.5px] text-fg">{fmtPrice(m.price.input)}</td>
-                <td className="py-3.5 text-right font-mono text-[13.5px] text-fg">{fmtPrice(m.price.output)}</td>
-                <td className="py-3.5 text-right font-mono text-[13.5px] text-fg">
+                <td className="py-3.5 text-right text-[14px] text-fg">{fmtCtx(m.context)}</td>
+                <td className="py-3.5 text-right text-[14px] text-fg">{fmtPrice(m.price.input)}</td>
+                <td className="py-3.5 text-right text-[14px] text-fg">{fmtPrice(m.price.output)}</td>
+                <td className="py-3.5 text-right text-[14px] text-fg">
                   {speedOf(m)}
-                  <span className="ml-1 text-[11px] text-fg3">t/s</span>
+                  <span className="ml-0.5 text-[12px] text-fg3">t/s</span>
                 </td>
                 <td className="py-3.5 pl-6">
                   <div className="flex items-center gap-2.5">
                     <span className="h-[5px] w-16 overflow-hidden rounded-full bg-line">
                       <span className="block h-full rounded-full bg-fg/70" style={{ width: `${Math.max(4, (tok / maxTok) * 100)}%` }} />
                     </span>
-                    <span className="font-mono text-[13px] text-fg2">{fmtTokens(tok)}</span>
+                    <span className="text-[13.5px] text-fg2">{fmtTokens(tok)}</span>
                   </div>
                 </td>
                 <td className="py-3.5 pr-3" onClick={(e) => e.stopPropagation()}>
@@ -116,7 +116,7 @@ export function ModelTable({ models, onCode, codeSlug }: { models: CatalogModel[
                 <div className="flex items-center gap-1.5 truncate text-[15px] font-semibold">
                   {m.name} <ModelFlags m={m} />
                 </div>
-                <div className="tabular mt-0.5 font-mono text-[12.5px] text-fg2">
+                <div className="tabular mt-0.5 text-[13px] text-fg2">
                   {fmtCtx(m.context)} · {fmtPrice(m.price.input)} / {fmtPrice(m.price.output)}
                 </div>
               </div>

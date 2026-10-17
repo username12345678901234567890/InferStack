@@ -32,7 +32,7 @@ export default function DeployHome() {
             <Card className="group h-full p-6 transition-all hover:border-line2 hover:bg-raised/40">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-line bg-raised text-fg"><x.icon size={20} /></div>
               <div className="mt-4 font-semibold">{x.title}</div>
-              <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{x.desc}</p>
+              <p className="mt-1.5 text-sm text-fg2">{x.desc}</p>
               <div className="mt-4 flex items-center gap-1 text-sm font-medium text-fg">
                 시작하기 <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
               </div>
@@ -46,30 +46,30 @@ export default function DeployHome() {
           <div className="flex items-center gap-2 font-semibold">
             <Badge color="amber">GGUF</Badge> llama.cpp 런타임
           </div>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Q8_0 ~ IQ1_S 전 양자화 지원. 분할 GGUF(-00001-of-0000N)는 자동 병합됩니다. 소형 GPU(L4, L40S)로 저렴하게 배포하기 좋습니다.</p>
+          <p className="mt-2 text-sm text-fg2">Q8_0 ~ IQ1_S 전 양자화 지원. 분할 GGUF(-00001-of-0000N)는 자동 병합됩니다. 소형 GPU(L4, L40S)로 저렴하게 배포하기 좋습니다.</p>
         </Card>
         <Card className="p-5">
           <div className="flex items-center gap-2 font-semibold">
             <Badge color="brand">Safetensors</Badge> vLLM · SGLang · TensorRT-LLM
           </div>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">BF16/FP16/FP8/MXFP4 원본 또는 배포 시 FP8·NVFP4·AWQ·GPTQ 양자화 변환. 텐서 병렬로 최대 8 GPU까지 확장됩니다.</p>
+          <p className="mt-2 text-sm text-fg2">BF16/FP16/FP8/MXFP4 원본 또는 배포 시 FP8·NVFP4·AWQ·GPTQ 양자화 변환. 텐서 병렬로 최대 8 GPU까지 확장됩니다.</p>
         </Card>
       </div>
 
       <Card className="mt-10 overflow-hidden">
-        <div className="flex flex-col gap-3 border-b border-slate-200 p-5 sm:flex-row sm:items-center dark:border-white/10">
+        <div className="flex flex-col gap-3 border-b border-line p-5 sm:flex-row sm:items-center">
           <div className="flex-1">
             <div className="font-semibold">지원 아키텍처 레지스트리</div>
-            <div className="text-sm text-slate-500">Hugging Face config.json의 architectures 값 기준 · {ARCHITECTURES.length}종</div>
+            <div className="text-sm text-fg3">Hugging Face config.json의 architectures 값 기준 · {ARCHITECTURES.length}종</div>
           </div>
           <div className="relative w-full sm:w-64">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg3" />
             <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="아키텍처 검색" className="h-9 pl-8" />
           </div>
         </div>
         <div className="max-h-[420px] overflow-auto">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-white text-left text-xs text-slate-500 dark:bg-slate-900">
+            <thead className="sticky top-0 bg-panel text-left text-xs text-fg3">
               <tr>
                 <th className="px-5 py-2 font-medium">architectures</th>
                 <th className="px-3 py-2 font-medium">계열</th>
@@ -80,24 +80,24 @@ export default function DeployHome() {
             </thead>
             <tbody>
               {archs.map((a) => (
-                <tr key={a.name} className="border-t border-slate-100 dark:border-white/5">
+                <tr key={a.name} className="border-t border-line">
                   <td className="px-5 py-2 font-mono text-xs">{a.name}</td>
                   <td className="px-3 py-2">
                     {a.family} {a.moe && <Badge>MoE</Badge>} {a.multimodal && <Badge>VL</Badge>}
                   </td>
-                  <td className="px-3 py-2 font-mono text-xs text-slate-500">{a.gguf ?? '—'}</td>
-                  <td className="px-3 py-2 text-xs text-slate-500">{a.engines.join(', ')}</td>
+                  <td className="px-3 py-2 font-mono text-xs text-fg3">{a.gguf ?? '—'}</td>
+                  <td className="px-3 py-2 text-xs text-fg3">{a.engines.join(', ')}</td>
                   <td className="px-3 py-2">{a.status === 'stable' ? <Badge color="green">stable</Badge> : <Badge color="amber">beta</Badge>}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="flex flex-col gap-3 border-t border-slate-200 bg-raised/50 p-5 sm:flex-row sm:items-center dark:border-white/10">
+        <div className="flex flex-col gap-3 border-t border-line bg-raised/50 p-5 sm:flex-row sm:items-center">
           <Sparkles size={20} className="text-accent" />
           <div className="flex-1 text-sm">
             <div className="font-medium">목록에 없는 새 아키텍처인가요?</div>
-            <div className="text-slate-600 dark:text-slate-400">
+            <div className="text-fg2">
               <span className="font-mono">inferstack.yaml</span> + <span className="font-mono">model.py</span> 규격의 추론 코드를 <Github size={12} className="inline" /> GitHub 또는 로컬에서 함께 업로드하면 Day-0로 배포할 수 있습니다.
             </div>
           </div>

@@ -40,7 +40,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
             <div className="font-medium">
               {det.via === 'gguf' ? 'GGUF 메타데이터' : 'config.json'}에서 <span className="font-mono">{det.name}</span> {det.known ? '아키텍처를 감지했습니다' : '— 레지스트리에 없는 새 아키텍처입니다'}
             </div>
-            <div className="mt-0.5 text-slate-600 dark:text-slate-400">
+            <div className="mt-0.5 text-fg2">
               {det.known
                 ? `InferStack 기본 런타임(${findArch(det.name)?.engines.join(' / ')})으로 바로 배포할 수 있습니다.`
                 : '아래 규격에 맞는 추론 코드를 GitHub 또는 로컬에서 업로드하면 이 아키텍처로 배포할 수 있습니다.'}
@@ -48,17 +48,17 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           </div>
         </div>
       ) : (
-        <div className="flex items-start gap-3 rounded-xl border border-slate-200 p-4 text-sm dark:border-white/10">
-          <Cpu size={18} className="mt-0.5 text-slate-400" />
+        <div className="flex items-start gap-3 rounded-xl border border-line p-4 text-sm">
+          <Cpu size={18} className="mt-0.5 text-fg3" />
           <div>아키텍처를 자동 감지하지 못했습니다. 목록에서 직접 선택하거나 새 아키텍처로 등록하세요.</div>
         </div>
       )}
 
       <div className="grid gap-6 lg:grid-cols-[1fr_1.2fr]">
         <Card className="flex max-h-[560px] flex-col overflow-hidden">
-          <div className="border-b border-slate-200 p-3 dark:border-white/10">
+          <div className="border-b border-line p-3">
             <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg3" />
               <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`지원 아키텍처 ${ARCHITECTURES.length}종 검색`} className="h-9 pl-8" />
             </div>
           </div>
@@ -67,7 +67,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
               <div className="flex items-center gap-2 font-medium">
                 <Sparkles size={14} className="text-accent" /> 새 아키텍처 (커스텀 추론 코드)
               </div>
-              <div className="text-xs text-slate-500">레지스트리에 없는 아키텍처 — GitHub / 로컬에서 코드 업로드</div>
+              <div className="text-xs text-fg3">레지스트리에 없는 아키텍처 — GitHub / 로컬에서 코드 업로드</div>
             </ArchOption>
             {list.map((a) => {
               const compatible = a.formats.includes(s.format)
@@ -78,7 +78,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
                     {a.status === 'beta' && <Badge color="amber">beta</Badge>}
                     {a.name === det.name && <Badge color="green">감지됨</Badge>}
                   </div>
-                  <div className="flex flex-wrap items-center gap-x-2 text-xs text-slate-500">
+                  <div className="flex flex-wrap items-center gap-x-2 text-xs text-fg3">
                     <span>{a.family}</span>·<span>{a.formats.join(', ')}</span>
                     {a.moe && <span>· MoE</span>}
                     {a.multimodal && <span>· 멀티모달</span>}
@@ -96,7 +96,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           ) : s.arch ? (
             <SelectedArch name={s.arch} s={s} set={set} />
           ) : (
-            <Card className="flex h-full items-center justify-center p-10 text-sm text-slate-500">왼쪽에서 아키텍처를 선택하세요</Card>
+            <Card className="flex h-full items-center justify-center p-10 text-sm text-fg3">왼쪽에서 아키텍처를 선택하세요</Card>
           )}
         </div>
       </div>
@@ -110,8 +110,8 @@ function ArchOption({ selected, disabled, onClick, children }: { selected: boole
       disabled={disabled}
       onClick={onClick}
       className={cx(
-        'block w-full border-b border-slate-100 px-4 py-2.5 text-left last:border-0 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/5',
-        selected ? 'bg-raised' : 'hover:bg-slate-50 dark:hover:bg-white/[0.03]',
+'block w-full border-b border-line px-4 py-2.5 text-left last:border-0 disabled:cursor-not-allowed disabled:opacity-40 ',
+        selected ? 'bg-raised' : 'hover:bg-raised/60',
       )}
     >
       {children}
@@ -130,19 +130,19 @@ function SelectedArch({ name, s, set }: { name: string; s: WizardState; set: Set
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
         <div>
-          <dt className="text-xs text-slate-500">계열</dt>
+          <dt className="text-xs text-fg3">계열</dt>
           <dd>{a.family}</dd>
         </div>
         <div>
-          <dt className="text-xs text-slate-500">model_type</dt>
+          <dt className="text-xs text-fg3">model_type</dt>
           <dd className="font-mono">{a.modelType}</dd>
         </div>
         <div>
-          <dt className="text-xs text-slate-500">GGUF arch</dt>
+          <dt className="text-xs text-fg3">GGUF arch</dt>
           <dd className="font-mono">{a.gguf ?? '—'}</dd>
         </div>
         <div>
-          <dt className="text-xs text-slate-500">상태</dt>
+          <dt className="text-xs text-fg3">상태</dt>
           <dd>{a.status === 'stable' ? '정식 지원' : '베타'}</dd>
         </div>
       </dl>
@@ -312,11 +312,11 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
               setDrag(false)
               handleFiles(e.dataTransfer.files)
             }}
-            className={cx('rounded-xl border-2 border-dashed p-6 text-center transition-colors', drag ? 'border-brand-500 bg-brand-500/5' : 'border-slate-300 dark:border-white/15')}
+            className={cx('rounded-xl border-2 border-dashed p-6 text-center transition-colors', drag ? 'border-brand-500 bg-brand-500/5' : 'border-line2')}
           >
-            <FolderUp size={28} className="mx-auto text-slate-400" />
+            <FolderUp size={28} className="mx-auto text-fg3" />
             <div className="mt-2 text-sm font-medium">파일을 끌어다 놓거나 선택하세요</div>
-            <div className="mt-1 text-xs text-slate-500">inferstack.yaml, model.py 필수 · 폴더 단위 선택 가능</div>
+            <div className="mt-1 text-xs text-fg3">inferstack.yaml, model.py 필수 · 폴더 단위 선택 가능</div>
             <div className="mt-3 flex justify-center gap-2">
               <input ref={fileRef} type="file" multiple hidden onChange={(e) => handleFiles(e.target.files)} />
               <input ref={dirRef} type="file" multiple hidden onChange={(e) => handleFiles(e.target.files)} {...({ webkitdirectory: '' } as Record<string, string>)} />
@@ -344,9 +344,9 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
             <div className="grid grid-cols-2 gap-1.5 text-xs">
               {checks.map((c) => (
                 <div key={c.file} className="flex items-center gap-1.5">
-                  {c.ok ? <CheckCircle2 size={13} className="text-emerald-500" /> : c.required ? <XCircle size={13} className="text-rose-500" /> : <span className="h-[13px] w-[13px] rounded-full border border-slate-300 dark:border-white/20" />}
+                  {c.ok ? <CheckCircle2 size={13} className="text-emerald-500" /> : c.required ? <XCircle size={13} className="text-rose-500" /> : <span className="h-[13px] w-[13px] rounded-full border border-line2" />}
                   <span className="font-mono">{c.file}</span>
-                  {!c.required && <span className="text-slate-400">(선택)</span>}
+                  {!c.required && <span className="text-fg3">(선택)</span>}
                 </div>
               ))}
               {manifestArchOk !== undefined && (
@@ -356,7 +356,7 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
                 </div>
               )}
             </div>
-            <div className="max-h-32 overflow-y-auto rounded-lg bg-slate-50 p-2 font-mono text-[11px] text-slate-600 dark:bg-white/5 dark:text-slate-400">
+            <div className="max-h-32 overflow-y-auto rounded-lg bg-raised p-2 font-mono text-[11px] text-fg2">
               {code.files.map((f) => (
                 <div key={f.name} className="flex justify-between">
                   <span>{f.name}</span>
@@ -377,13 +377,13 @@ function CustomCodePanel({ s, set }: { s: WizardState; set: Setter }) {
         <div className="flex items-center justify-between px-5 pt-4">
           <div>
             <div className="text-sm font-semibold">InferStack Architecture Package 규격 v1</div>
-            <div className="text-xs text-slate-500">아래 구조와 인터페이스를 따라야 합니다</div>
+            <div className="text-xs text-fg3">아래 구조와 인터페이스를 따라야 합니다</div>
           </div>
           <Button size="sm" variant="outline" onClick={() => Object.values(templates).forEach((t) => downloadText(t.file.split('/').pop()!, t.body))}>
             <Download size={14} /> 템플릿 받기
           </Button>
         </div>
-        <pre className="mx-5 mt-3 overflow-x-auto rounded-lg bg-slate-50 p-3 font-mono text-[11.5px] leading-relaxed text-slate-700 dark:bg-white/5 dark:text-slate-300">{SPEC_TREE}</pre>
+        <pre className="mx-5 mt-3 overflow-x-auto rounded-lg bg-raised p-3 font-mono text-[11.5px] leading-relaxed text-fg2">{SPEC_TREE}</pre>
         <Tabs
           className="mt-3 px-5"
           value={tpl}

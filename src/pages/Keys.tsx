@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { AlertTriangle, KeyRound, MoreHorizontal, Plus, Trash2 } from 'lucide-react'
-import { Badge, Button, Card, CodeBlock, CopyButton, Empty, Input, Label, Modal, PageHeader, Select, Toggle, toast } from '../components/ui'
+import { AlertTriangle, KeyRound, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Badge, Button, CodeBlock, CopyButton, Empty, Input, Label, Modal, PageHeader, Select, Toggle, cx, tbl, toast } from '../components/ui'
 import { MODELS } from '../data/models'
 import type { ApiKey } from '../data/types'
 import { fmtDate, fmtUSD, timeAgo } from '../lib/format'
@@ -24,7 +24,7 @@ export default function Keys() {
     <div>
       <PageHeader
         title="API 키"
-        description="키별로 사용 한도, 만료일, 허용 모델을 설정할 수 있습니다. 키는 생성 직후 한 번만 전체가 표시됩니다."
+        description="키마다 사용 한도, 만료일, 허용 모델을 따로 정할 수 있습니다. 키 전체는 만들 때 한 번만 보여 드립니다."
         actions={
           <Button onClick={() => setOpen(true)}>
             <Plus size={16} /> 키 생성
@@ -33,20 +33,19 @@ export default function Keys() {
       />
 
       {keys.length === 0 ? (
-        <Empty icon={<KeyRound size={32} />} title="API 키가 없습니다" action={<Button onClick={() => setOpen(true)}>첫 키 만들기</Button>} />
+        <Empty icon={<KeyRound size={32} />} title="API 키가 없습니다" description="키를 만들면 OpenAI 호환 SDK에서 바로 쓸 수 있습니다." action={<Button onClick={() => setOpen(true)}>첫 키 만들기</Button>} />
       ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-xs text-slate-500">
-              <tr className="border-b border-slate-200 dark:border-white/10">
-                <th className="px-4 py-3 font-medium">이름</th>
-                <th className="px-3 py-3 font-medium">키</th>
-                <th className="px-3 py-3 font-medium">사용량 / 한도</th>
-                <th className="px-3 py-3 font-medium">허용 모델</th>
-                <th className="px-3 py-3 font-medium">만료</th>
-                <th className="px-3 py-3 font-medium">마지막 사용</th>
-                <th className="px-3 py-3 font-medium">상태</th>
-                <th className="px-3 py-3" />
+        <div className={tbl.wrap}>
+          <table className={tbl.table}>
+            <thead>
+              <tr>
+                <th className={tbl.th}>이름</th>
+                <th className={tbl.th}>사용량 / 한도</th>
+                <th className={tbl.th}>허용 모델</th>
+                <th className={tbl.th}>만료</th>
+                <th className={tbl.th}>마지막 사용</th>
+                <th className={tbl.th}>상태</th>
+                <th className={tbl.th} />
               </tr>
             </thead>
             <tbody>
@@ -54,30 +53,32 @@ export default function Keys() {
                 const expired = !!k.expiresAt && k.expiresAt < Date.now()
                 const pct = k.limit ? Math.min(1, k.usage / k.limit) : 0
                 return (
-                  <tr key={k.id} className="border-b border-slate-100 last:border-0 dark:border-white/5">
-                    <td className="px-4 py-3 font-medium">{k.name}</td>
-                    <td className="px-3 py-3 font-mono text-xs text-slate-500">{mask(k.key)}</td>
-                    <td className="px-3 py-3">
+                  <tr key={k.id} className={tbl.tr}>
+                    <td className={tbl.td}>
+                      <div className="font-medium">{k.name}</div>
+                      <div className="mt-0.5 font-mono text-[12px] text-fg3">{mask(k.key)}</div>
+                    </td>
+                    <td className={tbl.td}>
                       <div>
-                        {fmtUSD(k.usage)} <span className="text-slate-500">/ {k.limit ? fmtUSD(k.limit, 0) : '무제한'}</span>
+                        {fmtUSD(k.usage)} <span className="text-fg3">/ {k.limit ? fmtUSD(k.limit, 0) : '무제한'}</span>
                       </div>
                       {k.limit ? (
-                        <div className="mt-1 h-1 w-28 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
-                          <div className={pct > 0.9 ? 'h-full bg-rose-500' : 'h-full bg-fg/70'} style={{ width: `${pct * 100}%` }} />
+                        <div className="mt-1.5 h-1 w-28 overflow-hidden rounded-full bg-raised">
+                          <div className={pct > 0.9 ? 'h-full bg-rose-500' : 'h-full bg-fg/60'} style={{ width: `${pct * 100}%` }} />
                         </div>
                       ) : null}
                     </td>
-                    <td className="px-3 py-3 text-xs text-slate-500">{k.allowedModels.length ? `${k.allowedModels.length}개 모델` : '전체'}</td>
-                    <td className="px-3 py-3 text-xs text-slate-500">{k.expiresAt ? fmtDate(k.expiresAt) : '없음'}</td>
-                    <td className="px-3 py-3 text-xs text-slate-500">{k.lastUsed ? timeAgo(k.lastUsed) : '사용 안 함'}</td>
-                    <td className="px-3 py-3">{k.disabled ? <Badge>비활성</Badge> : expired ? <Badge color="rose">만료</Badge> : <Badge color="green">활성</Badge>}</td>
-                    <td className="px-3 py-3">
-                      <div className="flex justify-end gap-1">
-                        <button onClick={() => setEdit(k)} className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-white/10 dark:hover:text-white">
-                          <MoreHorizontal size={16} />
+                    <td className={cx(tbl.td, 'text-fg2')}>{k.allowedModels.length ? `${k.allowedModels.length}개 모델` : '전체'}</td>
+                    <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{k.expiresAt ? fmtDate(k.expiresAt) : '없음'}</td>
+                    <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{k.lastUsed ? timeAgo(k.lastUsed) : '사용 안 함'}</td>
+                    <td className={tbl.td}>{k.disabled ? <Badge>비활성</Badge> : expired ? <Badge color="rose">만료</Badge> : <Badge color="green">활성</Badge>}</td>
+                    <td className={tbl.td}>
+                      <div className="flex justify-end gap-0.5">
+                        <button onClick={() => setEdit(k)} className="rounded-md p-1.5 text-fg3 hover:bg-raised hover:text-fg" aria-label={`${k.name} 편집`} title="편집">
+                          <Pencil size={15} />
                         </button>
-                        <button onClick={() => setDel(k)} className="rounded-md p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500 dark:hover:bg-rose-500/10">
-                          <Trash2 size={16} />
+                        <button onClick={() => setDel(k)} className="rounded-md p-1.5 text-fg3 hover:bg-rose-500/10 hover:text-rose-500" aria-label={`${k.name} 삭제`} title="삭제">
+                          <Trash2 size={15} />
                         </button>
                       </div>
                     </td>
@@ -86,19 +87,20 @@ export default function Keys() {
               })}
             </tbody>
           </table>
-        </Card>
+        </div>
       )}
 
-      <div className="mt-8 max-w-3xl">
-        <div className="mb-2 text-sm font-semibold">사용 방법</div>
+      <h2 className="mb-4 mt-12 text-[17px] font-semibold">사용 방법</h2>
+      <div className="max-w-3xl">
         <CodeBlock
           lang="bash"
           code={`export INFERSTACK_API_KEY="sk-is-v1-..."
 
+# 모델 목록
 curl https://api.inferstack.dev/v1/models \\
   -H "Authorization: Bearer $INFERSTACK_API_KEY"
 
-# 키 사용량/한도 조회
+# 이 키의 사용량과 한도
 curl https://api.inferstack.dev/v1/key \\
   -H "Authorization: Bearer $INFERSTACK_API_KEY"`}
         />
@@ -130,7 +132,7 @@ curl https://api.inferstack.dev/v1/key \\
         <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-500/10 dark:text-amber-200">
           <AlertTriangle size={16} className="mt-0.5 shrink-0" /> 이 키는 지금 한 번만 표시됩니다. 안전한 곳에 보관하세요.
         </div>
-        <div className="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-white/10 dark:bg-white/5">
+        <div className="mt-4 flex items-center gap-2 rounded-lg border border-line bg-raised p-3">
           <code className="flex-1 break-all font-mono text-xs">{created?.key}</code>
           <CopyButton text={created?.key ?? ''} label="복사" />
         </div>
@@ -227,9 +229,9 @@ function KeyForm({ open, onClose, onSubmit, initial }: { open: boolean; onClose:
         </div>
         <Toggle checked={restrict} onChange={setRestrict} label="허용 모델 제한" description="선택한 모델만 이 키로 호출할 수 있습니다" />
         {restrict && (
-          <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-slate-200 p-2 dark:border-white/10">
+          <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-line p-2">
             {MODELS.map((m) => (
-              <label key={m.slug} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm hover:bg-slate-50 dark:hover:bg-white/5">
+              <label key={m.slug} className="flex cursor-pointer items-center gap-2 rounded px-1 py-1 text-sm hover:bg-raised">
                 <input type="checkbox" className="accent-fg" checked={allowed.includes(m.slug)} onChange={() => setAllowed(allowed.includes(m.slug) ? allowed.filter((x) => x !== m.slug) : [...allowed, m.slug])} />
                 <span className="font-mono text-xs">{m.slug}</span>
               </label>

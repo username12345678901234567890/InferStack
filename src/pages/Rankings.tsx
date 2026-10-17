@@ -79,16 +79,16 @@ export default function Rankings() {
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px] [&>*]:min-w-0">
-        <Card className="divide-y divide-slate-100 dark:divide-white/5">
+        <Card className="divide-y divide-line">
           {list.map((m, i) => {
             const delta = (rng(m.slug + 'd')() - 0.35) * 60
             return (
-              <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/[0.03]">
-                <span className="w-6 text-right text-sm font-semibold text-slate-400">{i + 1}</span>
+              <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center gap-3 px-4 py-3 hover:bg-raised/60">
+                <span className="w-6 text-right text-sm font-semibold text-fg3">{i + 1}</span>
                 <OrgAvatar org={m.org} name={m.orgName} size={28} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{m.name}</div>
-                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/5">
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-raised">
                     <div className="h-full rounded-full bg-fg/70" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
                   </div>
                 </div>
@@ -115,7 +115,7 @@ export default function Rankings() {
                 <div key={o.id} className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-sm" style={{ background: COLORS[i % COLORS.length] }} />
                   <span className="flex-1">{o.name}</span>
-                  <span className="text-slate-500">{(o.share * 100).toFixed(1)}%</span>
+                  <span className="text-fg3">{(o.share * 100).toFixed(1)}%</span>
                 </div>
               ))}
             </div>
@@ -126,7 +126,7 @@ export default function Rankings() {
               {fastest.map(({ m, tps }) => (
                 <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
                   <span className="truncate">{m.name}</span>
-                  <span className="font-mono text-xs text-slate-500">{tps}</span>
+                  <span className="text-xs text-fg3">{tps}</span>
                 </Link>
               ))}
             </div>
@@ -140,7 +140,7 @@ export default function Rankings() {
                 .map((m) => (
                   <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
                     <span className="truncate">{m.name}</span>
-                    <span className="font-mono text-xs text-slate-500">{fmtPrice(m.price.output)}</span>
+                    <span className="text-xs text-fg3">{fmtPrice(m.price.output)}</span>
                   </Link>
                 ))}
             </div>

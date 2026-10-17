@@ -1,33 +1,44 @@
 import { clsx } from 'clsx'
 import { Check, Copy, X } from 'lucide-react'
 import { create } from 'zustand'
+import { Link } from 'react-router-dom'
 import { useEffect, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react'
 
 export const cx = clsx
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline' | 'accent'
+type Variant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline' | 'accent' | 'inverse'
 type Size = 'sm' | 'md' | 'lg'
+
+/** 버튼 모양. Link 에도 같은 모양을 쓰기 위해 분리 */
+export function buttonClass(variant: Variant = 'primary', size: Size = 'md', className?: string) {
+  return cx(
+    'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-medium transition-colors disabled:pointer-events-none disabled:opacity-40',
+    size === 'sm' && 'h-8 px-3 text-[13px]',
+    size === 'md' && 'h-9 px-4 text-[14px]',
+    size === 'lg' && 'h-11 px-5 text-[15px]',
+    (variant === 'primary' || variant === 'accent') && 'bg-accent text-white hover:bg-accent/90',
+    variant === 'inverse' && 'bg-fg text-bg hover:bg-fg/85',
+    variant === 'secondary' && 'border border-line bg-raised text-fg hover:border-line2',
+    variant === 'outline' && 'border border-line2 text-fg hover:bg-raised',
+    variant === 'ghost' && 'text-fg2 hover:bg-raised hover:text-fg',
+    variant === 'danger' && 'bg-rose-600 text-white hover:bg-rose-500',
+    className,
+  )
+}
 
 export function Button({ variant = 'primary', size = 'md', className, children, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: Size }) {
   return (
-    <button
-      className={cx(
-        'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40',
-        size === 'sm' && 'h-8 px-3 text-[13px]',
-        size === 'md' && 'h-9 px-4 text-sm',
-        size === 'lg' && 'h-11 px-5 text-[15px]',
-        variant === 'primary' && 'bg-fg text-bg hover:bg-fg/85',
-        variant === 'accent' && 'bg-accent text-white hover:bg-accent/90',
-        variant === 'secondary' && 'border border-line bg-raised text-fg hover:border-line2',
-        variant === 'outline' && 'border border-line2 text-fg hover:bg-raised',
-        variant === 'ghost' && 'text-fg2 hover:bg-raised hover:text-fg',
-        variant === 'danger' && 'bg-rose-600 text-white hover:bg-rose-500',
-        className,
-      )}
-      {...rest}
-    >
+    <button className={buttonClass(variant, size, className)} {...rest}>
       {children}
     </button>
+  )
+}
+
+export function ButtonLink({ to, variant = 'primary', size = 'md', className, children }: { to: string; variant?: Variant; size?: Size; className?: string; children: ReactNode }) {
+  return (
+    <Link to={to} className={buttonClass(variant, size, className)}>
+      {children}
+    </Link>
   )
 }
 
@@ -41,15 +52,15 @@ export function Card({ className, children, ...rest }: { className?: string; chi
 
 export function Badge({ children, color = 'slate', className }: { children: ReactNode; color?: 'slate' | 'brand' | 'green' | 'amber' | 'rose' | 'cyan' | 'violet'; className?: string }) {
   const map = {
-    slate: 'border-line2 text-fg2',
-    brand: 'border-accent/40 text-accent',
-    cyan: 'border-accent/40 text-accent',
-    violet: 'border-line2 text-fg',
-    green: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
-    amber: 'border-amber-500/40 text-amber-600 dark:text-amber-400',
-    rose: 'border-rose-500/40 text-rose-600 dark:text-rose-400',
+    slate: 'bg-raised text-fg2 ring-1 ring-inset ring-line',
+    violet: 'bg-raised text-fg ring-1 ring-inset ring-line2',
+    brand: 'bg-accent/[0.12] text-accent',
+    cyan: 'bg-accent/[0.12] text-accent',
+    green: 'bg-emerald-500/[0.12] text-emerald-600 dark:text-emerald-400',
+    amber: 'bg-amber-500/[0.12] text-amber-700 dark:text-amber-400',
+    rose: 'bg-rose-500/[0.12] text-rose-600 dark:text-rose-400',
   }
-  return <span className={cx('inline-flex items-center gap-1 rounded-[5px] border px-1.5 font-mono text-[10.5px] font-medium uppercase leading-[18px] tracking-wide', map[color], className)}>{children}</span>
+  return <span className={cx('inline-flex h-5 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 text-[11px] font-medium leading-none', map[color], className)}>{children}</span>
 }
 
 const fieldBase = 'rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/40 focus:outline-none'
@@ -246,7 +257,7 @@ export function Stat({ label, value, sub, icon }: { label: ReactNode; value: Rea
         {label}
         {icon}
       </div>
-      <div className="tabular mt-2 text-[22px] font-semibold tracking-tight">{value}</div>
+      <div className="tabular mt-2 text-[24px] font-bold tracking-[-0.02em]">{value}</div>
       {sub && <div className="mt-1 text-xs text-fg3">{sub}</div>}
     </Card>
   )
@@ -273,14 +284,42 @@ export function Progress({ value, className }: { value: number; className?: stri
 
 export function PageHeader({ title, description, actions }: { title: ReactNode; description?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 className="text-[26px] font-semibold tracking-[-0.03em]">{title}</h1>
-        {description && <p className="mt-1.5 text-sm text-fg2">{description}</p>}
+    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="text-[28px] font-bold leading-tight tracking-[-0.03em]">{title}</h1>
+        {description && <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-fg2">{description}</p>}
       </div>
-      {actions && <div className="flex gap-2">{actions}</div>}
+      {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
     </div>
   )
+}
+
+/** 섹션 제목 + 오른쪽 링크 */
+export function SectionHead({ title, sub, link }: { title: ReactNode; sub?: ReactNode; link?: { to: string; label: string } }) {
+  return (
+    <div className="mb-5 flex items-end justify-between gap-4">
+      <div className="min-w-0">
+        <h2 className="text-[20px] font-bold tracking-[-0.025em]">{title}</h2>
+        {sub && <p className="mt-1 text-[14px] text-fg2">{sub}</p>}
+      </div>
+      {link && (
+        <Link to={link.to} className="shrink-0 text-[13.5px] text-fg2 transition-colors hover:text-fg">
+          {link.label} →
+        </Link>
+      )}
+    </div>
+  )
+}
+
+/** 표 공통 클래스 */
+export const tbl = {
+  wrap: 'overflow-x-auto rounded-xl border border-line bg-panel',
+  table: 'tabular w-full text-[14px]',
+  th: 'whitespace-nowrap border-b border-line px-4 py-3 text-left text-[12.5px] font-medium text-fg3',
+  thR: 'whitespace-nowrap border-b border-line px-4 py-3 text-right text-[12.5px] font-medium text-fg3',
+  td: 'border-b border-line px-4 py-3.5 align-middle',
+  tdR: 'border-b border-line px-4 py-3.5 text-right align-middle',
+  tr: 'transition-colors hover:bg-raised/50 [&:last-child>td]:border-0',
 }
 
 /* ---------- toast ---------- */

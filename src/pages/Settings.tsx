@@ -17,7 +17,7 @@ export default function Settings() {
   const nav = useNavigate()
 
   return (
-    <div className="max-w-3xl">
+    <div>
       <PageHeader title="설정" />
       <div className="space-y-6">
         <Card className="space-y-4 p-5">
@@ -74,7 +74,7 @@ export default function Settings() {
         <Card className="flex items-center justify-between gap-4 border-rose-500/30 p-5">
           <div>
             <div className="font-medium text-rose-600 dark:text-rose-400">데모 데이터 초기화</div>
-            <div className="text-sm text-slate-500">API 키, 크레딧, 활동 로그, 커스텀 모델을 초기 상태로 되돌립니다.</div>
+            <div className="text-sm text-fg3">API 키, 크레딧, 활동 로그, 커스텀 모델을 초기 상태로 되돌립니다.</div>
           </div>
           <Button variant="danger" onClick={() => setConfirm(true)}>초기화</Button>
         </Card>

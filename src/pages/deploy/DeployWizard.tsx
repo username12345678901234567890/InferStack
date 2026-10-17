@@ -40,11 +40,11 @@ export default function DeployWizard() {
   ][step]
 
   const blockReason = [
-    '먼저 모델을 불러오세요',
+'먼저 모델을 불러오세요',
     s.format === 'gguf' ? 'GGUF 양자화 파일을 선택하세요' : '이 리포지토리에 safetensors 파일이 없습니다',
     s.arch === CUSTOM_ARCH ? '새 아키텍처 이름과 추론 코드 검증이 필요합니다' : '아키텍처를 선택하세요',
     slugTaken ? '이미 사용 중인 모델 ID입니다' : !s.slug ? '모델 ID를 입력하세요' : 'VRAM이 부족합니다',
-    '',
+'',
   ][step]
 
   const deploy = () => {
@@ -96,7 +96,7 @@ export default function DeployWizard() {
 
   return (
     <div className="mx-auto max-w-6xl">
-      <Link to="/deploy" className="mb-4 inline-flex items-center gap-1 text-sm text-slate-500 hover:text-fg">
+      <Link to="/deploy" className="mb-4 inline-flex items-center gap-1 text-sm text-fg3 hover:text-fg">
         <ArrowLeft size={14} /> 모델 업로드
       </Link>
       <h1 className="text-2xl font-semibold tracking-tight">새 모델 배포</h1>
@@ -108,10 +108,10 @@ export default function DeployWizard() {
               disabled={i > step}
               onClick={() => setStep(i)}
               className={cx(
-                'flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors',
+'flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors',
                 i === step && 'border-fg/50 bg-raised font-medium text-fg',
                 i < step && 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
-                i > step && 'border-slate-200 text-slate-400 dark:border-white/10',
+                i > step && 'border-line text-fg3 ',
               )}
             >
               <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-fg text-bg' : i === step ? 'border border-fg text-fg' : 'border border-line2 text-fg3')}>
@@ -119,7 +119,7 @@ export default function DeployWizard() {
               </span>
               {label}
             </button>
-            {i < STEPS.length - 1 && <span className="h-px w-4 bg-slate-300 dark:bg-white/15" />}
+            {i < STEPS.length - 1 && <span className="h-px w-4 bg-line2" />}
           </li>
         ))}
       </ol>
@@ -132,12 +132,12 @@ export default function DeployWizard() {
         {step === 4 && <Review s={s} need={need} />}
       </div>
 
-      <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-3 border-t border-slate-200 bg-white/90 py-4 backdrop-blur dark:border-white/10 dark:bg-[#08090a]/90">
+      <div className="sticky bottom-0 mt-8 flex items-center justify-between gap-3 border-t border-line bg-bg/90 py-4 backdrop-blur">
         <Button variant="ghost" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
           <ArrowLeft size={16} /> 이전
         </Button>
         <div className="flex items-center gap-3">
-          {!canNext && blockReason && <span className="hidden text-xs text-slate-500 sm:inline">{blockReason}</span>}
+          {!canNext && blockReason && <span className="hidden text-xs text-fg3 sm:inline">{blockReason}</span>}
           {step < STEPS.length - 1 ? (
             <Button onClick={() => setStep(step + 1)} disabled={!canNext}>
               다음 <ArrowRight size={16} />
@@ -175,24 +175,24 @@ function Review({ s, need }: { s: WizardState; need: number }) {
   ]
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <Card className="divide-y divide-slate-100 dark:divide-white/5">
+      <Card className="divide-y divide-line">
         {rows.map(([k, v]) => (
           <div key={k} className="flex flex-col gap-1 px-5 py-3 text-sm sm:flex-row sm:items-center">
-            <div className="w-36 shrink-0 text-slate-500">{k}</div>
+            <div className="w-36 shrink-0 text-fg3">{k}</div>
             <div className="min-w-0 break-all">{v}</div>
           </div>
         ))}
       </Card>
       <Card className="h-fit p-5 text-sm">
         <div className="font-semibold">배포 후 진행 과정</div>
-        <ol className="mt-3 space-y-2 text-slate-600 dark:text-slate-400">
+        <ol className="mt-3 space-y-2 text-fg2">
           <li>1. GPU 예약 및 가중치 {s.source === 'cli' ? '검증' : '다운로드'}</li>
           <li>2. 포맷·아키텍처·토크나이저 검증</li>
           {isNew && <li>3. 커스텀 추론 코드 빌드 & 스모크 테스트</li>}
           <li>{isNew ? 4 : 3}. 런타임 이미지 생성 및 GPU 로딩</li>
           <li>{isNew ? 5 : 4}. 헬스체크 후 엔드포인트 활성화</li>
         </ol>
-        <p className="mt-4 text-xs text-slate-500">배포가 완료되면 채팅 플레이그라운드와 API에서 즉시 사용할 수 있습니다.</p>
+        <p className="mt-4 text-xs text-fg3">배포가 완료되면 채팅 플레이그라운드와 API에서 즉시 사용할 수 있습니다.</p>
       </Card>
     </div>
   )

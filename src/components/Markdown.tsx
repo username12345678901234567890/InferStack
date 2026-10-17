@@ -27,11 +27,11 @@ export function Markdown({ text }: { text: string }) {
         <div key={k++} className="my-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr>{head.map((h, j) => <th key={j} className="border-b border-slate-300 px-2 py-1.5 text-left font-semibold dark:border-white/15">{inline(h)}</th>)}</tr>
+              <tr>{head.map((h, j) => <th key={j} className="border-b border-line2 px-2 py-1.5 text-left font-semibold">{inline(h)}</th>)}</tr>
             </thead>
             <tbody>
               {rows.map((r, ri) => (
-                <tr key={ri}>{r.map((c, j) => <td key={j} className="border-b border-slate-200 px-2 py-1.5 dark:border-white/10">{inline(c)}</td>)}</tr>
+                <tr key={ri}>{r.map((c, j) => <td key={j} className="border-b border-line px-2 py-1.5">{inline(c)}</td>)}</tr>
               ))}
             </tbody>
           </table>
@@ -82,8 +82,8 @@ function inline(s: string): ReactNode[] {
     if (idx > last) out.push(s.slice(last, idx))
     const t = m[0]
     if (t.startsWith('**')) out.push(<strong key={k++}>{t.slice(2, -2)}</strong>)
-    else if (t.startsWith('`')) out.push(<code key={k++} className="rounded bg-slate-200/70 px-1 py-0.5 font-mono text-[0.85em] dark:bg-white/10">{t.slice(1, -1)}</code>)
-    else out.push(<em key={k++} className="text-slate-500">{t.slice(1, -1)}</em>)
+    else if (t.startsWith('`')) out.push(<code key={k++} className="rounded bg-raised px-1 py-0.5 font-mono text-[0.85em]">{t.slice(1, -1)}</code>)
+    else out.push(<em key={k++} className="text-fg3">{t.slice(1, -1)}</em>)
     last = idx + t.length
   }
   if (last < s.length) out.push(s.slice(last))

@@ -31,8 +31,8 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
             </div>
             <div>
               <Label>모델 ID</Label>
-              <div className="flex items-center rounded-lg border border-slate-300 bg-slate-50 pl-3 text-sm dark:border-white/15 dark:bg-white/5">
-                <span className="font-mono text-slate-500">{username}/</span>
+              <div className="flex items-center rounded-lg border border-line2 bg-raised pl-3 text-sm">
+                <span className="font-mono text-fg3">{username}/</span>
                 <input value={s.slug} onChange={(e) => set({ slug: slugify(e.target.value) })} className="h-10 flex-1 bg-transparent pr-3 font-mono outline-none" />
               </div>
             </div>
@@ -58,17 +58,17 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
                   key={g.id}
                   onClick={() => set({ gpu: g.id })}
                   className={cx(
-                    'flex items-center justify-between rounded-lg border px-3 py-2.5 text-left text-sm transition-colors',
-                    s.gpu === g.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20',
+'flex items-center justify-between rounded-lg border px-3 py-2.5 text-left text-sm transition-colors',
+                    s.gpu === g.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-line hover:border-line2',
                   )}
                 >
                   <div>
                     <div className="font-medium">{g.name}</div>
-                    <div className="text-xs text-slate-500">
+                    <div className="text-xs text-fg3">
                       {g.vram}GB · ${g.price.toFixed(2)}/hr
                     </div>
                   </div>
-                  {ok ? <CheckCircle2 size={15} className="text-emerald-500" /> : <span className="text-[11px] text-slate-400">VRAM 부족</span>}
+                  {ok ? <CheckCircle2 size={15} className="text-emerald-500" /> : <span className="text-[11px] text-fg3">VRAM 부족</span>}
                 </button>
               )
             })}
@@ -140,12 +140,12 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
               <button
                 key={o.id}
                 onClick={() => set({ visibility: o.id })}
-                className={cx('rounded-lg border p-3 text-left text-sm', s.visibility === o.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-slate-200 dark:border-white/10')}
+                className={cx('rounded-lg border p-3 text-left text-sm', s.visibility === o.id ? 'border-fg/50 bg-raised ring-1 ring-fg/15' : 'border-line')}
               >
                 <div className="flex items-center gap-2 font-medium">
                   <o.icon size={15} /> {o.title}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">{o.desc}</div>
+                <div className="mt-1 text-xs text-fg3">{o.desc}</div>
               </button>
             ))}
           </div>
@@ -162,7 +162,7 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
               <Button variant="outline" onClick={() => set({ priceIn: suggested.in, priceOut: suggested.out })}>
                 <Wand2 size={14} /> 추천가
               </Button>
-              <div className="text-xs text-slate-500 md:col-span-3">
+              <div className="text-xs text-fg3 md:col-span-3">
                 추천가 ${suggested.in}/${suggested.out} — 유사 규모 카탈로그 모델 가격과 예상 처리량 기반. 손익분기 처리량 ≈ {fmtNum(Math.round((hourly / Math.max(0.01, s.priceOut * 0.8)) * 1e6 / 3600))} 출력 토큰/초
               </div>
             </div>
@@ -187,13 +187,13 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
           <div className="text-sm font-semibold">예상 비용</div>
           <div className="mt-3 text-3xl font-bold tracking-tight">
             {fmtUSD(hourly)}
-            <span className="text-sm font-normal text-slate-500">/hr · 레플리카당</span>
+            <span className="text-sm font-normal text-fg3">/hr · 레플리카당</span>
           </div>
           <div className="mt-3 space-y-2 text-sm">
             <Row k="상시 최소 비용" v={s.minReplicas === 0 ? '$0 (scale to zero)' : `${fmtUSD(hourly * s.minReplicas * 24 * 30, 0)}/월`} />
             <Row k="최대 부하 시" v={`${fmtUSD(hourly * s.maxReplicas)}/hr`} />
           </div>
-          <p className="mt-3 text-[11px] text-slate-500">초 단위 과금. 데모에서는 실제로 청구되지 않습니다.</p>
+          <p className="mt-3 text-[11px] text-fg3">초 단위 과금. 데모에서는 실제로 청구되지 않습니다.</p>
         </Card>
       </div>
     </div>
@@ -211,7 +211,7 @@ function suggestPrice(s: WizardState, hourly: number) {
 function Row({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-3">
-      <span className="text-slate-500">{k}</span>
+      <span className="text-fg3">{k}</span>
       <span className="text-right font-medium">{v}</span>
     </div>
   )

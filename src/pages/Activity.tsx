@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Download } from 'lucide-react'
-import { Badge, Button, Card, PageHeader, Segmented, Select, Stat } from '../components/ui'
+import { Badge, Button, Card, PageHeader, Segmented, Select, Stat, cx, tbl } from '../components/ui'
 import { useStore } from '../store'
 import { fmtDateTime, fmtTokens, fmtUSD } from '../lib/format'
 import { findModel } from '../data/models'
@@ -94,7 +94,7 @@ export default function Activity() {
         <Stat label="비용" value={fmtUSD(totalCost)} />
         <Stat label="토큰" value={fmtTokens(totalTok)} />
         <Stat label="요청" value={filtered.length.toLocaleString()} />
-        <Stat label="평균 TTFT" value={`${Math.round(avgLat)}ms`} />
+        <Stat label="평균 첫 토큰 지연" value={`${Math.round(avgLat)}ms`} />
       </div>
 
       <Card className="mt-6 p-5">
@@ -108,16 +108,16 @@ export default function Activity() {
               { id: 'requests', label: '요청 수' },
             ]}
           />
-          <div className="ml-auto flex gap-2">
-            <Select value={model} onChange={(e) => (setModel(e.target.value), setPage(0))} className="h-9 w-auto text-xs">
+          <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
+            <Select value={model} onChange={(e) => (setModel(e.target.value), setPage(0))} className="h-9 min-w-0 flex-1 text-[13px] sm:w-52 sm:flex-none" aria-label="모델 필터">
               <option value="all">모든 모델</option>
               {models.map((m) => (
                 <option key={m} value={m}>
-                  {m}
+                  {findModel(m)?.name ?? m}
                 </option>
               ))}
             </Select>
-            <Select value={key} onChange={(e) => (setKey(e.target.value), setPage(0))} className="h-9 w-auto text-xs">
+            <Select value={key} onChange={(e) => (setKey(e.target.value), setPage(0))} className="h-9 min-w-0 flex-1 text-[13px] sm:w-36 sm:flex-none" aria-label="키 필터">
               <option value="all">모든 키</option>
               {keys.map((k) => (
                 <option key={k} value={k}>
@@ -138,7 +138,7 @@ export default function Activity() {
                 contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, fontSize: 12 }}
                 cursor={{ fill: 'rgba(148,163,184,.08)' }}
               />
-              <Legend formatter={(v) => <span className="text-xs text-slate-500">{findModel(v)?.name ?? v}</span>} />
+              <Legend formatter={(v) => <span className="text-xs text-fg3">{findModel(v)?.name ?? v}</span>} />
               {series.map((s, i) => (
                 <Bar key={s} dataKey={s} stackId="a" fill={COLORS[i % COLORS.length]} radius={i === series.length - 1 ? [3, 3, 0, 0] : 0} />
               ))}
@@ -147,44 +147,46 @@ export default function Activity() {
         </div>
       </Card>
 
-      <Card className="mt-6 overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="text-left text-xs text-slate-500">
-            <tr className="border-b border-slate-200 dark:border-white/10">
-              <th className="px-4 py-3 font-medium">시간</th>
-              <th className="px-3 py-3 font-medium">모델</th>
-              <th className="px-3 py-3 font-medium">키</th>
-              <th className="px-3 py-3 font-medium">리전</th>
-              <th className="px-3 py-3 text-right font-medium">토큰 (in → out)</th>
-              <th className="px-3 py-3 text-right font-medium">비용</th>
-              <th className="px-3 py-3 text-right font-medium">TTFT</th>
-              <th className="px-3 py-3 text-right font-medium">tok/s</th>
-              <th className="px-3 py-3 font-medium">종료</th>
+      <div className="mt-6 overflow-hidden rounded-xl border border-line bg-panel">
+        <div className="overflow-x-auto">
+        <table className={tbl.table}>
+          <thead>
+            <tr>
+              <th className={tbl.th}>시간</th>
+              <th className={tbl.th}>모델</th>
+              <th className={tbl.th}>키</th>
+              <th className={tbl.th}>리전</th>
+              <th className={tbl.thR}>입력 → 출력 토큰</th>
+              <th className={tbl.thR}>비용</th>
+              <th className={tbl.thR}>첫 토큰</th>
+              <th className={tbl.thR}>tok/s</th>
+              <th className={tbl.th}>종료</th>
             </tr>
           </thead>
           <tbody>
             {rows.map((l) => (
-              <tr key={l.id} className="border-b border-slate-100 last:border-0 dark:border-white/5">
-                <td className="whitespace-nowrap px-4 py-2.5 text-slate-500">{fmtDateTime(l.ts)}</td>
-                <td className="px-3 py-2.5 font-mono text-xs">{l.model}</td>
-                <td className="px-3 py-2.5">
+              <tr key={l.id} className={tbl.tr}>
+                <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{fmtDateTime(l.ts)}</td>
+                <td className={cx(tbl.td, 'whitespace-nowrap font-medium')}>{findModel(l.model)?.name ?? l.model}</td>
+                <td className={cx(tbl.td, 'whitespace-nowrap')}>
                   {l.keyName} {l.source === 'playground' && <Badge color="violet">playground</Badge>}
                 </td>
-                <td className="px-3 py-2.5 font-mono text-xs text-slate-500">{l.endpoint}</td>
-                <td className="px-3 py-2.5 text-right text-slate-500">
+                <td className={cx(tbl.td, 'whitespace-nowrap font-mono text-[12.5px] text-fg3')}>{l.endpoint}</td>
+                <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>
                   {l.promptTokens.toLocaleString()} → {l.completionTokens.toLocaleString()}
                 </td>
-                <td className="px-3 py-2.5 text-right font-mono">{fmtUSD(l.cost, 4)}</td>
-                <td className="px-3 py-2.5 text-right text-slate-500">{l.latency}ms</td>
-                <td className="px-3 py-2.5 text-right text-slate-500">{l.throughput}</td>
-                <td className="px-3 py-2.5">
+                <td className={tbl.tdR}>{fmtUSD(l.cost, 4)}</td>
+                <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>{l.latency}ms</td>
+                <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>{l.throughput}</td>
+                <td className={tbl.td}>
                   <Badge color={l.finish === 'stop' ? 'green' : l.finish === 'error' ? 'rose' : 'amber'}>{l.finish}</Badge>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div className="flex items-center justify-between border-t border-slate-200 px-4 py-3 text-xs text-slate-500 dark:border-white/10">
+        </div>
+        <div className="flex items-center justify-between border-t border-line px-4 py-3 text-[13px] text-fg3">
           <span>
             {filtered.length ? page * PAGE + 1 : 0}–{Math.min(filtered.length, (page + 1) * PAGE)} / {filtered.length}
           </span>
@@ -197,7 +199,7 @@ export default function Activity() {
             </Button>
           </div>
         </div>
-      </Card>
+      </div>
     </div>
   )
 }

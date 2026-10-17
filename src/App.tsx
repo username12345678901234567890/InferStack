@@ -1,5 +1,5 @@
 import { HashRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
-import { Layout } from './components/Layout'
+import { AccountLayout, Layout } from './components/Layout'
 import { Button, Empty } from './components/ui'
 import Home from './pages/Home'
 import Models from './pages/Models'
@@ -35,15 +35,17 @@ export default function App() {
           <Route path="rankings" element={<Rankings />} />
           <Route path="docs" element={<Docs />} />
           <Route path="pricing" element={<Pricing />} />
-          <Route path="keys" element={<Keys />} />
-          <Route path="credits" element={<Credits />} />
-          <Route path="activity" element={<Activity />} />
-          <Route path="settings" element={<Settings />} />
+          <Route element={<AccountLayout />}>
+            <Route path="credits" element={<Credits />} />
+            <Route path="keys" element={<Keys />} />
+            <Route path="activity" element={<Activity />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="my-models" element={<MyModels />} />
+            <Route path="my-models/:slug" element={<MyModelDetail />} />
+          </Route>
           <Route path="signin" element={<SignIn />} />
           <Route path="deploy" element={<DeployHome />} />
           <Route path="deploy/new" element={<KeyedDeployWizard />} />
-          <Route path="my-models" element={<MyModels />} />
-          <Route path="my-models/:slug" element={<MyModelDetail />} />
           <Route
             path="*"
             element={

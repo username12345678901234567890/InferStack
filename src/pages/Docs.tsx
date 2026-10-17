@@ -26,7 +26,7 @@ export default function Docs() {
     <div className="grid gap-10 lg:grid-cols-[200px_1fr]">
       <aside className="hidden lg:block">
         <nav className="sticky top-20 space-y-1 text-sm">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">문서</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg3">문서</div>
           {TOC.map(([id, l]) => (
             <a
               key={id}
@@ -35,14 +35,14 @@ export default function Docs() {
                 e.preventDefault()
                 document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
               }}
-              className="block rounded-md px-2 py-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+              className="block rounded-md px-2 py-1 text-fg2 hover:bg-raised hover:text-fg"
             >
               {l}
             </a>
           ))}
         </nav>
       </aside>
-      <article className="min-w-0 max-w-3xl space-y-14 [&_h2]:scroll-mt-20 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-6 [&_h3]:font-semibold [&_p]:leading-relaxed [&_p]:text-slate-600 dark:[&_p]:text-slate-400">
+      <article className="min-w-0 max-w-3xl space-y-14 [&_p_code]:rounded [&_p_code]:bg-raised [&_p_code]:px-1.5 [&_p_code]:py-0.5 [&_p_code]:text-[0.86em] [&_li_code]:rounded [&_li_code]:bg-raised [&_li_code]:px-1.5 [&_li_code]:text-[0.86em] [&_h2]:scroll-mt-20 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-6 [&_h3]:font-semibold [&_p]:leading-relaxed [&_p]:text-fg2">
         <section>
           <h1 className="text-3xl font-bold tracking-tight">InferStack 문서</h1>
           <p className="mt-3">InferStack은 최신 오픈소스 LLM을 OpenAI 호환 API로 제공하고, 직접 업로드한 모델을 서버리스 엔드포인트로 배포하는 추론 플랫폼입니다.</p>
@@ -83,14 +83,14 @@ print(r.choices[0].message.content)`}
           </p>
           <Card className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-xs text-slate-500">
-                <tr className="border-b border-slate-200 dark:border-white/10">
+              <thead className="text-left text-xs text-fg3">
+                <tr className="border-b border-line">
                   <th className="px-4 py-2 font-medium">파라미터</th>
                   <th className="px-3 py-2 font-medium">타입</th>
                   <th className="px-3 py-2 font-medium">설명</th>
                 </tr>
               </thead>
-              <tbody className="[&_td]:px-3 [&_td]:py-2 [&_td:first-child]:px-4 [&_tr]:border-b [&_tr]:border-slate-100 dark:[&_tr]:border-white/5">
+              <tbody className="[&_td]:px-3 [&_td]:py-2 [&_td:first-child]:px-4 [&_tr]:border-b [&_tr]:border-line">
                 {[
                   ['model', 'string', '모델 슬러그. 예: z-ai/glm-5.3, demo/my-model'],
                   ['messages', 'array', 'role/content 메시지 배열. content는 텍스트 또는 image_url 파트 배열'],
@@ -105,7 +105,7 @@ print(r.choices[0].message.content)`}
                 ].map(([a, b, c]) => (
                   <tr key={a}>
                     <td className="font-mono text-xs">{a}</td>
-                    <td className="text-xs text-slate-500">{b}</td>
+                    <td className="text-xs text-fg3">{b}</td>
                     <td>{c}</td>
                   </tr>
                 ))}
@@ -117,11 +117,11 @@ print(r.choices[0].message.content)`}
             className="mt-3"
             lang="json"
             code={`"usage": {
-  "prompt_tokens": 1204,
-  "completion_tokens": 311,
-  "prompt_tokens_details": { "cached_tokens": 1024 },
-  "cost": 0.000614,
-  "provider": "ap-seoul-1"
+"prompt_tokens": 1204,
+"completion_tokens": 311,
+"prompt_tokens_details": { "cached_tokens": 1024 },
+"cost": 0.000614,
+"provider": "ap-seoul-1"
 }`}
           />
         </section>
@@ -140,23 +140,23 @@ print(r.choices[0].message.content)`}
             className="mt-4"
             lang="json"
             code={`{
-  "model": "qwen/qwen3.8-27b",
-  "messages": [...],
-  "provider": {
-    "order": ["ap-seoul-1", "ap-tokyo-1"],
-    "allow_fallbacks": true,
-    "quantizations": ["bf16", "fp8"],
-    "data_collection": "deny",
-    "sort": "throughput"
+"model": "qwen/qwen3.8-27b",
+"messages": [...],
+"provider": {
+"order": ["ap-seoul-1", "ap-tokyo-1"],
+"allow_fallbacks": true,
+"quantizations": ["bf16", "fp8"],
+"data_collection": "deny",
+"sort": "throughput"
   },
-  "models": ["qwen/qwen3.8-27b", "google/gemma-4-31b-it"]
+"models": ["qwen/qwen3.8-27b", "google/gemma-4-31b-it"]
 }`}
           />
         </section>
 
         <section>
           <h2 id="errors">에러 코드</h2>
-          <Card className="mt-4 divide-y divide-slate-100 text-sm dark:divide-white/5">
+          <Card className="mt-4 divide-y divide-line text-sm">
             {[
               ['400', '잘못된 요청 (파라미터 오류)'],
               ['401', '유효하지 않거나 비활성화된 API 키'],
@@ -169,7 +169,7 @@ print(r.choices[0].message.content)`}
             ].map(([c, d]) => (
               <div key={c} className="flex gap-4 px-4 py-2">
                 <span className="w-10 font-mono font-semibold">{c}</span>
-                <span className="text-slate-600 dark:text-slate-400">{d}</span>
+                <span className="text-fg2">{d}</span>
               </div>
             ))}
           </Card>
@@ -186,22 +186,22 @@ curl https://api.inferstack.dev/v1/custom-models \\
   -H "Authorization: Bearer $INFERSTACK_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "slug": "my-qwen-ft",
-    "source": { "type": "huggingface", "repo": "acme/qwen3.8-27b-ft", "revision": "main", "token": "hf_..." },
-    "weights": { "format": "safetensors", "dtype": "bfloat16", "quantization": "fp8" },
-    "architecture": "Qwen3_5ForConditionalGeneration",
-    "hardware": { "gpu": "H100", "count": 1, "min_replicas": 0, "max_replicas": 4 },
-    "context_length": 131072,
-    "visibility": "private"
+"slug": "my-qwen-ft",
+"source": { "type": "huggingface", "repo": "acme/qwen3.8-27b-ft", "revision": "main", "token": "hf_..." },
+"weights": { "format": "safetensors", "dtype": "bfloat16", "quantization": "fp8" },
+"architecture": "Qwen3_5ForConditionalGeneration",
+"hardware": { "gpu": "H100", "count": 1, "min_replicas": 0, "max_replicas": 4 },
+"context_length": 131072,
+"visibility": "private"
   }'
 
 # ModelScope / GGUF
-#   "source": { "type": "modelscope", "repo": "Qwen/Qwen3.8-27B-GGUF" },
-#   "weights": { "format": "gguf", "file": "Qwen3.8-27B-Q4_K_M.gguf" }
+#"source": { "type": "modelscope", "repo": "Qwen/Qwen3.8-27B-GGUF" },
+#"weights": { "format": "gguf", "file": "Qwen3.8-27B-Q4_K_M.gguf" }
 
 # 새 아키텍처: 추론 코드 패키지 지정
-#   "architecture": "BeamForCausalLM",
-#   "code": { "type": "github", "repo": "acme/beam-inferstack", "ref": "v0.1.0", "subdir": "pkg" }
+#"architecture": "BeamForCausalLM",
+#"code": { "type": "github", "repo": "acme/beam-inferstack", "ref": "v0.1.0", "subdir": "pkg" }
 
 # 상태 조회
 curl https://api.inferstack.dev/v1/custom-models/my-qwen-ft \\
@@ -245,11 +245,11 @@ inferstack code validate ./beam-inferstack/`}
           <p className="mt-3">
             InferStack 레지스트리에 없는 아키텍처(<Link to="/deploy" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">지원 목록</Link>)는 아래 규격의 추론 코드 패키지를 GitHub 리포지토리 또는 로컬 디렉터리로 업로드해야 합니다. 런타임은 <code>config.json</code>의 <code>architectures[0]</code>와 매니페스트의 <code>metadata.architectures</code>를 매칭하여 엔트리포인트 클래스를 로드합니다.
           </p>
-          <pre className="mt-4 overflow-x-auto rounded-xl bg-slate-100 p-4 font-mono text-xs dark:bg-white/5">{SPEC_TREE}</pre>
+          <pre className="mt-4 overflow-x-auto rounded-xl bg-raised p-4 font-mono text-xs">{SPEC_TREE}</pre>
           <h3>inferstack.yaml</h3>
           <CodeBlock className="mt-3" lang="yaml" code={manifestTemplate('BeamForCausalLM', 'beam')} />
           <h3>model.py — InferStackModel 인터페이스</h3>
-          <Card className="mt-3 divide-y divide-slate-100 text-sm dark:divide-white/5">
+          <Card className="mt-3 divide-y divide-line text-sm">
             {[
               ['load(weights_dir, config, device_map)', '가중치 로드. 텐서 병렬 rank 정보가 device_map으로 전달됩니다.'],
               ['tokenize(messages, tools)', '채팅 메시지 → 토큰 ID. 채팅 템플릿 적용 책임.'],
@@ -258,7 +258,7 @@ inferstack code validate ./beam-inferstack/`}
             ].map(([a, b]) => (
               <div key={a} className="px-4 py-2.5">
                 <div className="font-mono text-xs font-medium">{a}</div>
-                <div className="text-slate-600 dark:text-slate-400">{b}</div>
+                <div className="text-fg2">{b}</div>
               </div>
             ))}
           </Card>
@@ -266,7 +266,7 @@ inferstack code validate ./beam-inferstack/`}
           <h3>requirements.txt</h3>
           <CodeBlock className="mt-3" lang="text" code={REQUIREMENTS_TEMPLATE} />
           <h3>검증 규칙</h3>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-400">
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-fg2">
             <li>
               <code>inferstack.yaml</code>, <code>model.py</code> 필수 · 패키지 크기 50MB 이하 (가중치 포함 금지)
             </li>

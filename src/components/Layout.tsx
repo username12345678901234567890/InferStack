@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Activity, Boxes, ChevronDown, CreditCard, KeyRound, LogOut, Menu, Moon, Search, Settings, Sun, X } from 'lucide-react'
+import { Activity, Boxes, ChevronDown, CreditCard, KeyRound, LogOut, Menu, Moon, Search, Settings, Sun, Upload, X } from 'lucide-react'
 import { Logo } from './Logo'
 import { OrgAvatar } from './ModelBits'
-import { Button, Toaster, cx } from './ui'
+import { ButtonLink, Toaster, cx } from './ui'
 import { useStore } from '../store'
 import { MODELS } from '../data/models'
 import { fmtUSD } from '../lib/format'
@@ -11,9 +11,9 @@ import { buildProgress } from '../lib/build'
 
 const NAV = [
   { to: '/models', label: '모델' },
+  { to: '/chat', label: '채팅' },
   { to: '/rankings', label: '랭킹' },
   { to: '/deploy', label: '모델 업로드' },
-  { to: '/chat', label: '채팅' },
   { to: '/docs', label: '문서' },
   { to: '/pricing', label: '가격' },
 ]
@@ -62,8 +62,8 @@ function GlobalSearch() {
     ref.current?.blur()
   }
   return (
-    <div className="relative hidden w-56 lg:block">
-      <Search size={14} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-fg3" />
+    <div className="relative hidden w-60 md:block">
+      <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-fg3" />
       <input
         ref={ref}
         value={q}
@@ -81,17 +81,18 @@ function GlobalSearch() {
           if (e.key === 'Escape') ref.current?.blur()
         }}
         placeholder="모델 검색"
+        aria-label="모델 검색"
         className="h-8 w-full rounded-lg border border-line bg-panel pl-8 pr-10 text-[13px] text-fg placeholder:text-fg3 focus:border-line2 focus:outline-none"
       />
-      <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-line px-1 font-mono text-[10px] text-fg3">⌘K</kbd>
+      <kbd className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded border border-line px-1 text-[10.5px] text-fg3">⌘K</kbd>
       {open && results.length > 0 && (
         <div className="absolute left-0 top-10 z-50 w-80 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
           {results.map((m, i) => (
             <button key={m.slug} onMouseDown={() => go(m.slug)} className={cx('flex w-full items-center gap-2.5 px-3 py-2 text-left', i === sel ? 'bg-raised' : 'hover:bg-raised')}>
               <OrgAvatar org={m.org} name={m.orgName} size={22} />
               <span className="min-w-0">
-                <span className="block truncate text-[13px] font-medium">{m.name}</span>
-                <span className="block truncate font-mono text-[11px] text-fg3">{m.slug}</span>
+                <span className="block truncate text-[13.5px] font-medium">{m.name}</span>
+                <span className="block truncate font-mono text-[11.5px] text-fg3">{m.slug}</span>
               </span>
             </button>
           ))}
@@ -100,6 +101,14 @@ function GlobalSearch() {
     </div>
   )
 }
+
+const ACCOUNT_NAV = [
+  { to: '/credits', label: '크레딧', icon: CreditCard },
+  { to: '/keys', label: 'API 키', icon: KeyRound },
+  { to: '/activity', label: '활동', icon: Activity },
+  { to: '/my-models', label: '내 모델', icon: Boxes },
+  { to: '/settings', label: '설정', icon: Settings },
+]
 
 function UserMenu() {
   const user = useStore((s) => s.user)
@@ -110,52 +119,39 @@ function UserMenu() {
   useEffect(() => setOpen(false), [loc.pathname])
   if (!user)
     return (
-      <>
-        <Link to="/signin">
-          <Button variant="ghost" size="sm">
-            로그인
-          </Button>
-        </Link>
-        <Link to="/signin">
-          <Button size="sm">시작하기</Button>
-        </Link>
-      </>
+      <div className="flex items-center gap-1">
+        <ButtonLink to="/signin" variant="ghost" size="sm">
+          로그인
+        </ButtonLink>
+        <ButtonLink to="/signin" size="sm">
+          시작하기
+        </ButtonLink>
+      </div>
     )
-  const items = [
-    { to: '/keys', label: 'API 키', icon: KeyRound },
-    { to: '/credits', label: '크레딧', icon: CreditCard },
-    { to: '/activity', label: '활동', icon: Activity },
-    { to: '/my-models', label: '내 모델', icon: Boxes },
-    { to: '/settings', label: '설정', icon: Settings },
-  ]
   return (
-    <div className="relative flex items-center gap-1.5">
-      <Link to="/keys" className="hidden sm:block">
-        <Button size="sm">API 키</Button>
+    <div className="relative flex items-center gap-1">
+      <Link to="/credits" className="tabular hidden h-8 items-center rounded-lg px-2.5 text-[13px] text-fg2 transition-colors hover:bg-raised hover:text-fg sm:flex">
+        {fmtUSD(credits)}
       </Link>
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 rounded-lg py-1 pl-1 pr-1.5 hover:bg-raised">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full border border-line2 bg-raised text-[12px] font-semibold">{user.name[0]}</span>
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1 rounded-lg py-1 pl-1 pr-1.5 hover:bg-raised" aria-label="계정 메뉴">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[12px] font-semibold text-white">{user.name[0]}</span>
         <ChevronDown size={13} className="text-fg3" />
       </button>
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-11 z-50 w-60 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
+          <div className="absolute right-0 top-11 z-50 w-56 overflow-hidden rounded-xl border border-line2 bg-panel py-1 shadow-2xl shadow-black/40">
             <div className="border-b border-line px-3.5 py-2.5">
-              <div className="text-sm font-medium">{user.name}</div>
-              <div className="text-xs text-fg3">{user.email}</div>
-              <div className="tabular mt-2 flex items-center justify-between rounded-lg bg-raised px-2.5 py-1.5 font-mono text-xs">
-                <span className="font-sans text-fg3">크레딧</span>
-                {fmtUSD(credits)}
-              </div>
+              <div className="text-[14px] font-medium">{user.name}</div>
+              <div className="text-[12px] text-fg3">{user.email}</div>
             </div>
-            {items.map((it) => (
-              <Link key={it.to} to={it.to} className="flex items-center gap-2.5 px-3.5 py-2 text-[13px] text-fg2 hover:bg-raised hover:text-fg">
-                <it.icon size={14} /> {it.label}
+            {ACCOUNT_NAV.map((it) => (
+              <Link key={it.to} to={it.to} className="flex items-center gap-2.5 px-3.5 py-2 text-[13.5px] text-fg2 hover:bg-raised hover:text-fg">
+                <it.icon size={15} /> {it.label}
               </Link>
             ))}
-            <button onClick={signOut} className="flex w-full items-center gap-2.5 border-t border-line px-3.5 py-2 text-[13px] text-fg2 hover:bg-raised hover:text-fg">
-              <LogOut size={14} /> 로그아웃
+            <button onClick={signOut} className="flex w-full items-center gap-2.5 border-t border-line px-3.5 py-2 text-[13.5px] text-fg2 hover:bg-raised hover:text-fg">
+              <LogOut size={15} /> 로그아웃
             </button>
           </div>
         </>
@@ -182,31 +178,35 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-line bg-bg/85 backdrop-blur-md">
-        <div className={cx(CONTAINER, 'flex h-14 items-center gap-7', isChat && 'max-w-none')}>
-          <Link to="/" className="shrink-0" aria-label="InferStack 홈">
+      <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-md">
+        <div className={cx(CONTAINER, 'flex h-14 items-center gap-4', isChat && 'max-w-none')}>
+          <Link to="/" className="mr-2 shrink-0" aria-label="InferStack 홈">
             <Logo />
           </Link>
-          <nav className="hidden items-center gap-5 md:flex">
+          <GlobalSearch />
+          <nav className="ml-auto hidden items-center gap-1 lg:flex">
             {NAV.map((n) => (
-              <NavLink key={n.to} to={n.to} className={({ isActive }) => cx('text-[13.5px] transition-colors', isActive ? 'text-fg' : 'text-fg2 hover:text-fg')}>
+              <NavLink
+                key={n.to}
+                to={n.to}
+                className={({ isActive }) => cx('rounded-lg px-2.5 py-1.5 text-[14px] transition-colors', isActive ? 'text-fg' : 'text-fg2 hover:bg-raised hover:text-fg')}
+              >
                 {n.label}
               </NavLink>
             ))}
           </nav>
-          <div className="ml-auto flex items-center gap-2">
-            <GlobalSearch />
+          <div className="ml-auto flex items-center gap-1 lg:ml-2">
             <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="rounded-lg p-2 text-fg3 hover:bg-raised hover:text-fg" title="테마 전환" aria-label="테마 전환">
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <UserMenu />
-            <button className="rounded-lg p-2 text-fg2 md:hidden" onClick={() => setMobile(!mobile)} aria-label="메뉴">
+            <button className="rounded-lg p-2 text-fg2 lg:hidden" onClick={() => setMobile(!mobile)} aria-label="메뉴">
               {mobile ? <X size={18} /> : <Menu size={18} />}
             </button>
           </div>
         </div>
         {mobile && (
-          <nav className="border-t border-line px-5 py-2 md:hidden">
+          <nav className="border-t border-line px-5 py-2 lg:hidden">
             {NAV.map((n) => (
               <NavLink key={n.to} to={n.to} className="block py-2.5 text-[15px] text-fg2">
                 {n.label}
@@ -216,7 +216,7 @@ export function Layout() {
         )}
       </header>
 
-      <main className={cx('flex-1', !isChat && !isHome && cx(CONTAINER, 'py-10'))}>
+      <main className={cx('flex-1', !isChat && !isHome && cx(CONTAINER, 'pb-20 pt-10'))}>
         <Outlet />
       </main>
 
@@ -226,9 +226,46 @@ export function Layout() {
   )
 }
 
+/** 계정 영역: 왼쪽 사이드바 + 본문 */
+export function AccountLayout() {
+  const user = useStore((s) => s.user)
+  const credits = useStore((s) => s.credits)
+  return (
+    <div className="grid gap-10 md:grid-cols-[200px_minmax(0,1fr)]">
+      <aside className="min-w-0 md:sticky md:top-24 md:self-start">
+        {user && (
+          <div className="mb-5 hidden md:block">
+            <div className="text-[14px] font-semibold">{user.name}</div>
+            <div className="tabular mt-0.5 text-[13px] text-fg3">잔액 {fmtUSD(credits)}</div>
+          </div>
+        )}
+        <nav className="-mx-2 flex gap-1 overflow-x-auto md:flex-col">
+          {ACCOUNT_NAV.map((it) => (
+            <NavLink
+              key={it.to}
+              to={it.to}
+              className={({ isActive }) =>
+                cx('flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px] transition-colors', isActive ? 'bg-raised font-medium text-fg' : 'text-fg2 hover:bg-raised/60 hover:text-fg')
+              }
+            >
+              <it.icon size={16} /> {it.label}
+            </NavLink>
+          ))}
+          <NavLink to="/deploy" className="flex shrink-0 items-center gap-2.5 rounded-lg px-2.5 py-2 text-[14px] text-fg2 transition-colors hover:bg-raised/60 hover:text-fg md:mt-4 md:border-t md:border-line md:pt-4">
+            <Upload size={16} /> 모델 업로드
+          </NavLink>
+        </nav>
+      </aside>
+      <div className="min-w-0">
+        <Outlet />
+      </div>
+    </div>
+  )
+}
+
 function Footer() {
   const cols = [
-    { title: '제품', links: [['모델', '/models'], ['랭킹', '/rankings'], ['채팅', '/chat'], ['가격', '/pricing']] },
+    { title: '제품', links: [['모델', '/models'], ['채팅', '/chat'], ['랭킹', '/rankings'], ['가격', '/pricing']] },
     { title: '개발자', links: [['빠른 시작', '/docs#quickstart'], ['API 레퍼런스', '/docs#api'], ['CLI', '/docs#cli'], ['아키텍처 패키지', '/docs#arch']] },
     { title: '모델 업로드', links: [['Hugging Face', '/deploy/new?source=huggingface'], ['ModelScope', '/deploy/new?source=modelscope'], ['CLI 업로드', '/deploy/new?source=cli'], ['내 모델', '/my-models']] },
     { title: '계정', links: [['API 키', '/keys'], ['크레딧', '/credits'], ['활동', '/activity'], ['설정', '/settings']] },
@@ -238,12 +275,12 @@ function Footer() {
       <div className={cx(CONTAINER, 'grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(4,1fr)]')}>
         <div>
           <Logo />
-          <p className="mt-4 max-w-[17rem] text-[13px] leading-relaxed text-fg3">오픈 웨이트 모델을 위한 추론 API. 카탈로그 모델과 직접 올린 모델을 같은 엔드포인트에서 호출합니다.</p>
+          <p className="mt-4 max-w-[17rem] text-[13.5px] leading-relaxed text-fg3">오픈 웨이트 모델을 위한 추론 API. 카탈로그 모델과 직접 올린 모델을 같은 엔드포인트에서 호출합니다.</p>
         </div>
         {cols.map((c) => (
           <div key={c.title}>
-            <div className="text-[13px] font-medium">{c.title}</div>
-            <ul className="mt-4 space-y-2.5 text-[13px] text-fg3">
+            <div className="text-[13.5px] font-semibold">{c.title}</div>
+            <ul className="mt-4 space-y-2.5 text-[13.5px] text-fg3">
               {c.links.map(([l, to]) => (
                 <li key={l}>
                   <Link to={to} className="transition-colors hover:text-fg">
@@ -256,7 +293,7 @@ function Footer() {
         ))}
       </div>
       <div className="border-t border-line">
-        <div className={cx(CONTAINER, 'flex flex-col justify-between gap-2 py-6 text-xs text-fg3 sm:flex-row')}>
+        <div className={cx(CONTAINER, 'flex flex-col justify-between gap-2 py-6 text-[12.5px] text-fg3 sm:flex-row')}>
           <span>© 2026 InferStack</span>
           <span>프론트엔드 데모입니다. 추론, 결제, 배포는 시뮬레이션이며 사용량 수치는 예시 데이터입니다.</span>
         </div>
