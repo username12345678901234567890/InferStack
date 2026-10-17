@@ -1,4 +1,4 @@
-import { HashRouter, Link, Route, Routes } from 'react-router-dom'
+import { HashRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
 import { Layout } from './components/Layout'
 import { Button, Empty } from './components/ui'
 import Home from './pages/Home'
@@ -16,6 +16,12 @@ import SignIn from './pages/SignIn'
 import MyModels, { MyModelDetail } from './pages/MyModels'
 import DeployHome from './pages/deploy/DeployHome'
 import DeployWizard from './pages/deploy/DeployWizard'
+
+/** ?source=…&repo=… 가 바뀌면 같은 라우트라도 마법사를 새로 시작 */
+function KeyedDeployWizard() {
+  const { search } = useLocation()
+  return <DeployWizard key={search} />
+}
 
 export default function App() {
   return (
@@ -35,7 +41,7 @@ export default function App() {
           <Route path="settings" element={<Settings />} />
           <Route path="signin" element={<SignIn />} />
           <Route path="deploy" element={<DeployHome />} />
-          <Route path="deploy/new" element={<DeployWizard />} />
+          <Route path="deploy/new" element={<KeyedDeployWizard />} />
           <Route path="my-models" element={<MyModels />} />
           <Route path="my-models/:slug" element={<MyModelDetail />} />
           <Route

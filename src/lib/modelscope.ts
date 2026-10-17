@@ -16,6 +16,25 @@ export interface MSResult {
   resolvedVia: 'modelscope' | 'hf-mirror' | 'heuristic'
 }
 
+/** ModelScope 조직명 → Hugging Face 조직명 (HF 미러 메타데이터 조회용) */
+const MS_TO_HF_ORG: Record<string, string> = {
+  ZhipuAI: 'zai-org',
+  'deepseek-ai': 'deepseek-ai',
+  moonshotai: 'moonshotai',
+  MiniMax: 'MiniMaxAI',
+  XiaomiMiMo: 'XiaomiMiMo',
+  LLM_Research: 'meta-llama',
+  OpenBMB: 'openbmb',
+  stepfun: 'stepfun-ai',
+  Tencent_Hunyuan: 'tencent',
+  inclusionAI: 'inclusionAI',
+}
+
+function hfMirrorId(repo: string) {
+  const [org, name] = repo.split('/')
+  return `${MS_TO_HF_ORG[org] ?? org}/${name}`
+}
+
 export async function getModelScopeInfo(repo: string, revision = 'master'): Promise<MSResult> {
   try {
     const ctrl = new AbortController()
@@ -33,8 +52,8 @@ export async function getModelScopeInfo(repo: string, revision = 'master'): Prom
     /* CORS / network — fall through */
   }
   try {
-    const info = await getModelInfo(repo)
-    return { info, resolvedVia: 'hf-mirror' }
+    const info = await getModelInfo(hfMirrorId(repo))
+    return { info: { ...info, id: repo }, resolvedVia: 'hf-mirror' }
   } catch {
     /* fall through */
   }
