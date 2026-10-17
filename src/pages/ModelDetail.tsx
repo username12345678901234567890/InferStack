@@ -74,7 +74,7 @@ export default function ModelDetail() {
           ['Output', `${fmtPrice(m.price.output)}`, 'per 1M tokens'],
           ['Cached input', `${fmtPrice(m.price.cachedInput ?? 0)}`, 'per 1M tokens'],
           ['Context', fmtCtx(m.context), `${fmtNum(m.context)} tokens`],
-          ['Parameters', fmtParams(m.params), m.activeParams ? `${fmtParams(m.activeParams)} active` : findArch(m.architecture)?.moe ? 'MoE · active undisclosed' : 'Dense'],
+          ['Parameters', fmtParams(m.params), m.activeParams ? `${fmtParams(m.activeParams)} active` : findArch(m.architecture)?.moe ? 'Mixture of experts' : 'Dense'],
           ['Released', fmtDate(m.released), `License: ${m.license}`],
         ].map(([k, v, sub], i) => (
           <div key={k} className={cx('px-5 py-4', i > 0 && 'border-l border-line', i >= 2 && 'max-lg:border-t', i % 2 === 0 && 'max-sm:border-l-0')}>
@@ -126,8 +126,11 @@ function Overview({ m, eps }: { m: CatalogModel; eps: Endpoint[] }) {
         <div className="rounded-2xl border border-line bg-panel">
           <div className="border-b border-line px-5 py-3.5 text-[14px] font-semibold">Specs</div>
           <dl className="divide-y divide-line text-[13.5px]">
+            <div className="px-5 py-3">
+              <dt className="text-fg3">Architecture</dt>
+              <dd className="mt-1 break-all font-mono text-[12.5px]">{m.architecture}</dd>
+            </div>
             {[
-              ['Architecture', <span className="block truncate font-mono text-[12.5px]" title={m.architecture}>{m.architecture}</span>],
               ['Family', arch?.family ?? '—'],
               ['Structure', arch?.moe || m.activeParams ? 'MoE' : 'Dense'],
               ['Input', m.input.map((i) => ({ text: 'Text', image: 'Image', audio: 'Audio', video: 'Video' })[i]).join(', ')],
@@ -193,7 +196,7 @@ function EndpointTable({ m, eps, compact }: { m: CatalogModel; eps: Endpoint[]; 
                 <td className={tbl.tdR}>{(e.latency / 1000).toFixed(2)}s</td>
                 <td className={tbl.tdR}>{e.throughput} tok/s</td>
                 <td className={tbl.tdR}>
-                  <span className="inline-flex items-center gap-1.5"><span className={cx('h-1.5 w-1.5 rounded-full', e.uptime > 99.5 ? 'bg-emerald-500' : 'bg-amber-500')} />{e.uptime}%</span>
+                  <span className="inline-flex items-center gap-1.5"><span className={cx('h-1.5 w-1.5 rounded-full', e.uptime >= 99 ? 'bg-emerald-500' : 'bg-amber-500')} />{e.uptime}%</span>
                 </td>
                 {!compact && <td className={tbl.tdR}>{fmtCtx(e.maxOutput)}</td>}
               </tr>
@@ -313,11 +316,11 @@ for await (const chunk of stream) {
 function UseThis({ m }: { m: CatalogModel }) {
   return (
     <div className="rounded-2xl border border-line bg-panel p-5">
-      <div className="text-[14px] font-semibold">Use this model</div>
-      <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-raised py-1.5 pl-3 pr-1">
-        <span className="truncate font-mono text-[12.5px]">{m.slug}</span>
-        <CopyButton text={m.slug} />
+      <div className="flex items-center justify-between">
+        <span className="text-[14px] font-semibold">Use this model</span>
+        <CopyButton text={m.slug} label="Copy ID" />
       </div>
+      <div className="mt-2 rounded-xl bg-raised px-3 py-2 font-mono text-[12px] leading-snug">{m.slug.replace('/', '/\u200b')}</div>
       <div className="mt-4 grid grid-cols-2 gap-2">
         <ButtonLink to={`/chat?model=${encodeURIComponent(m.slug)}`} variant="outline">
           Try in chat

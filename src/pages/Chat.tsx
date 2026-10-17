@@ -193,7 +193,7 @@ export default function Chat() {
         </div>
         <div className="mt-3 rounded-xl border border-line p-3 text-xs">
           <div className="text-fg3">Credits left</div>
-          <div className="mt-0.5 text-base font-semibold">{fmtUSD(credits, 4)}</div>
+          <div className="mt-0.5 tabular text-base font-semibold">{fmtUSD(credits)}</div>
           <Link to="/credits" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">
             Add credits
           </Link>

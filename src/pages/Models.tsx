@@ -176,12 +176,12 @@ export default function Models() {
               <span className="tabular text-[14px] text-fg3">{list.length}</span>
               <span className="hidden text-[13px] text-fg3 xl:inline">· tick up to {MAX_COMPARE} to compare</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="relative min-w-0 flex-1 sm:w-60 sm:flex-none">
+            <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap">
+              <div className="relative w-full sm:w-60">
                 <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-fg3" />
                 <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Name, lab or architecture" className="!rounded-full pl-9" aria-label="Search models" />
               </div>
-              <Select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="w-[136px] !rounded-full" aria-label="Sort">
+              <Select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="min-w-0 flex-1 !rounded-full sm:w-[150px] sm:flex-none" aria-label="Sort">
                 <option value="popular">Most used</option>
                 <option value="newest">Newest</option>
                 <option value="price-asc">Cheapest</option>
@@ -266,28 +266,26 @@ function StartHere() {
   const all = useAllModels()
   const fastest = [...all].filter((m) => !m.custom).sort((a, b) => speedOf(b) - speedOf(a))[0]
   const picks: { label: string; slug: string; why: string }[] = [
-    { label: 'Best default', slug: 'deepseek/deepseek-v4.1-flash', why: '1M context, vision, strong all-rounder' },
-    { label: 'Best for coding', slug: 'z-ai/glm-5.3', why: 'Top agentic coding scores, 1M context' },
-    { label: 'Cheapest', slug: 'openbmb/minicpm5-2b', why: '$0.04 per M output tokens, free tier' },
-    { label: 'Fastest', slug: fastest.slug === 'openbmb/minicpm5-2b' ? 'liquid/lfm2.5-24b-a2b' : fastest.slug, why: 'Highest throughput across regions' },
+    { label: 'Best default', slug: 'deepseek/deepseek-v4.1-flash', why: '1M context and vision at a low price' },
+    { label: 'Best for coding', slug: 'z-ai/glm-5.3', why: 'Leads agentic coding benchmarks' },
+    { label: 'Cheapest', slug: 'openbmb/minicpm5-2b', why: '$0.04 per million output tokens' },
+    { label: 'Fastest', slug: fastest.slug === 'openbmb/minicpm5-2b' ? 'liquid/lfm2.5-24b-a2b' : fastest.slug, why: 'Highest throughput in the catalog' },
   ]
   return (
     <section className="mt-8">
       <div className="mb-3 text-[13px] font-medium text-fg3">Start here</div>
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="-mx-5 flex snap-x scroll-px-5 gap-3 overflow-x-auto px-5 pb-1 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-4">
         {picks.map((p) => {
           const m = findModel(p.slug)!
           return (
-            <div key={p.label} className="group relative flex flex-col rounded-2xl border border-line bg-panel p-4 transition-colors hover:border-line2">
+            <div key={p.label} className="group relative flex w-[80%] shrink-0 snap-start flex-col rounded-2xl border border-line bg-panel p-4 transition-colors hover:border-line2 sm:w-auto">
               <Link to={`/models/${m.slug}`} className="absolute inset-0 rounded-2xl" aria-label={`${p.label}: ${m.name}`} />
               <div className="text-[12.5px] font-medium text-accent">{p.label}</div>
               <div className="mt-3 flex items-center gap-2.5">
-                <OrgAvatar org={m.org} name={m.orgName} size={30} />
-                <div className="min-w-0">
-                  <div className="truncate text-[15px] font-semibold tracking-[-0.01em]">{m.name}</div>
-                  <div className="truncate text-[12.5px] text-fg3">{p.why}</div>
-                </div>
+                <OrgAvatar org={m.org} name={m.orgName} size={28} />
+                <div className="min-w-0 truncate text-[15px] font-semibold tracking-[-0.01em]">{m.name}</div>
               </div>
+              <p className="mt-2 flex-1 text-[13px] leading-snug text-fg2">{p.why}</p>
               <div className="tabular mt-4 flex items-center justify-between text-[12.5px] text-fg2">
                 <span>
                   {fmtPrice(m.price.input)} / {fmtPrice(m.price.output)} <span className="text-fg3">per M</span>

@@ -76,11 +76,11 @@ function Hero() {
         <p className="mt-6 max-w-[34rem] text-[17px] leading-relaxed text-fg2 sm:text-[18px]">
           Call {MODELS.length} open-weight models from DeepSeek, Qwen, Kimi, GLM and {ORGS.length - 4} more labs — or deploy your own fine-tune to the same endpoint. OpenAI-compatible, pay per token.
         </p>
-        <div className="mt-9 flex flex-wrap items-center gap-3">
-          <ButtonLink to="/keys" size="xl">
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <ButtonLink to="/keys" size="xl" className="w-full sm:w-auto">
             Get your API key <ArrowRight size={16} />
           </ButtonLink>
-          <ButtonLink to="/chat" size="xl" variant="outline">
+          <ButtonLink to="/chat" size="xl" variant="outline" className="w-full sm:w-auto">
             Try it in chat
           </ButtonLink>
         </div>
@@ -108,14 +108,14 @@ const DEMO = [
   {
     model: 'qwen/qwen3.8-27b',
     prompt: 'SQL for daily active users from an events table.',
-    answer: "SELECT date_trunc('day', ts) AS day,\n       count(DISTINCT user_id) AS dau\nFROM events\nWHERE ts >= now() - interval '30 days'\nGROUP BY 1\nORDER BY 1;",
+    answer: "SELECT date_trunc('day', ts) AS day,\n       count(DISTINCT user_id) AS dau\nFROM events GROUP BY 1 ORDER BY 1;",
     code: true,
   },
   {
     model: 'z-ai/glm-5.3',
     prompt: 'Three ways to cut LLM serving costs?',
     answer:
-      '1. Quantize to FP8 or 4-bit — roughly half the memory, small quality loss.\n2. Batch continuously so GPUs stay busy between requests.\n3. Route easy prompts to a small model and keep the large one for hard ones.',
+      '1. Quantize weights to FP8 or 4-bit.\n2. Batch requests continuously to keep GPUs busy.\n3. Send easy prompts to a smaller model.',
     code: false,
   },
   {
@@ -192,27 +192,13 @@ function LiveDemo() {
         })}
       </div>
 
-      <div className="h-[268px] px-5 py-5">
-        <div className="flex justify-end">
-          <div className="max-w-[85%] rounded-2xl rounded-br-md bg-raised px-3.5 py-2 text-[14px]">{d.prompt}</div>
-        </div>
-        <div className="mt-4 flex gap-3">
-          <OrgAvatar org={m.org} name={m.orgName} size={24} className="mt-0.5 shrink-0" />
-          <div className={cx('min-w-0 flex-1 whitespace-pre-wrap text-[14px] leading-relaxed', d.code && 'rounded-xl bg-raised px-3.5 py-3 font-mono text-[12.5px] leading-[1.7]')}>
-            {phase === 'wait' ? (
-              <span className="inline-flex gap-1 py-2">
-                {[0, 1, 2].map((k) => (
-                  <span key={k} className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg3" style={{ animationDelay: `${k * 150}ms` }} />
-                ))}
-              </span>
-            ) : (
-              <>
-                {d.code ? highlight(d.answer.slice(0, n), 'sql') : d.answer.slice(0, n)}
-                {phase === 'stream' && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-blink bg-fg" />}
-              </>
-            )}
+      {/* every exchange sits in the same grid cell, so the card is always as tall as the longest one */}
+      <div className="grid px-5 py-5">
+        {DEMO.map((x, k) => (
+          <div key={x.model} className={cx('[grid-area:1/1]', k !== i && 'invisible')} aria-hidden={k !== i}>
+            <Exchange prompt={x.prompt} answer={x.answer} code={x.code} model={findModel(x.model)!} shown={k === i ? n : x.answer.length} phase={k === i ? phase : 'done'} />
           </div>
-        </div>
+        ))}
       </div>
 
       <div className="flex items-center gap-4 border-t border-line px-5 py-3 text-[12.5px] text-fg3">
@@ -228,6 +214,33 @@ function LiveDemo() {
         </Link>
       </div>
     </div>
+  )
+}
+
+function Exchange({ prompt, answer, code, model, shown, phase }: { prompt: string; answer: string; code: boolean; model: CatalogModel; shown: number; phase: 'wait' | 'stream' | 'done' }) {
+  return (
+    <>
+      <div className="flex justify-end">
+        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-raised px-3.5 py-2 text-[14px]">{prompt}</div>
+      </div>
+      <div className="mt-4 flex gap-3">
+        <OrgAvatar org={model.org} name={model.orgName} size={24} className="mt-0.5 shrink-0" />
+        <div className={cx('min-w-0 flex-1 whitespace-pre-wrap text-[14px] leading-relaxed', code && 'rounded-xl bg-raised px-3.5 py-3 font-mono text-[12.5px] leading-[1.7]')}>
+          {phase === 'wait' ? (
+            <span className="inline-flex gap-1 py-2">
+              {[0, 1, 2].map((k) => (
+                <span key={k} className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg3" style={{ animationDelay: `${k * 150}ms` }} />
+              ))}
+            </span>
+          ) : (
+            <>
+              {code ? highlight(answer.slice(0, shown), 'sql') : answer.slice(0, shown)}
+              {phase === 'stream' && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-blink bg-fg" />}
+            </>
+          )}
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -247,7 +260,7 @@ function Pulse() {
   const [served, setServed] = useState(() => servedToday(perSec))
   useEffect(() => {
     if (reduce) return
-    const t = window.setInterval(() => setServed(servedToday(perSec)), 120)
+    const t = window.setInterval(() => setServed(servedToday(perSec)), 1000)
     return () => window.clearInterval(t)
   }, [reduce, perSec])
 
@@ -259,10 +272,11 @@ function Pulse() {
   ]
   return (
     <section className="border-y border-line">
-      <dl className={cx(CONTAINER, 'grid grid-cols-3 gap-y-6 py-8 lg:grid-cols-[1.6fr_1fr_1fr_1fr]')}>
+      {/* same 4-column grid as the catalog cards below, so the columns line up */}
+      <dl className={cx(CONTAINER, 'grid grid-cols-3 gap-x-3 gap-y-6 py-9 lg:grid-cols-4 lg:gap-x-4')}>
         {stats.map((s, i) => (
-          <div key={s.k} className={cx('min-w-0', i > 1 && 'border-l border-line pl-5 lg:pl-8', i === 1 && 'lg:border-l lg:border-line lg:pl-8', i === 0 && 'col-span-3 lg:col-span-1')}>
-            <dt className="tabular truncate text-[28px] font-semibold tracking-[-0.03em] sm:text-[32px]">{s.v}</dt>
+          <div key={s.k} className={cx('min-w-0', i === 0 && 'col-span-3 lg:col-span-1')}>
+            <dt className="tabular truncate text-[28px] font-semibold tracking-[-0.03em]">{s.v}</dt>
             <dd className="mt-1 flex items-center gap-1.5 text-[13.5px] text-fg3">
               {s.live && <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />}
               {s.k}
@@ -691,7 +705,7 @@ function Closing() {
   return (
     <section className={cx(CONTAINER, 'pb-24')}>
       <div className="relative overflow-hidden rounded-3xl bg-[#0d0d12] px-8 py-14 text-white sm:px-14">
-        <LogoMark size={300} className="pointer-events-none absolute -right-6 top-1/2 hidden -translate-y-1/2 lg:block" />
+        <LogoMark size={176} className="pointer-events-none absolute right-16 top-1/2 hidden -translate-y-1/2 lg:block" />
         <div className="relative max-w-xl">
           <h2 className="text-[32px] font-semibold leading-[1.12] tracking-[-0.03em] sm:text-[40px]">Start building in minutes</h2>
           <p className="mt-4 text-[16.5px] leading-relaxed text-white/65">Get $5 of free credit and call any of {MODELS.length} models with the OpenAI client you already use.</p>

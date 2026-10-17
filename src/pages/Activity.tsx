@@ -133,7 +133,7 @@ export default function Activity() {
             <BarChart data={chart} margin={{ left: 0, right: 0, top: 5, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,.15)" vertical={false} />
               <XAxis dataKey="day" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} interval={days > 7 ? 3 : 0} />
-              <YAxis tickFormatter={(v) => (metric === 'cost' ? `$${v.toFixed(2)}` : fmtTokens(v))} tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} width={56} />
+              <YAxis tickFormatter={(v) => (metric === 'cost' ? `$${v.toFixed(v > 0 && v < 0.1 ? 3 : 2)}` : fmtTokens(v))} tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} width={56} />
               <Tooltip
                 formatter={(v: number, n: string) => [metric === 'cost' ? fmtUSD(v, 4) : fmtTokens(v), findModel(n)?.name ?? n]}
                 contentStyle={{ background: 'rgb(var(--panel))', border: '1px solid var(--line2)', borderRadius: 8, fontSize: 12, color: 'rgb(var(--fg))' }}

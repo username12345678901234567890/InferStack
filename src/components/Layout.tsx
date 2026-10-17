@@ -175,7 +175,6 @@ export function Layout() {
   }, [theme])
   const isChat = loc.pathname.startsWith('/chat')
   const isHome = loc.pathname === '/'
-  const inAccount = ACCOUNT_NAV.some((a) => loc.pathname.startsWith(a.to))
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -201,11 +200,9 @@ export function Layout() {
               {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <UserMenu />
-            {!inAccount && !isChat && (
-              <ButtonLink to="/keys" size="sm" className="ml-1 hidden sm:inline-flex">
-                Get API key
-              </ButtonLink>
-            )}
+            <ButtonLink to="/keys" size="sm" className="ml-1 hidden sm:inline-flex">
+              Get API key
+            </ButtonLink>
             <button className="rounded-full p-2 text-fg2 lg:hidden" onClick={() => setMobile(!mobile)} aria-label="Menu">
               {mobile ? <X size={18} /> : <Menu size={18} />}
             </button>
