@@ -28,12 +28,12 @@ export default {
         },
         brand: {
           50: '#fff4ed', 100: '#ffe6d5', 200: '#ffc9a8', 300: '#ffa370', 400: '#ff8540',
-          500: '#ff6a1a', 600: '#f2540a', 700: '#c9400a', 800: '#a0350f', 900: '#812f10',
+          500: '#ea580c', 600: '#dc4f0a', 700: '#c9400a', 800: '#a0350f', 900: '#812f10',
         },
       },
-      letterSpacing: { tightest: '-0.045em' },
+      letterSpacing: { tightest: '-0.03em' },
       keyframes: {
-        'fade-in': { from: { opacity: 0, transform: 'translateY(4px)' }, to: { opacity: 1, transform: 'none' } },
+        'fade-in': { from: { opacity: 0 }, to: { opacity: 1 } },
         blink: { '50%': { opacity: 0 } },
         fill: { from: { transform: 'scaleX(0)' }, to: { transform: 'scaleX(1)' } },
       },

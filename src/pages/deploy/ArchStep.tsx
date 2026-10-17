@@ -65,7 +65,7 @@ export function ArchStep({ s, set }: { s: WizardState; set: Setter }) {
           <div className="flex-1 overflow-y-auto">
             <ArchOption selected={s.arch === CUSTOM_ARCH} onClick={() => set({ arch: CUSTOM_ARCH, newArchName: s.newArchName || det.name || '' })}>
               <div className="flex items-center gap-2 font-medium">
-                <Sparkles size={14} className="text-accent" /> 새 아키텍처 (커스텀 추론 코드)
+                <Sparkles size={14} className="text-fg3" /> 새 아키텍처 (커스텀 추론 코드)
               </div>
               <div className="text-xs text-fg3">레지스트리에 없는 아키텍처 — GitHub / 로컬에서 코드 업로드</div>
             </ArchOption>

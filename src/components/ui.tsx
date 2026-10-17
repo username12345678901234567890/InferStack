@@ -16,9 +16,9 @@ export function buttonClass(variant: Variant = 'primary', size: Size = 'md', cla
     size === 'sm' && 'h-8 px-3 text-[13px]',
     size === 'md' && 'h-9 px-4 text-[14px]',
     size === 'lg' && 'h-11 px-5 text-[15px]',
-    (variant === 'primary' || variant === 'accent') && 'bg-accent text-white hover:bg-accent/90',
-    variant === 'inverse' && 'bg-fg text-bg hover:bg-fg/85',
-    variant === 'secondary' && 'border border-line bg-raised text-fg hover:border-line2',
+    (variant === 'primary' || variant === 'inverse') && 'bg-fg text-bg hover:bg-fg/85',
+    variant === 'accent' && 'bg-accent text-white hover:bg-accent/90',
+    variant === 'secondary' && 'bg-raised text-fg hover:bg-fg/[0.08]',
     variant === 'outline' && 'border border-line2 text-fg hover:bg-raised',
     variant === 'ghost' && 'text-fg2 hover:bg-raised hover:text-fg',
     variant === 'danger' && 'bg-rose-600 text-white hover:bg-rose-500',
@@ -54,16 +54,16 @@ export function Badge({ children, color = 'slate', className }: { children: Reac
   const map = {
     slate: 'bg-raised text-fg2 ring-1 ring-inset ring-line',
     violet: 'bg-raised text-fg ring-1 ring-inset ring-line2',
-    brand: 'bg-accent/[0.12] text-accent',
-    cyan: 'bg-accent/[0.12] text-accent',
-    green: 'bg-emerald-500/[0.12] text-emerald-600 dark:text-emerald-400',
-    amber: 'bg-amber-500/[0.12] text-amber-700 dark:text-amber-400',
-    rose: 'bg-rose-500/[0.12] text-rose-600 dark:text-rose-400',
+    brand: 'bg-accent/[0.09] text-accent',
+    cyan: 'bg-raised text-fg2 ring-1 ring-inset ring-line',
+    green: 'bg-emerald-500/[0.09] text-emerald-700 dark:text-emerald-400',
+    amber: 'bg-amber-500/[0.1] text-amber-700 dark:text-amber-400',
+    rose: 'bg-rose-500/[0.09] text-rose-700 dark:text-rose-400',
   }
   return <span className={cx('inline-flex h-5 shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2 text-[11px] font-medium leading-none', map[color], className)}>{children}</span>
 }
 
-const fieldBase = 'rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/40 focus:outline-none'
+const fieldBase = 'rounded-lg border border-line2 bg-panel px-3 text-sm text-fg placeholder:text-fg3 transition-colors focus:border-fg/35 focus:outline-none'
 
 /** 너비 클래스를 넘기지 않으면 w-full */
 const width = (className?: string) => (/(^|\s)(w-|min-w-|flex-1)/.test(className ?? '') ? '' : 'w-full')
@@ -125,8 +125,8 @@ export function Modal({ open, onClose, title, children, footer, size = 'md' }: {
   if (!open) return null
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <div className={cx('relative w-full animate-fade-in rounded-xl border border-line2 bg-panel shadow-2xl shadow-black/40', size === 'sm' && 'max-w-md', size === 'md' && 'max-w-lg', size === 'lg' && 'max-w-2xl')}>
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className={cx('relative w-full animate-fade-in rounded-xl border border-line2 bg-panel shadow-2xl shadow-black/20', size === 'sm' && 'max-w-md', size === 'md' && 'max-w-lg', size === 'lg' && 'max-w-2xl')}>
         <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
           <h3 className="text-[15px] font-semibold">{title}</h3>
           <button onClick={onClose} className="rounded-md p-1 text-fg3 hover:bg-raised hover:text-fg">
@@ -198,22 +198,22 @@ export function CopyButton({ text, className, label }: { text: string; className
   )
 }
 
-/** 코드 패널. 라이트/다크 모두 어두운 바탕. */
+/** 코드 패널. 테마를 따라간다 (index.css 의 --code-*) */
 export function CodeBlock({ code, lang, className, lineNumbers = true, header = true }: { code: string; lang?: string; className?: string; lineNumbers?: boolean; header?: boolean }) {
   const lines = code.split('\n')
   return (
-    <div className={cx('overflow-hidden rounded-xl border border-line bg-[#0c0d0f] text-[#d6d7db]', className)}>
+    <div className={cx('code-panel overflow-hidden rounded-xl border border-line', className)}>
       {header && (
-        <div className="flex items-center justify-between border-b border-white/[0.06] py-1 pl-3.5 pr-1.5">
-          <span className="font-mono text-[11px] text-white/40">{lang ?? 'code'}</span>
-          <CopyButton text={code} className="text-white/45 hover:bg-white/10 hover:text-white" label="복사" />
+        <div className="flex items-center justify-between border-b border-line py-1 pl-3.5 pr-1.5">
+          <span className="code-muted font-mono text-[11px]">{lang ?? 'code'}</span>
+          <CopyButton text={code} className="hover:bg-fg/[0.06]" label="복사" />
         </div>
       )}
       <pre className="overflow-x-auto py-3.5 font-mono text-[12.5px] leading-[1.75]">
         <code className="block min-w-max">
           {lines.map((l, i) => (
             <span key={i} className="flex">
-              {lineNumbers && <span className="w-10 shrink-0 select-none pr-4 text-right text-white/20">{i + 1}</span>}
+              {lineNumbers && <span className="code-muted w-10 shrink-0 select-none pr-4 text-right opacity-60">{i + 1}</span>}
               <span className={cx('pr-5', !lineNumbers && 'pl-4')}>{highlight(l, lang)}</span>
             </span>
           ))}
@@ -239,10 +239,10 @@ export function highlight(code: string, lang?: string): ReactNode[] {
     const idx = m.index ?? 0
     if (idx > last) out.push(code.slice(last, idx))
     let cls = ''
-    if (s.startsWith('#') || (s.startsWith('//') && lang !== 'bash')) cls = 'text-white/35'
-    else if (/^["'`]/.test(s)) cls = 'text-[#a5d6a7]'
-    else if (/^\d/.test(s)) cls = 'text-[#f6c177]'
-    else if (kw.test(s)) cls = 'text-[#ff9b5e]'
+    if (s.startsWith('#') || (s.startsWith('//') && lang !== 'bash')) cls = 'code-muted'
+    else if (/^["'`]/.test(s)) cls = 'tk-str'
+    else if (/^\d/.test(s)) cls = 'tk-num'
+    else if (kw.test(s)) cls = 'tk-kw'
     out.push(cls ? <span key={i++} className={cls}>{s}</span> : s)
     last = idx + s.length
   }
@@ -257,7 +257,7 @@ export function Stat({ label, value, sub, icon }: { label: ReactNode; value: Rea
         {label}
         {icon}
       </div>
-      <div className="tabular mt-2 text-[24px] font-bold tracking-[-0.02em]">{value}</div>
+      <div className="tabular mt-2 text-[24px] font-semibold tracking-[-0.02em]">{value}</div>
       {sub && <div className="mt-1 text-xs text-fg3">{sub}</div>}
     </Card>
   )
@@ -277,7 +277,7 @@ export function Empty({ icon, title, description, action }: { icon?: ReactNode; 
 export function Progress({ value, className }: { value: number; className?: string }) {
   return (
     <div className={cx('h-1 w-full overflow-hidden rounded-full bg-raised', className)}>
-      <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />
+      <div className="h-full rounded-full bg-fg/70 transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />
     </div>
   )
 }
@@ -286,7 +286,7 @@ export function PageHeader({ title, description, actions }: { title: ReactNode; 
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-[28px] font-bold leading-tight tracking-[-0.03em]">{title}</h1>
+        <h1 className="text-[28px] font-bold leading-[1.25] tracking-[-0.02em]">{title}</h1>
         {description && <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-fg2">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 gap-2">{actions}</div>}
@@ -299,7 +299,7 @@ export function SectionHead({ title, sub, link }: { title: ReactNode; sub?: Reac
   return (
     <div className="mb-5 flex items-end justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="text-[20px] font-bold tracking-[-0.025em]">{title}</h2>
+        <h2 className="text-[20px] font-bold tracking-[-0.015em]">{title}</h2>
         {sub && <p className="mt-1 text-[14px] text-fg2">{sub}</p>}
       </div>
       {link && (

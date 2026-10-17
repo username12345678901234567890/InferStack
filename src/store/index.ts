@@ -115,14 +115,14 @@ export const useStore = create<State>()(
   persist(
     (set, get) => ({
       ...initial(),
-      theme: 'dark',
+      theme: 'light',
 
       signIn: (u) => set({ user: u }),
       signOut: () => set({ user: null }),
       setTheme: (t) => {
         document.documentElement.classList.toggle('dark', t === 'dark')
         try {
-          localStorage.setItem('is-theme', t)
+          localStorage.setItem('is-theme2', t)
         } catch {
           /* ignore */
         }
@@ -164,6 +164,6 @@ export const useStore = create<State>()(
 
       resetDemo: () => set({ ...initial() }),
     }),
-    { name: 'inferstack-demo', version: 1 },
+    { name: 'inferstack-demo', version: 2, migrate: (s) => ({ ...(s as State), theme: 'light' }) },
   ),
 )

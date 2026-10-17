@@ -5,8 +5,9 @@ import { Badge, Button, Card, PageHeader, Segmented, Select, Stat, cx, tbl } fro
 import { useStore } from '../store'
 import { fmtDateTime, fmtTokens, fmtUSD } from '../lib/format'
 import { findModel } from '../data/models'
+import { SERIES } from '../lib/palette'
 
-const COLORS = ['#ff6a1a', '#7c8aa5', '#4fa3a5', '#c9a66b', '#9b8bb4', '#6b7280']
+const COLORS = SERIES
 
 export default function Activity() {
   const logs = useStore((s) => s.logs)
@@ -135,12 +136,12 @@ export default function Activity() {
               <YAxis tickFormatter={(v) => (metric === 'cost' ? `$${v.toFixed(2)}` : fmtTokens(v))} tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} width={56} />
               <Tooltip
                 formatter={(v: number, n: string) => [metric === 'cost' ? fmtUSD(v, 4) : fmtTokens(v), findModel(n)?.name ?? n]}
-                contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, fontSize: 12 }}
+                contentStyle={{ background: 'rgb(var(--panel))', border: '1px solid var(--line2)', borderRadius: 8, fontSize: 12, color: 'rgb(var(--fg))' }}
                 cursor={{ fill: 'rgba(148,163,184,.08)' }}
               />
               <Legend formatter={(v) => <span className="text-xs text-fg3">{findModel(v)?.name ?? v}</span>} />
               {series.map((s, i) => (
-                <Bar key={s} dataKey={s} stackId="a" fill={COLORS[i % COLORS.length]} radius={i === series.length - 1 ? [3, 3, 0, 0] : 0} />
+                <Bar key={s} dataKey={s} stackId="a" fill={COLORS[i % COLORS.length]} maxBarSize={22} radius={i === series.length - 1 ? [3, 3, 0, 0] : 0} />
               ))}
             </BarChart>
           </ResponsiveContainer>
@@ -155,11 +156,9 @@ export default function Activity() {
               <th className={tbl.th}>시간</th>
               <th className={tbl.th}>모델</th>
               <th className={tbl.th}>키</th>
-              <th className={tbl.th}>리전</th>
-              <th className={tbl.thR}>입력 → 출력 토큰</th>
+              <th className={tbl.thR}>입력 → 출력</th>
               <th className={tbl.thR}>비용</th>
               <th className={tbl.thR}>첫 토큰</th>
-              <th className={tbl.thR}>tok/s</th>
               <th className={tbl.th}>종료</th>
             </tr>
           </thead>
@@ -167,19 +166,20 @@ export default function Activity() {
             {rows.map((l) => (
               <tr key={l.id} className={tbl.tr}>
                 <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{fmtDateTime(l.ts)}</td>
-                <td className={cx(tbl.td, 'whitespace-nowrap font-medium')}>{findModel(l.model)?.name ?? l.model}</td>
                 <td className={cx(tbl.td, 'whitespace-nowrap')}>
-                  {l.keyName} {l.source === 'playground' && <Badge color="violet">playground</Badge>}
+                  <div className="font-medium">{findModel(l.model)?.name ?? l.model}</div>
+                  <div className="text-[12.5px] text-fg3">
+                    {l.endpoint} · {l.throughput} tok/s
+                  </div>
                 </td>
-                <td className={cx(tbl.td, 'whitespace-nowrap font-mono text-[12.5px] text-fg3')}>{l.endpoint}</td>
+                <td className={cx(tbl.td, 'whitespace-nowrap text-fg2')}>{l.source === 'playground' ? '채팅' : l.keyName}</td>
                 <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>
                   {l.promptTokens.toLocaleString()} → {l.completionTokens.toLocaleString()}
                 </td>
                 <td className={tbl.tdR}>{fmtUSD(l.cost, 4)}</td>
                 <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>{l.latency}ms</td>
-                <td className={cx(tbl.tdR, 'whitespace-nowrap text-fg2')}>{l.throughput}</td>
                 <td className={tbl.td}>
-                  <Badge color={l.finish === 'stop' ? 'green' : l.finish === 'error' ? 'rose' : 'amber'}>{l.finish}</Badge>
+                  <Badge color={l.finish === 'stop' ? 'slate' : l.finish === 'error' ? 'rose' : 'amber'}>{l.finish}</Badge>
                 </td>
               </tr>
             ))}

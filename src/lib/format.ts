@@ -51,7 +51,8 @@ export function fmtDate(d: string | number | Date): string {
 
 export function fmtDateTime(d: string | number | Date): string {
   const dt = new Date(d)
-  return dt.toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${p(dt.getMonth() + 1)}.${p(dt.getDate())} ${p(dt.getHours())}:${p(dt.getMinutes())}`
 }
 
 export function timeAgo(d: string | number | Date): string {

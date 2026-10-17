@@ -134,7 +134,7 @@ function UserMenu() {
         {fmtUSD(credits)}
       </Link>
       <button onClick={() => setOpen(!open)} className="flex items-center gap-1 rounded-lg py-1 pl-1 pr-1.5 hover:bg-raised" aria-label="계정 메뉴">
-        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-accent text-[12px] font-semibold text-white">{user.name[0]}</span>
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-raised text-[12px] font-semibold text-fg ring-1 ring-inset ring-line2">{user.name[0]}</span>
         <ChevronDown size={13} className="text-fg3" />
       </button>
       {open && (
@@ -178,7 +178,7 @@ export function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="sticky top-0 z-40 border-b border-line bg-bg/90 backdrop-blur-md">
+      <header className="sticky top-0 z-40 border-b border-line bg-bg">
         <div className={cx(CONTAINER, 'flex h-14 items-center gap-4', isChat && 'max-w-none')}>
           <Link to="/" className="mr-2 shrink-0" aria-label="InferStack 홈">
             <Logo />

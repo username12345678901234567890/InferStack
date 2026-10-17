@@ -52,7 +52,7 @@ export function ModelRow({ m }: { m: CatalogModel }) {
           <ModelFlags m={m} />
           <span className="tabular ml-auto hidden font-mono text-[12.5px] text-fg2 sm:inline">{fmtTokens(weeklyTokens(m))} tokens/wk</span>
           <button onClick={() => toggle(m.slug)} className="text-fg3 opacity-0 transition-opacity hover:text-fg group-hover:opacity-100 data-[on=true]:opacity-100" data-on={fav} title="즐겨찾기">
-            <Star size={15} className={cx(fav && 'fill-accent text-accent')} />
+            <Star size={15} className={cx(fav && 'fill-fg text-fg')} />
           </button>
         </div>
         <p className="mt-1.5 line-clamp-2 max-w-3xl text-[13.5px] leading-relaxed text-fg2">{m.description}</p>

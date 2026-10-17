@@ -9,7 +9,7 @@ export function LogoMark({ size = 24, className = '' }: { size?: number; classNa
       <rect width="32" height="32" rx="8" className="fill-fg" />
       <rect x="6" y="8" width="12" height="4" rx="2" className="fill-bg" />
       <rect x="10" y="14" width="12" height="4" rx="2" className="fill-bg" />
-      <rect x="14" y="20" width="12" height="4" rx="2" fill="#ff6a1a" />
+      <rect x="14" y="20" width="12" height="4" rx="2" fill="#ea580c" />
     </svg>
   )
 }

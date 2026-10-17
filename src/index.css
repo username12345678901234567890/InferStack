@@ -2,31 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light */
+/* Light (default) */
 :root {
   color-scheme: light;
-  --bg: 250 250 250;
+  --bg: 255 255 255;
   --panel: 255 255 255;
-  --raised: 243 243 245;
-  --fg: 17 17 19;
+  --raised: 245 245 246;
+  --fg: 24 24 27;
   --fg2: 82 82 91;
-  --fg3: 136 136 146;
-  --accent: 238 88 10;
-  --line: rgba(9, 9, 11, 0.08);
-  --line2: rgba(9, 9, 11, 0.15);
+  --fg3: 113 113 122;
+  --accent: 234 88 12;
+  --line: rgba(9, 9, 11, 0.075);
+  --line2: rgba(9, 9, 11, 0.13);
+  --code-bg: #f7f7f8;
+  --code-fg: #27272a;
+  --code-muted: #a1a1aa;
+  --code-str: #15803d;
+  --code-kw: #c2410c;
+  --code-num: #a16207;
 }
-/* Dark (default) */
+/* Dark */
 .dark {
   color-scheme: dark;
-  --bg: 8 9 10;
-  --panel: 16 17 19;
-  --raised: 25 26 29;
-  --fg: 243 244 246;
-  --fg2: 161 164 171;
-  --fg3: 108 112 120;
-  --accent: 255 106 26;
-  --line: rgba(255, 255, 255, 0.08);
-  --line2: rgba(255, 255, 255, 0.15);
+  --bg: 18 18 20;
+  --panel: 24 24 27;
+  --raised: 33 33 37;
+  --fg: 236 236 239;
+  --fg2: 161 161 170;
+  --fg3: 120 120 130;
+  --accent: 245 130 60;
+  --line: rgba(255, 255, 255, 0.07);
+  --line2: rgba(255, 255, 255, 0.12);
+  --code-bg: #0f0f11;
+  --code-fg: #d6d7db;
+  --code-muted: #6b6b75;
+  --code-str: #a5d6a7;
+  --code-kw: #f5a06a;
+  --code-num: #f6c177;
 }
 
 html {
@@ -43,18 +55,29 @@ h1, h2, h3 {
 code, kbd, .font-mono {
   font-feature-settings: 'zero' 0, 'calt' 0;
 }
+.code-panel { background: var(--code-bg); color: var(--code-fg); }
+.code-muted { color: var(--code-muted); }
+.tk-str { color: var(--code-str); }
+.tk-kw { color: var(--code-kw); }
+.tk-num { color: var(--code-num); }
 .tabular {
   font-variant-numeric: tabular-nums;
 }
 ::selection {
-  background: rgb(var(--accent) / 0.25);
+  background: rgb(var(--accent) / 0.2);
+}
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(128, 128, 140, 0.35) transparent;
 }
 :is(a, button, summary, [role='switch'], [tabindex]):focus-visible {
-  outline: 2px solid rgb(var(--accent) / 0.6);
+  outline: 2px solid rgb(var(--fg) / 0.35);
   outline-offset: 2px;
 }
 :is(input, textarea, select):focus-visible {

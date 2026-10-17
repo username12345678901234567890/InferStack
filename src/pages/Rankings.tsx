@@ -1,3 +1,4 @@
+import { SERIES } from '../lib/palette'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -9,7 +10,7 @@ import { Card, PageHeader, Segmented } from '../components/ui'
 import { fmtPrice, fmtTokens } from '../lib/format'
 import { rng } from '../lib/rand'
 
-const COLORS = ['#ff6a1a', '#7c8aa5', '#4fa3a5', '#c9a66b', '#9b8bb4', '#6b7280', '#b0796b', '#8aa37b']
+const COLORS = SERIES
 
 type Cat = 'all' | Capability
 
@@ -71,7 +72,7 @@ export default function Rankings() {
                 contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, fontSize: 12 }}
               />
               {top.map((m, i) => (
-                <Area key={m.slug} type="monotone" dataKey={m.slug} stackId="1" stroke={COLORS[i]} fill={COLORS[i]} fillOpacity={0.55} />
+                <Area key={m.slug} type="monotone" dataKey={m.slug} stackId="1" stroke="rgb(var(--panel))" strokeWidth={1} fill={COLORS[i]} fillOpacity={0.9} />
               ))}
             </AreaChart>
           </ResponsiveContainer>

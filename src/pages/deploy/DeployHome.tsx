@@ -44,13 +44,13 @@ export default function DeployHome() {
       <div className="mt-6 grid gap-4 md:grid-cols-2">
         <Card className="p-5">
           <div className="flex items-center gap-2 font-semibold">
-            <Badge color="amber">GGUF</Badge> llama.cpp 런타임
+            <Badge>GGUF</Badge> llama.cpp 런타임
           </div>
           <p className="mt-2 text-sm text-fg2">Q8_0 ~ IQ1_S 전 양자화 지원. 분할 GGUF(-00001-of-0000N)는 자동 병합됩니다. 소형 GPU(L4, L40S)로 저렴하게 배포하기 좋습니다.</p>
         </Card>
         <Card className="p-5">
           <div className="flex items-center gap-2 font-semibold">
-            <Badge color="brand">Safetensors</Badge> vLLM · SGLang · TensorRT-LLM
+            <Badge>Safetensors</Badge> vLLM · SGLang · TensorRT-LLM
           </div>
           <p className="mt-2 text-sm text-fg2">BF16/FP16/FP8/MXFP4 원본 또는 배포 시 FP8·NVFP4·AWQ·GPTQ 양자화 변환. 텐서 병렬로 최대 8 GPU까지 확장됩니다.</p>
         </Card>
@@ -87,14 +87,14 @@ export default function DeployHome() {
                   </td>
                   <td className="px-3 py-2 font-mono text-xs text-fg3">{a.gguf ?? '—'}</td>
                   <td className="px-3 py-2 text-xs text-fg3">{a.engines.join(', ')}</td>
-                  <td className="px-3 py-2">{a.status === 'stable' ? <Badge color="green">stable</Badge> : <Badge color="amber">beta</Badge>}</td>
+                  <td className="px-3 py-2">{a.status === 'stable' ? <span className="text-[12.5px] text-fg3">stable</span> : <Badge color="amber">beta</Badge>}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
         <div className="flex flex-col gap-3 border-t border-line bg-raised/50 p-5 sm:flex-row sm:items-center">
-          <Sparkles size={20} className="text-accent" />
+          <Sparkles size={20} className="text-fg3" />
           <div className="flex-1 text-sm">
             <div className="font-medium">목록에 없는 새 아키텍처인가요?</div>
             <div className="text-fg2">

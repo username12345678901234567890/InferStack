@@ -136,7 +136,7 @@ export default function Models() {
       <div className="min-w-0">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-baseline gap-3">
-            <h1 className="text-[28px] font-bold tracking-[-0.03em]">모델</h1>
+            <h1 className="text-[28px] font-bold tracking-[-0.02em]">모델</h1>
             <span className="tabular text-[15px] text-fg3">{list.length}개</span>
           </div>
           <div className="flex items-center gap-2">

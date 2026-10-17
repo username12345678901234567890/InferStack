@@ -35,7 +35,7 @@ export default function Credits() {
       <Card className="flex flex-col gap-6 p-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="text-[13.5px] text-fg3">잔액</div>
-          <div className="tabular mt-1 text-[44px] font-bold leading-none tracking-[-0.035em]">{fmtUSD(credits)}</div>
+          <div className="tabular mt-1 text-[44px] font-bold leading-none tracking-[-0.02em]">{fmtUSD(credits)}</div>
           <div className="tabular mt-3 text-[13.5px] text-fg2">
             최근 30일 {fmtUSD(spent30)} 사용{daysLeft !== null && daysLeft < 365 && <> · 지금 속도면 약 {daysLeft}일 사용 가능</>}
           </div>

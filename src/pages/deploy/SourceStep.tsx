@@ -139,7 +139,7 @@ function HFImport({ s, set, onLoaded }: { s: WizardState; set: Setter; onLoaded:
                 >
                   <span className="truncate font-mono">{m.id}</span>
                   <span className="flex shrink-0 items-center gap-2 text-xs text-fg3">
-                    {m.library_name === 'gguf' || m.tags?.includes('gguf') ? <Badge color="amber">GGUF</Badge> : null}
+                    {m.library_name === 'gguf' || m.tags?.includes('gguf') ? <Badge>GGUF</Badge> : null}
                     <Download size={11} /> {fmtTokens(m.downloads)}
                   </span>
                 </button>
@@ -412,8 +412,8 @@ function RepoSummary({ s }: { s: WizardState }) {
       </div>
       <div className="mt-4 flex flex-wrap gap-2 text-xs">
         <span className={cx('rounded-md px-2 py-1', st.length ? 'bg-raised text-fg ring-1 ring-line2' : 'bg-raised text-fg3 line-through ')}>Safetensors {st.length ? `· ${st.length} shards` : ''}</span>
-        <span className={cx('rounded-md px-2 py-1', ggufs.length ? 'bg-amber-500/10 text-amber-600 dark:text-amber-300' : 'bg-raised text-fg3 line-through ')}>GGUF {ggufs.length ? `· ${ggufs.length} quants` : ''}</span>
-        {info.chatTemplate && <span className="rounded-md bg-emerald-500/10 px-2 py-1 text-emerald-600 dark:text-emerald-300">chat template ✓</span>}
+        <span className={cx('rounded-md px-2 py-1', ggufs.length ? 'bg-raised text-fg ring-1 ring-line2' : 'bg-raised text-fg3 line-through ')}>GGUF {ggufs.length ? `· ${ggufs.length} quants` : ''}</span>
+        {info.chatTemplate && <span className="rounded-md bg-raised px-2 py-1 text-fg ring-1 ring-line2">chat template 포함</span>}
         {info.lastModified && <span className="px-2 py-1 text-fg3">수정 {timeAgo(info.lastModified)}</span>}
       </div>
     </Card>

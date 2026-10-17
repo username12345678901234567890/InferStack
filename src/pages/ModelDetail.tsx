@@ -46,7 +46,7 @@ export default function ModelDetail() {
           <OrgAvatar org={m.org} name={m.orgName} size={52} />
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-[30px] font-bold leading-tight tracking-[-0.035em]">{m.name}</h1>
+              <h1 className="text-[30px] font-bold leading-tight tracking-[-0.02em]">{m.name}</h1>
               <ModelFlags m={m} />
             </div>
             <div className="mt-1 flex items-center gap-1 font-mono text-[13.5px] text-fg2">
@@ -57,7 +57,7 @@ export default function ModelDetail() {
         </div>
         <div className="flex shrink-0 gap-2">
           <button onClick={() => toggleFav(m.slug)} className="flex h-9 w-9 items-center justify-center rounded-lg border border-line2 text-fg2 hover:bg-raised hover:text-fg" aria-label="즐겨찾기" title="즐겨찾기">
-            <Star size={16} className={cx(fav && 'fill-accent text-accent')} />
+            <Star size={16} className={cx(fav && 'fill-fg text-fg')} />
           </button>
           <ButtonLink to={`/deploy/new?source=huggingface&repo=${encodeURIComponent(m.hfId)}`} variant="outline">
             <Rocket size={15} /> 전용 배포
@@ -181,7 +181,7 @@ function EndpointTable({ m, eps, compact }: { m: CatalogModel; eps: Endpoint[]; 
                 <td className={tbl.td}>
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{REGION_KO[e.region] ?? e.region}</span>
-                    {i === 0 && <Badge color="brand">기본</Badge>}
+                    {i === 0 && <Badge>기본</Badge>}
                   </div>
                   <div className="font-mono text-[12px] text-fg3">{e.region}</div>
                 </td>
@@ -193,7 +193,7 @@ function EndpointTable({ m, eps, compact }: { m: CatalogModel; eps: Endpoint[]; 
                 <td className={tbl.tdR}>{(e.latency / 1000).toFixed(2)}s</td>
                 <td className={tbl.tdR}>{e.throughput} tok/s</td>
                 <td className={tbl.tdR}>
-                  <span className={e.uptime > 99.7 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}>{e.uptime}%</span>
+                  <span className="inline-flex items-center gap-1.5"><span className={cx('h-1.5 w-1.5 rounded-full', e.uptime > 99.5 ? 'bg-emerald-500' : 'bg-amber-500')} />{e.uptime}%</span>
                 </td>
                 {!compact && <td className={tbl.tdR}>{fmtCtx(e.maxOutput)}</td>}
               </tr>
@@ -227,15 +227,15 @@ function UsageChart({ m }: { m: CatalogModel }) {
           <AreaChart data={data} margin={{ left: 0, right: 4, top: 8, bottom: 0 }}>
             <defs>
               <linearGradient id="ug" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#ff6a1a" stopOpacity={0.25} />
-                <stop offset="1" stopColor="#ff6a1a" stopOpacity={0} />
+                <stop offset="0" stopColor="#ea580c" stopOpacity={0.25} />
+                <stop offset="1" stopColor="#ea580c" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid stroke="rgba(128,128,140,.12)" vertical={false} />
             <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8a8d96' }} tickLine={false} axisLine={false} interval={6} />
             <YAxis tickFormatter={(v) => fmtTokens(v)} tick={{ fontSize: 12, fill: '#8a8d96' }} tickLine={false} axisLine={false} width={48} />
             <Tooltip formatter={(v: number) => [fmtTokens(v), '토큰']} contentStyle={{ background: '#16171a', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, fontSize: 12, color: '#f3f4f6' }} />
-            <Area type="monotone" dataKey="tokens" stroke="#ff6a1a" strokeWidth={2} fill="url(#ug)" />
+            <Area type="monotone" dataKey="tokens" stroke="#ea580c" strokeWidth={2} fill="url(#ug)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

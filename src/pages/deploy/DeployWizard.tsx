@@ -110,7 +110,7 @@ export default function DeployWizard() {
               className={cx(
 'flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors',
                 i === step && 'border-fg/50 bg-raised font-medium text-fg',
-                i < step && 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400',
+                i < step && 'border-line2 text-fg2 hover:text-fg',
                 i > step && 'border-line text-fg3 ',
               )}
             >

@@ -68,7 +68,7 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
                       {g.vram}GB · ${g.price.toFixed(2)}/hr
                     </div>
                   </div>
-                  {ok ? <CheckCircle2 size={15} className="text-emerald-500" /> : <span className="text-[11px] text-fg3">VRAM 부족</span>}
+                  {!ok ? <span className="text-[11px] text-fg3">VRAM 부족</span> : s.gpu === g.id ? <CheckCircle2 size={15} className="text-fg" /> : null}
                 </button>
               )
             })}
