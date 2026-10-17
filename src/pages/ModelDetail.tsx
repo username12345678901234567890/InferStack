@@ -230,15 +230,22 @@ function UsageChart({ m }: { m: CatalogModel }) {
           <AreaChart data={data} margin={{ left: 0, right: 4, top: 8, bottom: 0 }}>
             <defs>
               <linearGradient id="ug" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stopColor="#5b4cf0" stopOpacity={0.25} />
-                <stop offset="1" stopColor="#5b4cf0" stopOpacity={0} />
+                <stop offset="0" stopColor="#5560f4" stopOpacity={0.22} />
+                <stop offset="1" stopColor="#5560f4" stopOpacity={0} />
+              </linearGradient>
+              {/* the logo gradient along the line */}
+              <linearGradient id="ul" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stopColor="#0ff0cf" />
+                <stop offset="0.38" stopColor="#1ba6f2" />
+                <stop offset="0.7" stopColor="#5560f4" />
+                <stop offset="1" stopColor="#8b2cf5" />
               </linearGradient>
             </defs>
             <CartesianGrid stroke="rgba(128,128,140,.12)" vertical={false} />
-            <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8a8d96' }} tickLine={false} axisLine={false} interval={6} />
-            <YAxis tickFormatter={(v) => fmtTokens(v)} tick={{ fontSize: 12, fill: '#8a8d96' }} tickLine={false} axisLine={false} width={58} />
+            <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#8a8fae' }} tickLine={false} axisLine={false} interval={6} />
+            <YAxis tickFormatter={(v) => fmtTokens(v)} tick={{ fontSize: 12, fill: '#8a8fae' }} tickLine={false} axisLine={false} width={58} />
             <Tooltip formatter={(v: number) => [fmtTokens(v), 'Tokens']} contentStyle={{ background: 'rgb(var(--panel))', border: '1px solid var(--line2)', borderRadius: 10, fontSize: 12, color: 'rgb(var(--fg))' }} />
-            <Area type="monotone" dataKey="tokens" stroke="#5b4cf0" strokeWidth={2} fill="url(#ug)" />
+            <Area type="monotone" dataKey="tokens" stroke="url(#ul)" strokeWidth={2} fill="url(#ug)" />
           </AreaChart>
         </ResponsiveContainer>
       </div>

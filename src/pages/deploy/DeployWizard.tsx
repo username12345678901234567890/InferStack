@@ -114,7 +114,7 @@ export default function DeployWizard() {
                 i > step && 'border-line text-fg3 ',
               )}
             >
-              <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-brand text-white' : i === step ? 'border border-accent text-accent' : 'border border-line2 text-fg3')}>
+              <span className={cx('flex h-5 w-5 items-center justify-center rounded-full text-[11px]', i < step ? 'bg-brand text-on-brand' : i === step ? 'border border-accent text-accent' : 'border border-line2 text-fg3')}>
                 {i < step ? <Check size={12} /> : i + 1}
               </span>
               {label}

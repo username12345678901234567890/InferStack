@@ -175,7 +175,7 @@ function LiveDemo() {
   const cost = (14 * m.price.input + completion * m.price.output) / 1e6
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_30px_70px_-35px_rgba(24,24,27,0.35)]">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-line2 bg-panel">
       <div className="flex items-center gap-1.5 overflow-x-auto border-b border-line px-3 py-2.5">
         {DEMO.map((x, k) => {
           const mm = findModel(x.model)!
@@ -343,7 +343,7 @@ function Showcase() {
 function ModelCard({ m, className }: { m: CatalogModel; className?: string }) {
   const nav = useNavigate()
   return (
-    <div className={cx('group relative flex flex-col rounded-2xl border border-line bg-panel p-4 transition-[border-color,box-shadow] hover:border-line2 hover:shadow-[0_10px_30px_-18px_rgba(24,24,27,0.3)]', className)}>
+    <div className={cx('group relative flex flex-col rounded-2xl border border-line bg-panel p-4 transition-colors hover:border-line2 hover:bg-raised/40', className)}>
       <Link to={`/models/${m.slug}`} className="absolute inset-0 rounded-2xl" aria-label={m.name} />
       <div className="flex items-center gap-3">
         <OrgAvatar org={m.org} name={m.orgName} size={34} />
@@ -570,7 +570,7 @@ function Upload() {
           </form>
         </div>
 
-        <div className="min-w-0 overflow-hidden rounded-2xl border border-line bg-panel shadow-[0_20px_50px_-30px_rgba(24,24,27,0.3)]">
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-line2 bg-panel">
           <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
             <OrgAvatar org="liquid" name="Liquid AI" size={28} />
             <div className="min-w-0">
@@ -670,7 +670,7 @@ function Global() {
               <span className="w-24 shrink-0 font-medium">{r.location}</span>
               <span className="hidden w-32 shrink-0 font-mono text-[12.5px] text-fg3 sm:block">{r.region}</span>
               <span className="h-1 flex-1 overflow-hidden rounded-full bg-raised">
-                <span className="block h-full rounded-full bg-brand opacity-70 transition-[width] duration-700" style={{ width: `${Math.min(100, (lat[i] / 180) * 100)}%` }} />
+                <span className="block h-full rounded-full bg-brand-x transition-[width] duration-700" style={{ width: `${Math.min(100, (lat[i] / 180) * 100)}%` }} />
               </span>
               <span className="tabular w-14 shrink-0 text-right text-fg2">{lat[i]} ms</span>
             </li>
@@ -688,7 +688,7 @@ function Global() {
 function Closing() {
   return (
     <section className={cx(CONTAINER, 'pb-24')}>
-      <div className="relative overflow-hidden rounded-3xl bg-[#14164a] px-8 py-14 text-white sm:px-14">
+      <div className="relative overflow-hidden rounded-3xl bg-[#14164a] px-8 py-14 text-white ring-1 ring-inset ring-white/10 sm:px-14">
         <LogoMark size={176} className="pointer-events-none absolute right-16 top-1/2 hidden -translate-y-1/2 lg:block" />
         <div className="relative max-w-xl">
           <h2 className="text-[32px] font-semibold leading-[1.12] tracking-[-0.03em] sm:text-[40px]">Start building in minutes</h2>

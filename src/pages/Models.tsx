@@ -207,7 +207,7 @@ export default function Models() {
                 onClick={() => applyPreset(p)}
                 className={cx(
                   'h-8 shrink-0 rounded-full border px-3.5 text-[13px] transition-colors',
-                  presetActive(p) ? 'border-transparent bg-brand text-white' : 'border-line2 text-fg2 hover:border-fg/40 hover:text-fg',
+                  presetActive(p) ? 'border-transparent bg-brand text-on-brand' : 'border-line2 text-fg2 hover:border-fg/40 hover:text-fg',
                 )}
               >
                 {p.label}

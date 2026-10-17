@@ -17,7 +17,7 @@ export function buttonClass(variant: Variant = 'primary', size: Size = 'md', cla
     size === 'md' && 'h-9 px-4 text-[14px]',
     size === 'lg' && 'h-11 px-6 text-[15px]',
     size === 'xl' && 'h-12 px-7 text-[15.5px]',
-    (variant === 'primary' || variant === 'accent') && 'bg-brand text-white shadow-[0_6px_18px_-8px_rgba(85,96,244,0.6)] hover:brightness-110',
+    (variant === 'primary' || variant === 'accent') && 'bg-brand text-on-brand hover:brightness-105',
     variant === 'inverse' && 'bg-fg text-bg hover:bg-fg/85',
     variant === 'secondary' && 'bg-raised text-fg hover:bg-fg/[0.08]',
     variant === 'outline' && 'border border-line2 text-fg hover:bg-raised',
@@ -278,7 +278,7 @@ export function Empty({ icon, title, description, action }: { icon?: ReactNode; 
 export function Progress({ value, className }: { value: number; className?: string }) {
   return (
     <div className={cx('h-1 w-full overflow-hidden rounded-full bg-raised', className)}>
-      <div className="h-full rounded-full bg-brand transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />
+      <div className="h-full rounded-full bg-brand-x transition-[width] duration-500" style={{ width: `${Math.max(0, Math.min(100, value * 100))}%` }} />
     </div>
   )
 }

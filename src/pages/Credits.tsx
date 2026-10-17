@@ -125,7 +125,7 @@ export default function Credits() {
             <button
               key={p}
               onClick={() => setAmount(p)}
-              className={cx('h-10 rounded-full border text-[14px] font-medium transition-colors', amount === p ? 'border-transparent bg-brand text-white' : 'border-line2 hover:bg-raised')}
+              className={cx('h-10 rounded-full border text-[14px] font-medium transition-colors', amount === p ? 'border-transparent bg-brand text-on-brand' : 'border-line2 hover:bg-raised')}
             >
               ${p}
             </button>
