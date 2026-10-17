@@ -2,27 +2,114 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light (default) */
 :root {
   color-scheme: light;
+  --bg: 255 255 255;
+  --panel: 255 255 255;
+  --raised: 244 245 250;
+  --fg: 12 15 51;
+  --fg2: 74 79 110;
+  --fg3: 108 113 142;
+  --accent: 85 96 244;
+  --line: rgba(12, 15, 51, 0.08);
+  --line2: rgba(12, 15, 51, 0.14);
+  --code-bg: #f5f6fb;
+  --code-fg: #1d2142;
+  --code-muted: #9a9eb8;
+  --code-str: #15803d;
+  --code-kw: #c2410c;
+  --code-num: #a16207;
 }
+/* Dark */
 .dark {
   color-scheme: dark;
+  --bg: 11 13 38;
+  --panel: 17 20 52;
+  --raised: 26 30 70;
+  --fg: 236 238 250;
+  --fg2: 168 172 205;
+  --fg3: 124 129 168;
+  --accent: 132 140 255;
+  --line: rgba(255, 255, 255, 0.08);
+  --line2: rgba(255, 255, 255, 0.14);
+  --code-bg: #0d1030;
+  --code-fg: #d9dcf2;
+  --code-muted: #6c7099;
+  --code-str: #a5d6a7;
+  --code-kw: #f5a06a;
+  --code-num: #f6c177;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
 body {
-  @apply bg-white text-slate-900 antialiased dark:bg-[#070a14] dark:text-slate-100;
-  font-feature-settings: 'ss01', 'cv11';
+  @apply bg-bg text-fg antialiased;
+  font-feature-settings: 'cv11', 'ss01';
+  font-optical-sizing: auto;
 }
-
-code {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+h1, h2, h3 {
+  text-wrap: balance;
 }
-
+code, kbd, .font-mono {
+  font-feature-settings: 'zero' 0, 'calt' 0;
+}
+@layer utilities {
+  /* Fill for anything with white text on it: the logo's teal → violet run in the mark's direction,
+     with the middle stops taken deeper and the teal kept to the corner, so labels stay above 4.5:1. */
+  .bg-brand {
+    background-image: linear-gradient(169deg, #0ad3bb 0%, #177ce6 16%, #4a50ee 52%, #7c25e8 100%);
+  }
+  /* the exact logo stops laid along a bar, for meters and progress (no text on top) */
+  .bg-brand-x {
+    background-image: linear-gradient(90deg, #0ff0cf 0%, #1ba6f2 38%, #5560f4 70%, #8b2cf5 100%);
+  }
+  .text-on-brand {
+    color: #fff;
+  }
+}
+.code-panel { background: var(--code-bg); color: var(--code-fg); }
+.code-muted { color: var(--code-muted); }
+.tk-str { color: var(--code-str); }
+.tk-kw { color: var(--code-kw); }
+.tk-num { color: var(--code-num); }
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
 ::selection {
-  @apply bg-brand-500/30;
+  background: rgb(var(--accent) / 0.2);
 }
-
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  scrollbar-color: rgba(128, 128, 140, 0.35) transparent;
+}
+:is(a, button, summary, [role='switch'], [tabindex]):focus-visible {
+  outline: 2px solid rgb(var(--fg) / 0.35);
+  outline-offset: 2px;
+}
+:is(input, textarea, select):focus-visible {
+  outline: none;
+}
+/* number inputs: no native spinners */
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }

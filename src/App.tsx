@@ -1,5 +1,5 @@
-import { HashRouter, Link, Route, Routes } from 'react-router-dom'
-import { Layout } from './components/Layout'
+import { HashRouter, Link, Route, Routes, useLocation } from 'react-router-dom'
+import { AccountLayout, Layout } from './components/Layout'
 import { Button, Empty } from './components/ui'
 import Home from './pages/Home'
 import Models from './pages/Models'
@@ -17,6 +17,12 @@ import MyModels, { MyModelDetail } from './pages/MyModels'
 import DeployHome from './pages/deploy/DeployHome'
 import DeployWizard from './pages/deploy/DeployWizard'
 
+/** Restart the wizard when ?source=…&repo=… changes, even on the same route */
+function KeyedDeployWizard() {
+  const { search } = useLocation()
+  return <DeployWizard key={search} />
+}
+
 export default function App() {
   return (
     <HashRouter>
@@ -29,23 +35,25 @@ export default function App() {
           <Route path="rankings" element={<Rankings />} />
           <Route path="docs" element={<Docs />} />
           <Route path="pricing" element={<Pricing />} />
-          <Route path="keys" element={<Keys />} />
-          <Route path="credits" element={<Credits />} />
-          <Route path="activity" element={<Activity />} />
-          <Route path="settings" element={<Settings />} />
+          <Route element={<AccountLayout />}>
+            <Route path="credits" element={<Credits />} />
+            <Route path="keys" element={<Keys />} />
+            <Route path="activity" element={<Activity />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="my-models" element={<MyModels />} />
+            <Route path="my-models/:slug" element={<MyModelDetail />} />
+          </Route>
           <Route path="signin" element={<SignIn />} />
           <Route path="deploy" element={<DeployHome />} />
-          <Route path="deploy/new" element={<DeployWizard />} />
-          <Route path="my-models" element={<MyModels />} />
-          <Route path="my-models/:slug" element={<MyModelDetail />} />
+          <Route path="deploy/new" element={<KeyedDeployWizard />} />
           <Route
             path="*"
             element={
               <Empty
-                title="페이지를 찾을 수 없습니다"
+                title="Page not found"
                 action={
                   <Link to="/">
-                    <Button variant="outline">홈으로</Button>
+                    <Button variant="outline">Back to home</Button>
                   </Link>
                 }
               />

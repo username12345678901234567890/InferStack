@@ -1,15 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 64" fill="none">
-  <defs>
-    <linearGradient id="g" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#608aff"/><stop offset=".55" stop-color="#3b63fb"/><stop offset="1" stop-color="#06b6d4"/>
-    </linearGradient>
-    <linearGradient id="t" x1="160" y1="0" x2="290" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#3b63fb"/><stop offset="1" stop-color="#06b6d4"/>
-    </linearGradient>
-  </defs>
-  <path d="M8 40.5 32 53l24-12.5" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".45"/>
-  <path d="M8 30.5 32 43l24-12.5" stroke="url(#g)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".75"/>
-  <path d="M32 6 56 18.5 32 31 8 18.5Z" fill="url(#g)"/>
-  <path d="M32 12.5 37.5 18.5 32 24.5 26.5 18.5Z" fill="#fff"/>
-  <text x="72" y="43" font-family="Inter, Pretendard, system-ui, sans-serif" font-size="32" font-weight="800" letter-spacing="-1" fill="#0f172a">Infer<tspan fill="url(#t)">Stack</tspan></text>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 196 40" fill="none"><g transform="translate(2 4)"><defs><linearGradient id="is-g" x1="13" y1="1" x2="19" y2="31" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#0FF0CF"/><stop offset="0.38" stop-color="#1BA6F2"/><stop offset="0.7" stop-color="#5560F4"/><stop offset="1" stop-color="#8B2CF5"/></linearGradient></defs><path d="M2 9 L16 1 L30 9 L30 14.2 L16 6.2 L2 14.2 Z" fill="url(#is-g)"/><path d="M2 17.4 L16 9.4 L30 17.4 L30 22.6 L16 14.6 L2 22.6 Z" fill="url(#is-g)"/><path d="M2 25.8 L16 17.8 L30 25.8 L30 31 L16 23 L2 31 Z" fill="url(#is-g)"/></g><text x="44" y="28" font-family="Inter, system-ui, sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5" fill="#18181b">InferStack</text></svg>

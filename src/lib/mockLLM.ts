@@ -1,10 +1,13 @@
-/** 데모용 가짜 LLM 응답 생성기 (실제 백엔드 없음) */
+/** Fake LLM response generator for the demo (no real backend) */
 import { rng } from './rand'
+
+/** Hangul syllables (Korean user input is still tokenized sensibly) */
+const HANGUL = /[\uAC00-\uD7A3]/g
 
 const SNIPPETS: { re: RegExp; reply: (model: string) => string }[] = [
   {
-    re: /(코드|code|python|파이썬|함수|function|javascript|typescript)/i,
-    reply: (m) => `물론입니다. 아래는 InferStack API를 OpenAI 호환 SDK로 호출하는 예시입니다.
+    re: /(code|coding|python|function|javascript|typescript)/i,
+    reply: (m) => `Sure. Here's how to call the InferStack API with an OpenAI-compatible SDK.
 
 \`\`\`python
 from openai import OpenAI
@@ -23,55 +26,55 @@ for chunk in resp:
     print(chunk.choices[0].delta.content or "", end="")
 \`\`\`
 
-핵심 포인트:
-1. \`base_url\`만 바꾸면 기존 OpenAI 코드가 그대로 동작합니다.
-2. \`model\`에 카탈로그의 슬러그(예: \`${m}\`)를 넣으세요.
-3. \`stream=True\`로 토큰 단위 스트리밍을 받을 수 있습니다.`,
+Key points:
+1. Change only \`base_url\`. Your existing OpenAI code works as is.
+2. Set \`model\` to a catalog slug (e.g. \`${m}\`).
+3. Pass \`stream=True\` to receive tokens as they're generated.`,
   },
   {
-    re: /(안녕|hello|hi\b|반가)/i,
-    reply: (m) => `안녕하세요! 저는 InferStack에서 서빙 중인 **${m}** 입니다. 😊
+    re: /\b(hello|hi|hey)\b/i,
+    reply: (m) => `Hi! I'm **${m}**, served on InferStack.
 
-무엇을 도와드릴까요? 예를 들어 이런 걸 할 수 있어요:
-- 문서 요약·번역
-- 코드 작성 및 리뷰
-- 데이터 분석 아이디어 정리
-- 복잡한 문제의 단계별 추론`,
+How can I help? For example, I can:
+- Summarize and translate documents
+- Write and review code
+- Brainstorm approaches to data analysis
+- Reason through complex problems step by step`,
   },
   {
-    re: /(gguf|safetensors|양자화|quant)/i,
-    reply: () => `**GGUF vs Safetensors** 간단 비교입니다.
+    re: /(gguf|safetensors|quant)/i,
+    reply: () => `Here's a quick comparison of **GGUF vs. safetensors**.
 
-| 항목 | GGUF | Safetensors |
+| | GGUF | Safetensors |
 |---|---|---|
-| 주 런타임 | llama.cpp | vLLM / SGLang / TensorRT-LLM |
-| 양자화 | 파일 자체에 포함 (Q4_K_M 등) | 서빙 시 FP8/AWQ/GPTQ 선택 |
-| 장점 | 단일 파일, 작은 VRAM | 높은 처리량, 배치 효율 |
-| 추천 | 소형~중형, 비용 최적화 | 대형 모델, 프로덕션 트래픽 |
+| Primary runtime | llama.cpp | vLLM / SGLang / TensorRT-LLM |
+| Quantization | Baked into the file (Q4_K_M, etc.) | Chosen at serve time (FP8/AWQ/GPTQ) |
+| Strengths | Single file, low VRAM | High throughput, efficient batching |
+| Best for | Small to mid-size models, cost optimization | Large models, production traffic |
 
-InferStack에서는 두 포맷 모두 업로드할 수 있으며 포맷에 맞춰 엔진이 자동 선택됩니다.`,
+InferStack accepts both formats and picks the right inference engine automatically.`,
   },
   {
-    re: /(가격|price|비용|cost)/i,
-    reply: (m) => `InferStack은 **토큰 단위 종량제**입니다. \`${m}\`의 경우 입력/출력 토큰 가격이 모델 페이지에 표시되며, 캐시된 입력 토큰은 75% 할인됩니다. 크레딧은 선불로 충전하고 사용량만큼 차감됩니다.`,
+    re: /(pric|cost|billing)/i,
+    reply: (m) => `InferStack uses **pay-as-you-go, per-token pricing**. Input and output token prices for \`${m}\` are listed on its model page, and cached input tokens are 75% off. Credits are prepaid and deducted as you use them.`,
   },
 ]
 
 const GENERIC = [
-  (m: string, q: string) => `좋은 질문입니다. "${q.slice(0, 60)}${q.length > 60 ? '…' : ''}"에 대해 단계별로 정리해 보겠습니다.
+  (m: string, q: string) => `Good question. Let's work through "${q.slice(0, 60)}${q.length > 60 ? '…' : ''}" step by step.
 
-**1. 문제 정의**
-먼저 무엇을 해결하려는지 명확히 해야 합니다. 목표, 제약 조건, 성공 기준을 구분하면 접근 방향이 선명해집니다.
+**1. Define the problem**
+Start by clarifying what you're trying to solve. Separating goals, constraints, and success criteria makes the right approach much clearer.
 
-**2. 핵심 고려사항**
-- 데이터와 맥락: 어떤 정보가 이미 주어졌고, 무엇이 부족한가
-- 트레이드오프: 속도·비용·정확도 사이의 균형
-- 검증 방법: 결과가 맞는지 어떻게 확인할 것인가
+**2. Key considerations**
+- Data and context: what do you already have, and what's missing?
+- Trade-offs: balancing speed, cost, and accuracy
+- Validation: how will you check that the result is correct?
 
-**3. 제안**
-작게 시작해서 빠르게 검증하고, 결과를 보며 반복적으로 개선하는 방식을 추천합니다.
+**3. Recommendation**
+Start small, validate quickly, and iterate based on what you learn.
 
-_(이 응답은 InferStack 데모 환경에서 ${m} 모델을 시뮬레이션한 결과입니다.)_`,
+_(This is a simulated ${m} response from the InferStack demo.)_`,
 ]
 
 export function mockReply(model: string, prompt: string): string {
@@ -82,13 +85,13 @@ export function mockReply(model: string, prompt: string): string {
 }
 
 export function estimateTokens(text: string): number {
-  // 대략: 영문 4자/토큰, 한글 1.5자/토큰
-  const ko = (text.match(/[가-힣]/g) ?? []).length
+  // Rough estimate: ~4 chars/token for Latin text, ~1.5 chars/token for Hangul
+  const ko = (text.match(HANGUL) ?? []).length
   return Math.max(1, Math.round(ko / 1.5 + (text.length - ko) / 4))
 }
 
-/** 텍스트를 토큰 단위 조각으로 쪼개 스트리밍 흉내 */
+/** Splits text into token-sized pieces to simulate streaming */
 export function* chunkText(text: string): Generator<string> {
-  const parts = text.match(/(\s+|[가-힣]{1,2}|[^\s가-힣]{1,4})/g) ?? [text]
+  const parts = text.match(/(\s+|[\uAC00-\uD7A3]{1,2}|[^\s\uAC00-\uD7A3]{1,4})/g) ?? [text]
   for (const p of parts) yield p
 }

@@ -1,3 +1,4 @@
+import { SERIES } from '../lib/palette'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
@@ -9,7 +10,7 @@ import { Card, PageHeader, Segmented } from '../components/ui'
 import { fmtPrice, fmtTokens } from '../lib/format'
 import { rng } from '../lib/rand'
 
-const COLORS = ['#3b63fb', '#06b6d4', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899', '#64748b', '#ef4444']
+const COLORS = SERIES
 
 type Cat = 'all' | Capability
 
@@ -44,22 +45,24 @@ export default function Rankings() {
 
   return (
     <div>
-      <PageHeader title="랭킹" description="InferStack 전체 트래픽 기준 모델 사용량 순위 (주간 토큰)" />
-      <Segmented
-        value={cat}
-        onChange={setCat}
-        options={[
-          { id: 'all', label: '전체' },
-          { id: 'coding', label: '코딩' },
-          { id: 'reasoning', label: '추론' },
-          { id: 'agent', label: '에이전트' },
-          { id: 'vision', label: '비전' },
-          { id: 'multilingual', label: '다국어' },
-        ]}
-      />
+      <PageHeader title="Rankings" description="Models ranked by weekly token usage across all InferStack traffic" />
+      <div className="-mx-5 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <Segmented
+          value={cat}
+          onChange={setCat}
+          options={[
+            { id: 'all', label: 'All' },
+            { id: 'coding', label: 'Coding' },
+            { id: 'reasoning', label: 'Reasoning' },
+            { id: 'agent', label: 'Agents' },
+            { id: 'vision', label: 'Vision' },
+            { id: 'multilingual', label: 'Multilingual' },
+          ]}
+        />
+      </div>
 
       <Card className="mt-4 p-5">
-        <div className="mb-2 text-sm font-semibold">최근 12주 토큰 사용량 (상위 8개)</div>
+        <div className="mb-2 text-sm font-semibold">Token usage, last 12 weeks (top 8)</div>
         <div className="h-72">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chart}>
@@ -71,7 +74,7 @@ export default function Rankings() {
                 contentStyle={{ background: '#0f172a', border: '1px solid rgba(255,255,255,.1)', borderRadius: 8, fontSize: 12 }}
               />
               {top.map((m, i) => (
-                <Area key={m.slug} type="monotone" dataKey={m.slug} stackId="1" stroke={COLORS[i]} fill={COLORS[i]} fillOpacity={0.55} />
+                <Area key={m.slug} type="monotone" dataKey={m.slug} stackId="1" stroke="rgb(var(--panel))" strokeWidth={1} fill={COLORS[i]} fillOpacity={0.9} />
               ))}
             </AreaChart>
           </ResponsiveContainer>
@@ -79,17 +82,17 @@ export default function Rankings() {
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px] [&>*]:min-w-0">
-        <Card className="divide-y divide-slate-100 dark:divide-white/5">
+        <Card className="divide-y divide-line">
           {list.map((m, i) => {
             const delta = (rng(m.slug + 'd')() - 0.35) * 60
             return (
-              <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/[0.03]">
-                <span className="w-6 text-right text-sm font-semibold text-slate-400">{i + 1}</span>
+              <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center gap-3 px-4 py-3 hover:bg-raised/60">
+                <span className="w-6 text-right text-sm font-semibold text-fg3">{i + 1}</span>
                 <OrgAvatar org={m.org} name={m.orgName} size={28} />
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium">{m.name}</div>
-                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-white/5">
-                    <div className="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
+                  <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-raised">
+                    <div className="h-full rounded-full bg-brand-x" style={{ width: `${(weeklyTokens(m) / max) * 100}%` }} />
                   </div>
                 </div>
                 <div className="w-20 text-right text-sm font-medium">{fmtTokens(weeklyTokens(m))}</div>
@@ -104,7 +107,7 @@ export default function Rankings() {
 
         <div className="space-y-6">
           <Card className="p-5">
-            <div className="text-sm font-semibold">제공자별 점유율</div>
+            <div className="text-sm font-semibold">Share by provider</div>
             <div className="mt-4 flex h-3 overflow-hidden rounded-full">
               {orgs.map((o, i) => (
                 <div key={o.id} style={{ width: `${o.share * 100}%`, background: COLORS[i % COLORS.length] }} title={o.name} />
@@ -115,32 +118,32 @@ export default function Rankings() {
                 <div key={o.id} className="flex items-center gap-2">
                   <span className="h-2.5 w-2.5 rounded-sm" style={{ background: COLORS[i % COLORS.length] }} />
                   <span className="flex-1">{o.name}</span>
-                  <span className="text-slate-500">{(o.share * 100).toFixed(1)}%</span>
+                  <span className="text-fg3">{(o.share * 100).toFixed(1)}%</span>
                 </div>
               ))}
             </div>
           </Card>
           <Card className="p-5">
-            <div className="text-sm font-semibold">가장 빠른 모델 (tok/s)</div>
+            <div className="text-sm font-semibold">Fastest models (tok/s)</div>
             <div className="mt-3 space-y-2 text-sm">
               {fastest.map(({ m, tps }) => (
-                <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-brand-500">
+                <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
                   <span className="truncate">{m.name}</span>
-                  <span className="font-mono text-xs text-slate-500">{tps}</span>
+                  <span className="text-xs text-fg3">{tps}</span>
                 </Link>
               ))}
             </div>
           </Card>
           <Card className="p-5">
-            <div className="text-sm font-semibold">가성비 (출력 $/M 낮은순)</div>
+            <div className="text-sm font-semibold">Best value (lowest output $/M)</div>
             <div className="mt-3 space-y-2 text-sm">
               {[...MODELS]
                 .sort((a, b) => a.price.output - b.price.output)
                 .slice(0, 6)
                 .map((m) => (
-                  <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-brand-500">
+                  <Link key={m.slug} to={`/models/${m.slug}`} className="flex items-center justify-between hover:text-fg">
                     <span className="truncate">{m.name}</span>
-                    <span className="font-mono text-xs text-slate-500">{fmtPrice(m.price.output)}</span>
+                    <span className="text-xs text-fg3">{fmtPrice(m.price.output)}</span>
                   </Link>
                 ))}
             </div>

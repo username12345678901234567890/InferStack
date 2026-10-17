@@ -1,20 +1,24 @@
 import { Link } from 'react-router-dom'
-import { Sparkles, Star } from 'lucide-react'
-import { ORG_COLORS, CAPABILITY_LABEL, weeklyTokens } from '../data/models'
+import { Cpu, Star } from 'lucide-react'
+import { CAPABILITY_LABEL, ORG_COLORS, weeklyTokens } from '../data/models'
 import type { CatalogModel } from '../data/types'
 import { fmtCtx, fmtParams, fmtPrice, fmtTokens } from '../lib/format'
 import { Badge, Card, cx } from './ui'
 import { useStore } from '../store'
 
-export function OrgAvatar({ org, name, size = 32 }: { org: string; name?: string; size?: number }) {
-  const color = ORG_COLORS[org] ?? '#475569'
-  const letter = (name ?? org).replace(/[^A-Za-z0-9]/g, '').slice(0, 1).toUpperCase()
+/** Provider logo (Hugging Face org avatars downloaded to public/logos) */
+export function OrgAvatar({ org, name, size = 32, className }: { org: string; name?: string; size?: number; className?: string }) {
+  const known = org in ORG_COLORS
+  const r = Math.max(4, Math.round(size * 0.22))
+  if (!known)
+    return (
+      <span className={cx('inline-flex shrink-0 items-center justify-center border border-line2 bg-raised text-fg2', className)} style={{ width: size, height: size, borderRadius: r }} title={name ?? org}>
+        <Cpu size={Math.round(size * 0.55)} strokeWidth={1.6} />
+      </span>
+    )
   return (
-    <span
-      className="inline-flex shrink-0 items-center justify-center rounded-lg font-bold text-white"
-      style={{ width: size, height: size, background: `linear-gradient(135deg, ${color}, ${color}cc)`, fontSize: size * 0.42 }}
-    >
-      {letter}
+    <span className={cx('inline-flex shrink-0 overflow-hidden bg-white ring-1 ring-black/10 dark:ring-white/10', className)} style={{ width: size, height: size, borderRadius: r }} title={name ?? org}>
+      <img src={`./logos/${org}.png`} alt={name ?? org} width={size} height={size} className="h-full w-full object-cover" />
     </span>
   )
 }
@@ -22,13 +26,9 @@ export function OrgAvatar({ org, name, size = 32 }: { org: string; name?: string
 export function ModelFlags({ m }: { m: CatalogModel }) {
   return (
     <>
-      {m.custom && <Badge color="violet">커스텀</Badge>}
-      {m.isNew && (
-        <Badge color="cyan">
-          <Sparkles size={10} /> NEW
-        </Badge>
-      )}
-      {m.free && <Badge color="green">무료 티어</Badge>}
+      {m.custom && <Badge color="violet">My model</Badge>}
+      {m.isNew && <Badge color="brand">New</Badge>}
+      {m.free && <Badge color="green">Free</Badge>}
       {m.preview && <Badge color="amber">Preview</Badge>}
     </>
   )
@@ -42,62 +42,69 @@ export function ModelRow({ m }: { m: CatalogModel }) {
   const fav = useStore((s) => s.favorites.includes(m.slug))
   const toggle = useStore((s) => s.toggleFavorite)
   return (
-    <Card className="group p-4 transition-colors hover:border-brand-400/60 dark:hover:border-brand-400/40">
-      <div className="flex items-start gap-3">
-        <OrgAvatar org={m.org} name={m.orgName} size={36} />
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <Link to={modelHref(m)} className="font-semibold hover:text-brand-500">
-              {m.name}
-            </Link>
-            <ModelFlags m={m} />
-            <span className="ml-auto hidden text-sm text-slate-500 sm:inline">{fmtTokens(weeklyTokens(m))} 토큰/주</span>
-            <button onClick={() => toggle(m.slug)} className="text-slate-400 hover:text-amber-400" title="즐겨찾기">
-              <Star size={16} className={cx(fav && 'fill-amber-400 text-amber-400')} />
-            </button>
-          </div>
-          <div className="mt-0.5 font-mono text-xs text-slate-500">{m.slug}</div>
-          <p className="mt-2 line-clamp-2 text-sm text-slate-600 dark:text-slate-400">{m.description}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-            <span>by {m.orgName}</span>
-            <span>{fmtParams(m.params)} params{m.activeParams ? ` · ${fmtParams(m.activeParams)} active` : ''}</span>
-            <span>{fmtCtx(m.context)} context</span>
-            <span>
-              {fmtPrice(m.price.input)}/M 입력 · {fmtPrice(m.price.output)}/M 출력
-            </span>
-            <span className="hidden gap-1 md:flex">
-              {m.capabilities.slice(0, 4).map((c) => (
-                <Badge key={c}>{CAPABILITY_LABEL[c]}</Badge>
-              ))}
-            </span>
-          </div>
+    <div className="group grid grid-cols-[auto_1fr] gap-4 border-b border-line py-5 last:border-0">
+      <OrgAvatar org={m.org} name={m.orgName} size={36} />
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <Link to={modelHref(m)} className="text-[15px] font-semibold tracking-[-0.01em] hover:underline hover:decoration-fg3 hover:underline-offset-4">
+            {m.name}
+          </Link>
+          <ModelFlags m={m} />
+          <span className="tabular ml-auto hidden font-mono text-[12.5px] text-fg2 sm:inline">{fmtTokens(weeklyTokens(m))} tokens/wk</span>
+          <button onClick={() => toggle(m.slug)} className="text-fg3 opacity-0 transition-opacity hover:text-fg group-hover:opacity-100 data-[on=true]:opacity-100" data-on={fav} title="Favorite">
+            <Star size={15} className={cx(fav && 'fill-accent text-accent')} />
+          </button>
+        </div>
+        <p className="mt-1.5 line-clamp-2 max-w-3xl text-[13.5px] leading-relaxed text-fg2">{m.description}</p>
+        <div className="tabular mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[12px] text-fg3">
+          <span className="font-sans text-fg2">by {m.orgName}</span>
+          <Dot />
+          <span>{fmtCtx(m.context)} context</span>
+          <Dot />
+          <span>{fmtParams(m.params)}{m.activeParams ? ` · ${fmtParams(m.activeParams)} active` : ''}</span>
+          <Dot />
+          <span>
+            {fmtPrice(m.price.input)}/M in · {fmtPrice(m.price.output)}/M out
+          </span>
+          <span className="hidden font-sans text-fg3 lg:inline">
+            <Dot /> {m.capabilities.slice(0, 3).map((c) => CAPABILITY_LABEL[c]).join(' · ')}
+          </span>
         </div>
       </div>
-    </Card>
+    </div>
   )
+}
+
+function Dot() {
+  return <span className="text-fg3/50">·</span>
 }
 
 export function ModelTile({ m }: { m: CatalogModel }) {
   return (
-    <Link to={modelHref(m)}>
-      <Card className="h-full p-4 transition-all hover:-translate-y-0.5 hover:border-brand-400/60 hover:shadow-lg hover:shadow-brand-900/10">
-        <div className="flex items-center gap-2.5">
-          <OrgAvatar org={m.org} name={m.orgName} size={30} />
+    <Link to={modelHref(m)} className="block">
+      <Card className="h-full p-4 transition-colors hover:border-line2 hover:bg-raised/40">
+        <div className="flex items-center gap-3">
+          <OrgAvatar org={m.org} name={m.orgName} size={32} />
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold">{m.name}</div>
-            <div className="text-xs text-slate-500">{m.orgName}</div>
+            <div className="flex items-center gap-1.5 truncate text-sm font-semibold">
+              {m.name} <ModelFlags m={m} />
+            </div>
+            <div className="text-xs text-fg3">by {m.orgName}</div>
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap gap-1">
-          <ModelFlags m={m} />
-          <Badge>{fmtCtx(m.context)} ctx</Badge>
-          <Badge>{fmtParams(m.params)}</Badge>
-        </div>
-        <div className="mt-3 flex items-end justify-between text-xs text-slate-500">
-          <span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">{fmtPrice(m.price.input)}</span> / <span className="font-semibold text-slate-800 dark:text-slate-200">{fmtPrice(m.price.output)}</span> per M
-          </span>
-          <span>{fmtTokens(weeklyTokens(m))}/wk</span>
+        <div className="tabular mt-4 grid grid-cols-3 gap-2 border-t border-line pt-3 font-mono text-[12px]">
+          <div>
+            <div className="text-fg">{fmtTokens(weeklyTokens(m))}</div>
+            <div className="font-sans text-[11px] text-fg3">tokens/wk</div>
+          </div>
+          <div>
+            <div className="text-fg">{fmtCtx(m.context)}</div>
+            <div className="font-sans text-[11px] text-fg3">context</div>
+          </div>
+          <div>
+            <div className="text-fg">{fmtPrice(m.price.output)}</div>
+            <div className="font-sans text-[11px] text-fg3">out / 1M</div>
+          </div>
         </div>
       </Card>
     </Link>

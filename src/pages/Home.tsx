@@ -1,27 +1,359 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowRight, Boxes, Cpu, Download, Github, Globe2, Heart, KeyRound, Route, Search, ShieldCheck, Terminal, Upload, Zap } from 'lucide-react'
-import { MODELS, weeklyTokens } from '../data/models'
-import { ModelTile } from '../components/ModelBits'
-import { Badge, Button, Card, CodeBlock, Segmented } from '../components/ui'
-import { LogoMark } from '../components/Logo'
-import { trendingLLMs, hfUrl, type HFModelSummary } from '../lib/hf'
-import { fmtNum, fmtTokens, timeAgo } from '../lib/format'
+import { ArrowRight, Check, MessageSquare } from 'lucide-react'
+import { MODELS, ORGS, REGIONS, endpointsFor, findModel, weeklyTokens } from '../data/models'
+import { ARCHITECTURES } from '../data/architectures'
+import type { CatalogModel } from '../data/types'
+import { ModelFlags, OrgAvatar } from '../components/ModelBits'
+import { ButtonLink, CopyButton, Segmented, buttonClass, cx, highlight } from '../components/ui'
+import { CONTAINER } from '../components/Layout'
+import { fmtCtx, fmtPrice, fmtTokens, fmtUSD } from '../lib/format'
 
-const SAMPLES = {
-  python: `from openai import OpenAI
+export default function Home() {
+  return (
+    <div>
+      <Hero />
+      <Pulse />
+      <Showcase />
+      <Start />
+      <Upload />
+      <Regions />
+    </div>
+  )
+}
+
+const SECTION = 'py-16 sm:py-20'
+
+function useReducedMotion() {
+  const [reduce, setReduce] = useState(false)
+  useEffect(() => {
+    const q = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduce(q.matches)
+    const h = () => setReduce(q.matches)
+    q.addEventListener('change', h)
+    return () => q.removeEventListener('change', h)
+  }, [])
+  return reduce
+}
+
+/** Shared section heading: always left-aligned */
+function Head({ title, sub, action }: { title: React.ReactNode; sub?: React.ReactNode; action?: React.ReactNode }) {
+  return (
+    <div className="mb-8 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+      <div className="max-w-2xl">
+        <h2 className="text-[26px] font-semibold leading-[1.2] tracking-[-0.02em] sm:text-[30px]">{title}</h2>
+        {sub && <p className="mt-2 text-[15.5px] leading-relaxed text-fg2">{sub}</p>}
+      </div>
+      {action && <div className="shrink-0">{action}</div>}
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Hero                                                                */
+/* ------------------------------------------------------------------ */
+
+function Hero() {
+  return (
+    <section className={cx(CONTAINER, 'grid grid-cols-1 items-center gap-12 pb-16 pt-14 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_540px] lg:gap-14')}>
+      <div>
+        <h1 className="text-[42px] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-[60px]">
+          One API for
+          <br />
+          every open model
+        </h1>
+        <p className="mt-6 max-w-[34rem] text-[17px] leading-relaxed text-fg2 sm:text-[18px]">
+          {MODELS.length} open-weight models from {ORGS.length} labs, and your own fine-tunes, behind one OpenAI-compatible endpoint. Pay per token.
+        </p>
+        <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+          <ButtonLink to="/keys" size="xl" className="w-full sm:w-auto">
+            Get your API key <ArrowRight size={16} />
+          </ButtonLink>
+          <ButtonLink to="/chat" size="xl" variant="outline" className="w-full sm:w-auto">
+            Try it in chat
+          </ButtonLink>
+        </div>
+      </div>
+      <LiveDemo />
+    </section>
+  )
+}
+
+const DEMO = [
+  {
+    model: 'deepseek/deepseek-v4.1-flash',
+    prompt: 'Explain the KV cache in two sentences.',
+    answer:
+      'A KV cache keeps the key and value tensors of tokens the model has already seen, so each new token attends to stored states instead of recomputing the whole prefix. Generation gets much faster, at the cost of GPU memory that grows with context length.',
+    code: false,
+  },
+  {
+    model: 'qwen/qwen3.8-27b',
+    prompt: 'SQL for daily active users from an events table.',
+    answer: "SELECT date_trunc('day', ts) AS day,\n       count(DISTINCT user_id) AS dau\nFROM events GROUP BY 1 ORDER BY 1;",
+    code: true,
+  },
+  {
+    model: 'z-ai/glm-5.3',
+    prompt: 'Return as JSON: "Paid $1,240.50 to Acme on Oct 3"',
+    answer: '{\n  "payee": "Acme",\n  "amount": 1240.5,\n  "currency": "USD",\n  "date": "2026-10-03"\n}',
+    code: true,
+  },
+  {
+    model: 'moonshotai/kimi-k3',
+    prompt: 'Regex for a semantic version like 1.4.2',
+    answer: '^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)$',
+    code: true,
+  },
+]
+
+function LiveDemo() {
+  const reduce = useReducedMotion()
+  const [i, setI] = useState(0)
+  const [n, setN] = useState(0)
+  const [phase, setPhase] = useState<'wait' | 'stream' | 'done'>('wait')
+  const d = DEMO[i]
+  const m = findModel(d.model)!
+  const ep = useMemo(() => endpointsFor(m)[0], [m])
+
+  // play the current request: wait for the first token, then stream
+  useEffect(() => {
+    if (reduce) {
+      setN(d.answer.length)
+      setPhase('done')
+      return
+    }
+    setN(0)
+    setPhase('wait')
+    let count = 0
+    let tick: number | undefined
+    const start = window.setTimeout(() => {
+      setPhase('stream')
+      const step = Math.max(1, Math.round(ep.throughput / 40))
+      tick = window.setInterval(() => {
+        count = Math.min(d.answer.length, count + step)
+        setN(count)
+        if (count >= d.answer.length) {
+          window.clearInterval(tick)
+          setPhase('done')
+        }
+      }, 28)
+    }, Math.min(900, ep.latency))
+    return () => {
+      window.clearTimeout(start)
+      window.clearInterval(tick)
+    }
+  }, [i, reduce, d.answer, ep])
+
+  // then move on to the next model
+  useEffect(() => {
+    if (phase !== 'done' || reduce) return
+    const t = window.setTimeout(() => setI((x) => (x + 1) % DEMO.length), 3400)
+    return () => window.clearTimeout(t)
+  }, [phase, reduce])
+
+  const completion = Math.ceil(n / 4)
+  const cost = (14 * m.price.input + completion * m.price.output) / 1e6
+
+  return (
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-line2 bg-panel">
+      <div className="flex items-center gap-1.5 overflow-x-auto border-b border-line px-3 py-2.5">
+        {DEMO.map((x, k) => {
+          const mm = findModel(x.model)!
+          return (
+            <button
+              key={x.model}
+              onClick={() => setI(k)}
+              className={cx('flex shrink-0 items-center gap-1.5 rounded-full py-1 pl-1 pr-2.5 text-[12.5px] transition-colors', k === i ? 'bg-raised font-medium text-fg ring-1 ring-inset ring-line2' : 'text-fg3 hover:text-fg')}
+            >
+              <OrgAvatar org={mm.org} name={mm.orgName} size={18} className="!rounded-full" />
+              {mm.name}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* every exchange sits in the same grid cell, so the card is always as tall as the longest one */}
+      <div className="grid px-5 py-5">
+        {DEMO.map((x, k) => (
+          <div key={x.model} className={cx('[grid-area:1/1]', k !== i && 'invisible')} aria-hidden={k !== i}>
+            <Exchange prompt={x.prompt} answer={x.answer} code={x.code} model={findModel(x.model)!} shown={k === i ? n : x.answer.length} phase={k === i ? phase : 'done'} />
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-4 border-t border-line px-5 py-3 text-[12.5px] text-fg3">
+        <span className="tabular">
+          <span className="text-fg2">{phase === 'wait' ? '—' : `${(ep.latency / 1000).toFixed(2)}s`}</span> latency
+        </span>
+        <span className="tabular hidden sm:inline">
+          <span className="text-fg2">{phase === 'wait' ? '—' : ep.throughput}</span> tok/s
+        </span>
+        <span className="tabular text-fg2">{fmtUSD(cost)}</span>
+        <Link to={`/chat?model=${encodeURIComponent(m.slug)}`} className="ml-auto flex items-center gap-1 font-medium text-fg transition-colors hover:text-accent">
+          Open in chat <ArrowRight size={13} />
+        </Link>
+      </div>
+    </div>
+  )
+}
+
+function Exchange({ prompt, answer, code, model, shown, phase }: { prompt: string; answer: string; code: boolean; model: CatalogModel; shown: number; phase: 'wait' | 'stream' | 'done' }) {
+  return (
+    <>
+      <div className="flex justify-end">
+        <div className="max-w-[85%] rounded-2xl rounded-br-md bg-raised px-3.5 py-2 text-[14px]">{prompt}</div>
+      </div>
+      <div className="mt-4 flex gap-3">
+        <OrgAvatar org={model.org} name={model.orgName} size={24} className="mt-0.5 shrink-0" />
+        <div className={cx('min-w-0 flex-1 whitespace-pre-wrap text-[14px] leading-relaxed', code && 'rounded-xl bg-raised px-3.5 py-3 font-mono text-[12.5px] leading-[1.7]')}>
+          {phase === 'wait' ? (
+            <span className="inline-flex gap-1 py-2">
+              {[0, 1, 2].map((k) => (
+                <span key={k} className="h-1.5 w-1.5 animate-pulse rounded-full bg-fg3" style={{ animationDelay: `${k * 150}ms` }} />
+              ))}
+            </span>
+          ) : (
+            <>
+              {code ? highlight(answer.slice(0, shown), 'sql') : answer.slice(0, shown)}
+              {phase === 'stream' && <span className="ml-0.5 inline-block h-4 w-[2px] translate-y-0.5 animate-blink bg-fg" />}
+            </>
+          )}
+        </div>
+      </div>
+    </>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Catalog numbers                                                     */
+/* ------------------------------------------------------------------ */
+
+function Pulse() {
+  // all four numbers come straight from the catalog
+  const cheapest = Math.min(...MODELS.map((m) => m.price.input))
+  const stats = [
+    { v: `${fmtPrice(cheapest)}/M`, k: 'Starting price' },
+    { v: String(MODELS.length), k: 'Models' },
+    { v: String(ORGS.length), k: 'Labs' },
+    { v: String(REGIONS.length), k: 'Regions' },
+  ]
+  return (
+    <section className="border-y border-line">
+      {/* same 4-column grid as the catalog cards below, so the columns line up */}
+      <dl className={cx(CONTAINER, 'grid grid-cols-2 gap-x-3 gap-y-6 py-9 lg:grid-cols-4 lg:gap-x-4')}>
+        {stats.map((s) => (
+          <div key={s.k} className="min-w-0">
+            <dt className="tabular truncate text-[28px] font-semibold tracking-[-0.03em]">{s.v}</dt>
+            <dd className="mt-1 text-[13.5px] text-fg3">{s.k}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Catalog showcase                                                    */
+/* ------------------------------------------------------------------ */
+
+type Tab = 'trending' | 'new' | 'free' | 'coding' | 'vision' | 'long'
+
+const TABS: { id: Tab; label: string; pick: (m: CatalogModel) => boolean; sort?: (a: CatalogModel, b: CatalogModel) => number }[] = [
+  { id: 'trending', label: 'Trending', pick: () => true },
+  { id: 'new', label: 'New', pick: (m) => !!m.isNew, sort: (a, b) => b.released.localeCompare(a.released) },
+  { id: 'free', label: 'Free tier', pick: (m) => !!m.free },
+  { id: 'coding', label: 'Coding', pick: (m) => m.capabilities.includes('coding') },
+  { id: 'vision', label: 'Vision', pick: (m) => m.input.includes('image') },
+  { id: 'long', label: '1M context', pick: (m) => m.context >= 1_000_000 },
+]
+
+function Showcase() {
+  const [tab, setTab] = useState<Tab>('trending')
+  const t = TABS.find((x) => x.id === tab)!
+  const list = MODELS.filter(t.pick)
+    .sort(t.sort ?? ((a, b) => weeklyTokens(b) - weeklyTokens(a)))
+    .slice(0, 12)
+  return (
+    <section className={cx(CONTAINER, SECTION)}>
+      <Head
+        title="Popular models"
+        action={
+          <Link to="/models" className="flex items-center gap-1 text-[14px] font-medium text-fg2 transition-colors hover:text-fg">
+            All {MODELS.length} models <ArrowRight size={14} />
+          </Link>
+        }
+      />
+      <div className="-mx-5 mb-6 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        <Segmented value={tab} onChange={setTab} options={TABS.map((x) => ({ id: x.id, label: x.label }))} className="[&>button]:px-3.5 [&>button]:py-1.5 [&>button]:text-[13px]" />
+      </div>
+      <div key={tab} className="grid animate-fade-in gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {list.map((m, i) => (
+          <ModelCard key={m.slug} m={m} className={i >= 6 ? 'hidden sm:flex' : undefined} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ModelCard({ m, className }: { m: CatalogModel; className?: string }) {
+  const nav = useNavigate()
+  return (
+    <div className={cx('group relative flex flex-col rounded-2xl border border-line bg-panel p-4 transition-colors hover:border-line2 hover:bg-raised/40', className)}>
+      <Link to={`/models/${m.slug}`} className="absolute inset-0 rounded-2xl" aria-label={m.name} />
+      <div className="flex items-center gap-3">
+        <OrgAvatar org={m.org} name={m.orgName} size={34} />
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-[14.5px] font-semibold tracking-[-0.01em]">{m.name}</div>
+          <div className="text-[12.5px] text-fg3">{m.orgName}</div>
+        </div>
+        <button
+          onClick={() => nav(`/chat?model=${encodeURIComponent(m.slug)}`)}
+          className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-fg3 opacity-0 transition hover:bg-raised hover:text-fg focus-visible:opacity-100 group-hover:opacity-100"
+          title={`Chat with ${m.name}`}
+          aria-label={`Chat with ${m.name}`}
+        >
+          <MessageSquare size={15} />
+        </button>
+      </div>
+      <p className="mt-3 line-clamp-2 flex-1 text-[13px] leading-relaxed text-fg2">{m.description}</p>
+      <div className="mt-4 flex items-center gap-1.5">
+        <ModelFlags m={m} />
+        <span className="tabular ml-auto whitespace-nowrap text-[12.5px] text-fg2">
+          {fmtPrice(m.price.input)} <span className="text-fg3">in</span> · {fmtPrice(m.price.output)} <span className="text-fg3">out</span>
+        </span>
+      </div>
+      <div className="tabular mt-1.5 flex justify-between text-[12px] text-fg3">
+        <span>{fmtCtx(m.context)} context</span>
+        <span>{fmtTokens(weeklyTokens(m))} tokens/wk</span>
+      </div>
+    </div>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Get started                                                         */
+/* ------------------------------------------------------------------ */
+
+const SNIPPETS = {
+  python: {
+    lang: 'python',
+    code: `from openai import OpenAI
 
 client = OpenAI(
     base_url="https://api.inferstack.dev/v1",
-    api_key="<INFERSTACK_API_KEY>",
+    api_key="sk-is-v1-...",
 )
 
-completion = client.chat.completions.create(
+res = client.chat.completions.create(
     model="deepseek/deepseek-v4.1-flash",
-    messages=[{"role": "user", "content": "인생의 의미는?"}],
+    messages=[{"role": "user", "content": "Hello!"}],
 )
-print(completion.choices[0].message.content)`,
-  ts: `import OpenAI from "openai"
+print(res.choices[0].message.content)`,
+  },
+  typescript: {
+    lang: 'ts',
+    code: `import OpenAI from "openai"
 
 const client = new OpenAI({
   baseURL: "https://api.inferstack.dev/v1",
@@ -29,259 +361,201 @@ const client = new OpenAI({
 })
 
 const res = await client.chat.completions.create({
-  model: "z-ai/glm-5.3",
-  messages: [{ role: "user", content: "인생의 의미는?" }],
+  model: "deepseek/deepseek-v4.1-flash",
+  messages: [{ role: "user", content: "Hello!" }],
 })
 console.log(res.choices[0].message.content)`,
-  curl: `curl https://api.inferstack.dev/v1/chat/completions \\
+  },
+  curl: {
+    lang: 'bash',
+    code: `curl https://api.inferstack.dev/v1/chat/completions \\
   -H "Authorization: Bearer $INFERSTACK_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "model": "qwen/qwen3.8-27b",
-    "messages": [{"role": "user", "content": "인생의 의미는?"}]
+    "model": "deepseek/deepseek-v4.1-flash",
+    "messages": [{"role": "user", "content": "Hello!"}]
   }'`,
+  },
 }
 
-export default function Home() {
-  const [q, setQ] = useState('')
-  const [lang, setLang] = useState<'python' | 'ts' | 'curl'>('python')
-  const nav = useNavigate()
-  const featured = [...MODELS].filter((m) => m.isNew).slice(0, 8)
-  const top = [...MODELS].sort((a, b) => weeklyTokens(b) - weeklyTokens(a)).slice(0, 8)
-  const totalWeekly = MODELS.reduce((s, m) => s + weeklyTokens(m), 0)
-
+function Start() {
+  const [lang, setLang] = useState<keyof typeof SNIPPETS>('python')
+  const steps = [
+    ['Create an API key', 'New accounts start with $5 of credit.'],
+    ['Set the base URL', 'https://api.inferstack.dev/v1 in any OpenAI SDK.'],
+    ['Pick a model', 'Use the model ID from its page, e.g. deepseek/deepseek-v4.1-flash.'],
+  ]
+  const s = SNIPPETS[lang]
   return (
-    <div className="-mt-8">
-      {/* hero */}
-      <section className="relative overflow-hidden pb-16 pt-16 sm:pt-24">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute left-1/2 top-[-10%] h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-to-r from-brand-600/25 via-indigo-500/15 to-accent-500/25 blur-3xl" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(148,163,184,.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(148,163,184,.08)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
-        </div>
-        <div className="mx-auto max-w-3xl text-center">
-          <Link to="/models?sort=newest" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-xs font-medium text-slate-600 backdrop-blur hover:border-brand-400 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
-            <Badge color="cyan">NEW</Badge> LFM2.5-24B-A2B · Ling-3.1-flash · GLM-5.3 지원 시작 <ArrowRight size={12} />
-          </Link>
-          <h1 className="mt-6 text-4xl font-extrabold tracking-tight sm:text-6xl">
-            모든 오픈 모델을,
-            <br />
-            <span className="bg-gradient-to-r from-brand-500 via-indigo-400 to-accent-400 bg-clip-text text-transparent">하나의 API로.</span>
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base text-slate-600 dark:text-slate-400 sm:text-lg">
-            DeepSeek V4, Qwen3.8, GLM-5.3, Kimi K3까지 — 최신 오픈소스 LLM을 OpenAI 호환 엔드포인트로 즉시 호출하세요. 내 모델도 업로드하면 몇 분 만에 서버리스로 배포됩니다.
-          </p>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              nav(`/models${q ? `?q=${encodeURIComponent(q)}` : ''}`)
-            }}
-            className="mx-auto mt-8 flex max-w-xl items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl shadow-brand-900/5 dark:border-white/10 dark:bg-slate-900/80"
-          >
-            <Search size={18} className="ml-2 text-slate-400" />
-            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`${MODELS.length}개 모델 검색 — 예: "coding", "vision", "deepseek"`} className="h-10 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400" />
-            <Button type="submit">검색</Button>
-          </form>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/chat">
-              <Button size="lg">
-                채팅으로 바로 써보기 <ArrowRight size={16} />
-              </Button>
-            </Link>
-            <Link to="/deploy">
-              <Button size="lg" variant="outline">
-                <Upload size={16} /> 내 모델 업로드
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        <div className="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-4 sm:grid-cols-4">
-          {[
-            ['주간 처리 토큰', fmtTokens(totalWeekly)],
-            ['지원 모델', `${MODELS.length}+`],
-            ['글로벌 리전', '5'],
-            ['평균 TTFT', '310ms'],
-          ].map(([l, v]) => (
-            <div key={l} className="text-center">
-              <div className="text-2xl font-bold tracking-tight sm:text-3xl">{v}</div>
-              <div className="mt-1 text-xs text-slate-500">{l}</div>
-            </div>
+    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:gap-16')}>
+      <div>
+        <Head title="Quickstart" />
+        <ol className="space-y-5">
+          {steps.map(([t, d], i) => (
+            <li key={t} className="flex gap-4">
+              <span className="tabular w-5 shrink-0 pt-px text-[15px] font-semibold text-fg3">{i + 1}.</span>
+              <div className="min-w-0">
+                <div className="text-[15.5px] font-semibold">{t}</div>
+                <p className="mt-0.5 break-words text-[14.5px] text-fg2">{d}</p>
+              </div>
+            </li>
           ))}
-        </div>
-      </section>
-
-      {/* featured */}
-      <section className="py-8">
-        <SectionHead title="새로 추가된 모델" href="/models?sort=newest" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map((m) => (
-            <ModelTile key={m.slug} m={m} />
-          ))}
-        </div>
-      </section>
-
-      <section className="py-8">
-        <SectionHead title="이번 주 가장 많이 쓰인 모델" href="/rankings" />
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {top.map((m) => (
-            <ModelTile key={m.slug} m={m} />
-          ))}
-        </div>
-      </section>
-
-      {/* features */}
-      <section className="py-16">
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            { icon: Route, title: '스마트 라우팅 & 폴백', desc: '리전·GPU·양자화가 다른 여러 엔드포인트 중 가장 빠르고 저렴한 곳으로 자동 라우팅. 장애 시 즉시 폴백합니다.' },
-            { icon: KeyRound, title: 'OpenAI 호환 API', desc: 'base_url만 바꾸면 됩니다. 스트리밍, 툴 호출, JSON 모드, 비전 입력, 프롬프트 캐싱까지 그대로.' },
-            { icon: Zap, title: '종량제 크레딧', desc: '구독 없이 토큰만큼만 결제. API 키별 사용 한도, 만료일, 모델 허용 목록을 세밀하게 설정하세요.' },
-            { icon: Upload, title: '커스텀 모델 업로드', desc: 'Hugging Face · ModelScope · CLI로 GGUF/Safetensors 가중치를 가져와 전용 엔드포인트로 배포.' },
-            { icon: Cpu, title: '새 아키텍처도 Day-0', desc: '레지스트리에 없는 아키텍처라면 규격에 맞춘 추론 코드를 GitHub 또는 로컬에서 업로드하세요.' },
-            { icon: ShieldCheck, title: '프라이버시 우선', desc: '프롬프트 로깅은 기본 OFF. 학습 데이터 사용 금지 엔드포인트만 선택하는 옵션을 제공합니다.' },
-          ].map((f) => (
-            <Card key={f.title} className="p-5">
-              <f.icon size={20} className="text-brand-500" />
-              <div className="mt-3 font-semibold">{f.title}</div>
-              <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{f.desc}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* code */}
-      <section className="grid items-center gap-10 py-10 lg:grid-cols-2 [&>*]:min-w-0">
-        <div>
-          <Badge color="brand">개발자</Badge>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">기존 코드 그대로, 3줄 변경으로</h2>
-          <p className="mt-3 text-slate-600 dark:text-slate-400">OpenAI SDK, LangChain, LlamaIndex, Vercel AI SDK 등 OpenAI 호환 클라이언트라면 무엇이든 동작합니다. 모델 이름만 바꿔 36개 이상의 오픈 모델을 비교해 보세요.</p>
-          <div className="mt-6 flex gap-3">
-            <Link to="/keys">
-              <Button>
-                <KeyRound size={16} /> API 키 발급
-              </Button>
-            </Link>
-            <Link to="/docs">
-              <Button variant="outline">문서 보기</Button>
-            </Link>
-          </div>
-        </div>
-        <div>
+        </ol>
+        <Link to="/docs" className="mt-8 inline-flex items-center gap-1 text-[14px] font-medium text-fg2 transition-colors hover:text-fg">
+          Read the docs <ArrowRight size={14} />
+        </Link>
+      </div>
+      <div className="code-panel min-w-0 self-center overflow-hidden rounded-2xl border border-line">
+        <div className="flex items-center justify-between border-b border-line px-3 py-2">
           <Segmented
-            className="mb-2"
             value={lang}
             onChange={setLang}
             options={[
               { id: 'python', label: 'Python' },
-              { id: 'ts', label: 'TypeScript' },
+              { id: 'typescript', label: 'TypeScript' },
               { id: 'curl', label: 'cURL' },
             ]}
           />
-          <CodeBlock code={SAMPLES[lang]} lang={lang === 'curl' ? 'bash' : lang} />
+          <CopyButton text={s.code} label="Copy" className="hover:bg-fg/[0.06]" />
         </div>
-      </section>
-
-      {/* BYOM */}
-      <section className="py-16">
-        <Card className="relative overflow-hidden p-8 sm:p-10">
-          <div className="pointer-events-none absolute -right-20 -top-20 opacity-20">
-            <LogoMark size={320} />
-          </div>
-          <div className="relative max-w-2xl">
-            <Badge color="violet">Bring Your Own Model</Badge>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight">내 모델, 3가지 방법으로 업로드</h2>
-            <p className="mt-3 text-slate-600 dark:text-slate-400">GGUF·Safetensors 포맷을 지원하며 config.json에서 아키텍처를 자동 감지합니다. 배포한 모델은 비공개로 쓰거나 마켓플레이스에 공개해 수익을 얻을 수 있습니다.</p>
-          </div>
-          <div className="relative mt-8 grid gap-4 md:grid-cols-3">
-            {[
-              { icon: Download, title: 'Hugging Face에서 불러오기', desc: 'repo ID만 입력하면 파일 목록·아키텍처·컨텍스트 길이를 자동으로 읽어옵니다. 게이트/비공개 모델은 토큰 지원.', to: '/deploy/new?source=huggingface' },
-              { icon: Globe2, title: 'ModelScope에서 불러오기', desc: 'ModelScope 리포지토리를 그대로 가져옵니다. 중국 리전 미러로 대형 가중치도 빠르게.', to: '/deploy/new?source=modelscope' },
-              { icon: Terminal, title: 'CLI로 업로드', desc: '`inferstack upload` 한 줄로 로컬 가중치를 재개 가능한 멀티파트 업로드로 전송합니다.', to: '/deploy/new?source=cli' },
-            ].map((x) => (
-              <Link key={x.title} to={x.to}>
-                <div className="h-full rounded-xl border border-slate-200 bg-slate-50/70 p-5 transition-colors hover:border-brand-400 dark:border-white/10 dark:bg-white/[0.03]">
-                  <x.icon size={20} className="text-brand-500" />
-                  <div className="mt-3 font-semibold">{x.title}</div>
-                  <p className="mt-1.5 text-sm text-slate-600 dark:text-slate-400">{x.desc}</p>
-                </div>
-              </Link>
+        <pre className="overflow-x-auto py-5 font-mono text-[13px] leading-[1.75]">
+          <code className="block min-w-max">
+            {s.code.split('\n').map((l, i) => (
+              <span key={i} className={cx('block px-5', /base_url|baseURL|api\.inferstack\.dev/.test(l) && 'bg-accent/[0.08]')}>
+                {highlight(l, s.lang)}
+              </span>
             ))}
-          </div>
-          <div className="relative mt-6 flex flex-wrap items-center gap-2 text-xs text-slate-500">
-            <Boxes size={14} /> 새 아키텍처? <Github size={14} /> GitHub 또는 로컬에서 <Link to="/docs#arch" className="text-brand-500 hover:underline">InferStack Architecture Package</Link> 규격의 추론 코드를 함께 업로드하세요.
-          </div>
-        </Card>
-      </section>
-
-      <HFTrending />
-    </div>
+          </code>
+        </pre>
+      </div>
+    </section>
   )
 }
 
-function SectionHead({ title, href }: { title: string; href: string }) {
-  return (
-    <div className="mb-4 flex items-end justify-between">
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <Link to={href} className="flex items-center gap-1 text-sm text-slate-500 hover:text-brand-500">
-        전체 보기 <ArrowRight size={14} />
-      </Link>
-    </div>
-  )
-}
+/* ------------------------------------------------------------------ */
+/* Bring your own model                                                */
+/* ------------------------------------------------------------------ */
 
-function HFTrending() {
-  const [items, setItems] = useState<HFModelSummary[] | null>(null)
-  const [err, setErr] = useState(false)
-  useEffect(() => {
-    trendingLLMs(9)
-      .then(setItems)
-      .catch(() => setErr(true))
-  }, [])
+function Upload() {
+  const nav = useNavigate()
+  const [source, setSource] = useState<'huggingface' | 'modelscope'>('huggingface')
+  const [repo, setRepo] = useState('')
+  const go = (r = repo) => r.trim() && nav(`/deploy/new?source=${source}&repo=${encodeURIComponent(r.trim())}`)
+  const quants = [
+    ['Q8_0', '25.5 GB'],
+    ['Q6_K', '19.7 GB'],
+    ['Q4_K_M', '14.5 GB'],
+  ]
   return (
-    <section className="py-8">
-      <div className="mb-4 flex items-end justify-between">
+    <section className="bg-raised/50">
+      <div className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16')}>
         <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
-            <span>🤗</span> Hugging Face 실시간 트렌딩
-          </h2>
-          <p className="text-sm text-slate-500">huggingface.co API에서 실시간으로 불러옵니다. 클릭 한 번으로 InferStack에 배포하세요.</p>
+          <Head
+            title="Deploy your own model"
+            sub={`Paste a Hugging Face or ModelScope repo ID. InferStack reads the architecture and quantized files, suggests a GPU and serves it on the same API. ${ARCHITECTURES.length} architectures are supported, and you can upload inference code for new ones.`}
+          />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              go()
+            }}
+            className="max-w-md"
+          >
+            <Segmented
+              value={source}
+              onChange={setSource}
+              options={[
+                { id: 'huggingface', label: 'Hugging Face' },
+                { id: 'modelscope', label: 'ModelScope' },
+              ]}
+            />
+            <div className="mt-3 flex gap-2">
+              <input
+                value={repo}
+                onChange={(e) => setRepo(e.target.value)}
+                placeholder="Qwen/Qwen3.8-27B"
+                aria-label="Repository ID"
+                className="h-11 min-w-0 flex-1 rounded-full border border-line2 bg-panel px-4 text-[14px] text-fg placeholder:text-fg3 focus:border-fg/35 focus:outline-none"
+              />
+              <button type="submit" className={buttonClass('primary', 'lg', 'shrink-0')}>
+                Import
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <div className="min-w-0 overflow-hidden rounded-2xl border border-line2 bg-panel">
+          <div className="flex items-center gap-3 border-b border-line px-5 py-3.5">
+            <OrgAvatar org="liquid" name="Liquid AI" size={28} />
+            <div className="min-w-0">
+              <div className="truncate font-mono text-[13px] font-medium">LiquidAI/LFM2.5-24B-A2B-GGUF</div>
+              <div className="text-[12px] text-fg3">Imported from Hugging Face</div>
+            </div>
+            <span className="ml-auto flex shrink-0 items-center gap-1 text-[12.5px] font-medium text-emerald-600 dark:text-emerald-400">
+              <Check size={14} /> Analyzed
+            </span>
+          </div>
+          <dl className="tabular grid grid-cols-3 border-b border-line">
+            {[
+              ['Architecture', 'Lfm2Moe'],
+              ['Parameters', '24B'],
+              ['Context', '131K'],
+            ].map(([k, v], i) => (
+              <div key={k} className={cx('px-5 py-3.5', i > 0 && 'border-l border-line')}>
+                <dt className="text-[12px] text-fg3">{k}</dt>
+                <dd className="mt-0.5 text-[15px] font-semibold">{v}</dd>
+              </div>
+            ))}
+          </dl>
+          <div className="px-5 pb-2 pt-4 text-[12.5px] font-medium text-fg3">Quantized files</div>
+          <div className="px-3 pb-3">
+            {quants.map(([q, size]) => {
+              const on = q === 'Q4_K_M'
+              return (
+                <div key={q} className={cx('flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13.5px]', on && 'bg-raised')}>
+                  <span className={cx('h-4 w-4 shrink-0 rounded-full border', on ? 'border-[5px] border-accent' : 'border-line2')} />
+                  <span className="w-20 font-mono">{q}</span>
+                  <span className="flex-1 text-fg3">{on ? 'Recommended' : ''}</span>
+                  <span className="tabular text-fg2">{size}</span>
+                </div>
+              )
+            })}
+          </div>
+          <div className="flex items-center justify-between border-t border-line px-5 py-3.5 text-[13.5px]">
+            <span className="text-fg2">
+              Suggested GPU <span className="font-semibold text-fg">1× L40S</span>
+            </span>
+            <span className="tabular font-semibold">$1.60 / hr</span>
+          </div>
         </div>
       </div>
-      {err && <Card className="p-6 text-sm text-slate-500">Hugging Face API에 연결할 수 없습니다 (오프라인 또는 네트워크 차단).</Card>}
-      {!items && !err && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-xl bg-slate-100 dark:bg-white/5" />
-          ))}
-        </div>
-      )}
-      {items && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((m) => (
-            <Card key={m.id} className="flex min-w-0 items-center gap-3 p-4">
-              <div className="min-w-0 flex-1">
-                <a href={hfUrl(m.id)} target="_blank" rel="noreferrer" className="block truncate text-sm font-medium hover:text-brand-500">
-                  {m.id}
-                </a>
-                <div className="mt-1 flex items-center gap-3 text-xs text-slate-500">
-                  <span className="flex items-center gap-1">
-                    <Heart size={11} /> {fmtNum(m.likes)}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Download size={11} /> {fmtTokens(m.downloads)}
-                  </span>
-                  {m.createdAt && <span>{timeAgo(m.createdAt)}</span>}
-                </div>
-              </div>
-              <Link to={`/deploy/new?source=huggingface&repo=${encodeURIComponent(m.id)}`}>
-                <Button size="sm" variant="secondary">
-                  배포
-                </Button>
-              </Link>
-            </Card>
-          ))}
-        </div>
-      )}
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Regions                                                             */
+/* ------------------------------------------------------------------ */
+
+function Regions() {
+  // how many catalog models each region serves
+  const served = useMemo(() => {
+    const n: Record<string, number> = {}
+    for (const m of MODELS) for (const e of endpointsFor(m)) n[e.region] = (n[e.region] ?? 0) + 1
+    return n
+  }, [])
+  return (
+    <section className={cx(CONTAINER, SECTION, 'grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-16')}>
+      <Head title="Regions" sub="Requests go to the nearest healthy region and fail over automatically. Pin a region in settings if you need data residency." />
+      <ul className="min-w-0 divide-y divide-line border-y border-line text-[14px]">
+        {REGIONS.map((r) => (
+          <li key={r.region} className="flex items-center gap-4 py-3">
+            <span className="w-28 shrink-0 font-medium">{r.location}</span>
+            <span className="flex-1 font-mono text-[12.5px] text-fg3">{r.region}</span>
+            <span className="tabular text-fg2">{served[r.region] ?? 0} models</span>
+          </li>
+        ))}
+      </ul>
     </section>
   )
 }

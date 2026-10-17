@@ -4,16 +4,16 @@ import { Badge, Card, CodeBlock } from '../components/ui'
 import { REQUIREMENTS_TEMPLATE, SPEC_TREE, manifestTemplate, modelPyTemplate } from '../data/customArchSpec'
 
 const TOC = [
-  ['quickstart', '빠른 시작'],
-  ['auth', '인증'],
+  ['quickstart', 'Quickstart'],
+  ['auth', 'Authentication'],
   ['api', 'Chat Completions'],
-  ['models-api', '모델 목록'],
-  ['routing', '라우팅 & 폴백'],
-  ['errors', '에러 코드'],
-  ['custom', '커스텀 모델 API'],
-  ['cli', 'CLI 레퍼런스'],
-  ['arch', '아키텍처 패키지 규격'],
-  ['billing', '과금'],
+  ['models-api', 'List models'],
+  ['routing', 'Routing & fallbacks'],
+  ['errors', 'Error codes'],
+  ['custom', 'Custom models API'],
+  ['cli', 'CLI reference'],
+  ['arch', 'Architecture package spec'],
+  ['billing', 'Billing'],
 ] as const
 
 export default function Docs() {
@@ -26,7 +26,7 @@ export default function Docs() {
     <div className="grid gap-10 lg:grid-cols-[200px_1fr]">
       <aside className="hidden lg:block">
         <nav className="sticky top-20 space-y-1 text-sm">
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">문서</div>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg3">Docs</div>
           {TOC.map(([id, l]) => (
             <a
               key={id}
@@ -35,23 +35,23 @@ export default function Docs() {
                 e.preventDefault()
                 document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
               }}
-              className="block rounded-md px-2 py-1 text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+              className="block rounded-md px-2 py-1 text-fg2 hover:bg-raised hover:text-fg"
             >
               {l}
             </a>
           ))}
         </nav>
       </aside>
-      <article className="min-w-0 max-w-3xl space-y-14 [&_h2]:scroll-mt-20 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-6 [&_h3]:font-semibold [&_p]:leading-relaxed [&_p]:text-slate-600 dark:[&_p]:text-slate-400">
+      <article className="min-w-0 max-w-3xl space-y-14 [&_p_code]:rounded [&_p_code]:bg-raised [&_p_code]:px-1.5 [&_p_code]:py-0.5 [&_p_code]:text-[0.86em] [&_li_code]:rounded [&_li_code]:bg-raised [&_li_code]:px-1.5 [&_li_code]:text-[0.86em] [&_h2]:scroll-mt-20 [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h3]:mt-6 [&_h3]:font-semibold [&_p]:leading-relaxed [&_p]:text-fg2">
         <section>
-          <h1 className="text-3xl font-bold tracking-tight">InferStack 문서</h1>
-          <p className="mt-3">InferStack은 최신 오픈소스 LLM을 OpenAI 호환 API로 제공하고, 직접 업로드한 모델을 서버리스 엔드포인트로 배포하는 추론 플랫폼입니다.</p>
+          <h1 className="text-3xl font-bold tracking-tight">InferStack docs</h1>
+          <p className="mt-3">InferStack is an inference platform that serves the latest open-source LLMs through an OpenAI-compatible API, and deploys models you upload as serverless endpoints.</p>
         </section>
 
         <section>
-          <h2 id="quickstart">빠른 시작</h2>
+          <h2 id="quickstart">Quickstart</h2>
           <p className="mt-3">
-            1) <Link to="/keys" className="text-brand-500 hover:underline">API 키 발급</Link> → 2) <Link to="/credits" className="text-brand-500 hover:underline">크레딧 충전</Link> → 3) OpenAI SDK의 <code>base_url</code>을 변경합니다.
+            1) <Link to="/keys" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">Create an API key</Link> → 2) <Link to="/credits" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">Add credits</Link> → 3) Point the OpenAI SDK's <code>base_url</code> at InferStack.
           </p>
           <CodeBlock
             className="mt-4"
@@ -70,224 +70,224 @@ print(r.choices[0].message.content)`}
         </section>
 
         <section>
-          <h2 id="auth">인증</h2>
+          <h2 id="auth">Authentication</h2>
           <p className="mt-3">
-            모든 요청은 <code>Authorization: Bearer sk-is-v1-…</code> 헤더가 필요합니다. 선택적으로 <code>X-Title</code>, <code>HTTP-Referer</code> 헤더를 보내면 랭킹 페이지의 앱 목록에 표시됩니다.
+            Every request requires an <code>Authorization: Bearer sk-is-v1-…</code> header. Optionally send <code>X-Title</code> and <code>HTTP-Referer</code> headers to have your app listed on the Rankings page.
           </p>
         </section>
 
         <section>
           <h2 id="api">Chat Completions</h2>
           <p className="mt-3">
-            <Badge color="green">POST</Badge> <code className="font-mono">/v1/chat/completions</code> — OpenAI Chat Completions와 동일한 스키마입니다.
+            <Badge color="green">POST</Badge> <code className="font-mono">/v1/chat/completions</code>. Same schema as OpenAI Chat Completions.
           </p>
           <Card className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="text-left text-xs text-slate-500">
-                <tr className="border-b border-slate-200 dark:border-white/10">
-                  <th className="px-4 py-2 font-medium">파라미터</th>
-                  <th className="px-3 py-2 font-medium">타입</th>
-                  <th className="px-3 py-2 font-medium">설명</th>
+              <thead className="text-left text-xs text-fg3">
+                <tr className="border-b border-line">
+                  <th className="px-4 py-2 font-medium">Parameter</th>
+                  <th className="px-3 py-2 font-medium">Type</th>
+                  <th className="px-3 py-2 font-medium">Description</th>
                 </tr>
               </thead>
-              <tbody className="[&_td]:px-3 [&_td]:py-2 [&_td:first-child]:px-4 [&_tr]:border-b [&_tr]:border-slate-100 dark:[&_tr]:border-white/5">
+              <tbody className="[&_td]:px-3 [&_td]:py-2 [&_td:first-child]:px-4 [&_tr]:border-b [&_tr]:border-line">
                 {[
-                  ['model', 'string', '모델 슬러그. 예: z-ai/glm-5.3, demo/my-model'],
-                  ['messages', 'array', 'role/content 메시지 배열. content는 텍스트 또는 image_url 파트 배열'],
-                  ['stream', 'boolean', 'SSE 스트리밍 여부'],
-                  ['temperature / top_p / top_k', 'number', '샘플링 파라미터'],
-                  ['max_tokens', 'integer', '최대 생성 토큰'],
-                  ['tools / tool_choice', 'array / string', '함수 호출'],
-                  ['response_format', 'object', '{"type":"json_object"} 또는 json_schema'],
-                  ['reasoning', 'object', '{"effort":"low|medium|high"} — 추론 모델 전용'],
-                  ['provider', 'object', '라우팅 선호도 (아래 참고)'],
-                  ['models', 'string[]', '폴백 모델 목록 — 첫 모델 실패 시 순서대로 시도'],
+                  ['model', 'string', 'Model slug, e.g. z-ai/glm-5.3 or demo/my-model'],
+                  ['messages', 'array', 'Array of role/content messages. content is a string or an array of text and image_url parts'],
+                  ['stream', 'boolean', 'Stream the response over SSE'],
+                  ['temperature / top_p / top_k', 'number', 'Sampling parameters'],
+                  ['max_tokens', 'integer', 'Maximum number of tokens to generate'],
+                  ['tools / tool_choice', 'array / string', 'Tool calls (function calling)'],
+                  ['response_format', 'object', '{"type":"json_object"} (JSON mode) or json_schema'],
+                  ['reasoning', 'object', '{"effort":"low|medium|high"}. Reasoning models only.'],
+                  ['provider', 'object', 'Routing preferences (see below)'],
+                  ['models', 'string[]', 'Fallback models, tried in order if the first one fails'],
                 ].map(([a, b, c]) => (
                   <tr key={a}>
                     <td className="font-mono text-xs">{a}</td>
-                    <td className="text-xs text-slate-500">{b}</td>
+                    <td className="text-xs text-fg3">{b}</td>
                     <td>{c}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </Card>
-          <h3>응답 usage</h3>
+          <h3>Response usage</h3>
           <CodeBlock
             className="mt-3"
             lang="json"
             code={`"usage": {
-  "prompt_tokens": 1204,
-  "completion_tokens": 311,
-  "prompt_tokens_details": { "cached_tokens": 1024 },
-  "cost": 0.000614,
-  "provider": "ap-seoul-1"
+"prompt_tokens": 1204,
+"completion_tokens": 311,
+"prompt_tokens_details": { "cached_tokens": 1024 },
+"cost": 0.000614,
+"provider": "us-east-1"
 }`}
           />
         </section>
 
         <section>
-          <h2 id="models-api">모델 목록</h2>
+          <h2 id="models-api">List models</h2>
           <p className="mt-3">
-            <Badge color="brand">GET</Badge> <code className="font-mono">/v1/models</code> — 카탈로그 모델과 내가 배포한 커스텀 모델을 함께 반환합니다. 각 항목에 <code>pricing</code>, <code>context_length</code>, <code>architecture</code>, <code>hugging_face_id</code> 가 포함됩니다.
+            <Badge color="brand">GET</Badge> <code className="font-mono">/v1/models</code> returns catalog models together with the custom models you've deployed. Each item includes <code>pricing</code>, <code>context_length</code>, <code>architecture</code>, and <code>hugging_face_id</code>.
           </p>
         </section>
 
         <section>
-          <h2 id="routing">라우팅 & 폴백</h2>
-          <p className="mt-3">각 모델은 여러 리전·GPU·양자화 엔드포인트로 서빙됩니다. 기본값은 가격·지연·가동률을 종합한 자동 라우팅입니다.</p>
+          <h2 id="routing">Routing & fallbacks</h2>
+          <p className="mt-3">Each model is served from multiple endpoints across regions, GPUs, and quantizations. By default, requests are routed automatically to the nearest healthy endpoint, balancing price, latency, and uptime.</p>
           <CodeBlock
             className="mt-4"
             lang="json"
             code={`{
-  "model": "qwen/qwen3.8-27b",
-  "messages": [...],
-  "provider": {
-    "order": ["ap-seoul-1", "ap-tokyo-1"],
-    "allow_fallbacks": true,
-    "quantizations": ["bf16", "fp8"],
-    "data_collection": "deny",
-    "sort": "throughput"
+"model": "qwen/qwen3.8-27b",
+"messages": [...],
+"provider": {
+"order": ["us-east-1", "eu-central-1"],
+"allow_fallbacks": true,
+"quantizations": ["bf16", "fp8"],
+"data_collection": "deny",
+"sort": "throughput"
   },
-  "models": ["qwen/qwen3.8-27b", "google/gemma-4-31b-it"]
+"models": ["qwen/qwen3.8-27b", "google/gemma-4-31b-it"]
 }`}
           />
         </section>
 
         <section>
-          <h2 id="errors">에러 코드</h2>
-          <Card className="mt-4 divide-y divide-slate-100 text-sm dark:divide-white/5">
+          <h2 id="errors">Error codes</h2>
+          <Card className="mt-4 divide-y divide-line text-sm">
             {[
-              ['400', '잘못된 요청 (파라미터 오류)'],
-              ['401', '유효하지 않거나 비활성화된 API 키'],
-              ['402', '크레딧 부족 또는 키 사용 한도 초과'],
-              ['403', '키에 허용되지 않은 모델'],
-              ['408', '요청 시간 초과'],
-              ['429', '속도 제한 (무료 티어: 분당 20회)'],
-              ['502', '업스트림 엔드포인트 오류 — 폴백 시도됨'],
-              ['503', '사용 가능한 엔드포인트 없음 (커스텀 모델 콜드스타트 포함)'],
+              ['400', 'Bad request (invalid parameters)'],
+              ['401', 'Invalid or disabled API key'],
+              ['402', 'Insufficient credits or key limit exceeded'],
+              ['403', 'Model not allowed for this key'],
+              ['408', 'Request timed out'],
+              ['429', 'Rate limited (free tier: 20 requests/min)'],
+              ['502', 'Upstream endpoint error. Fallback attempted.'],
+              ['503', 'No endpoint available (including custom model cold starts)'],
             ].map(([c, d]) => (
               <div key={c} className="flex gap-4 px-4 py-2">
                 <span className="w-10 font-mono font-semibold">{c}</span>
-                <span className="text-slate-600 dark:text-slate-400">{d}</span>
+                <span className="text-fg2">{d}</span>
               </div>
             ))}
           </Card>
         </section>
 
         <section>
-          <h2 id="custom">커스텀 모델 API</h2>
-          <p className="mt-3">대시보드의 업로드 마법사와 동일한 작업을 REST API로 수행할 수 있습니다.</p>
+          <h2 id="custom">Custom models API</h2>
+          <p className="mt-3">Everything the upload wizard in the dashboard does is also available through the REST API.</p>
           <CodeBlock
             className="mt-4"
             lang="bash"
-            code={`# Hugging Face에서 가져와 배포
+            code={`# Import from Hugging Face and deploy
 curl https://api.inferstack.dev/v1/custom-models \\
   -H "Authorization: Bearer $INFERSTACK_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "slug": "my-qwen-ft",
-    "source": { "type": "huggingface", "repo": "acme/qwen3.8-27b-ft", "revision": "main", "token": "hf_..." },
-    "weights": { "format": "safetensors", "dtype": "bfloat16", "quantization": "fp8" },
-    "architecture": "Qwen3_5ForConditionalGeneration",
-    "hardware": { "gpu": "H100", "count": 1, "min_replicas": 0, "max_replicas": 4 },
-    "context_length": 131072,
-    "visibility": "private"
+"slug": "my-qwen-ft",
+"source": { "type": "huggingface", "repo": "acme/qwen3.8-27b-ft", "revision": "main", "token": "hf_..." },
+"weights": { "format": "safetensors", "dtype": "bfloat16", "quantization": "fp8" },
+"architecture": "Qwen3_5ForConditionalGeneration",
+"hardware": { "gpu": "H100", "count": 1, "min_replicas": 0, "max_replicas": 4 },
+"context_length": 131072,
+"visibility": "private"
   }'
 
 # ModelScope / GGUF
-#   "source": { "type": "modelscope", "repo": "Qwen/Qwen3.8-27B-GGUF" },
-#   "weights": { "format": "gguf", "file": "Qwen3.8-27B-Q4_K_M.gguf" }
+#"source": { "type": "modelscope", "repo": "Qwen/Qwen3.8-27B-GGUF" },
+#"weights": { "format": "gguf", "file": "Qwen3.8-27B-Q4_K_M.gguf" }
 
-# 새 아키텍처: 추론 코드 패키지 지정
-#   "architecture": "BeamForCausalLM",
-#   "code": { "type": "github", "repo": "acme/beam-inferstack", "ref": "v0.1.0", "subdir": "pkg" }
+# New architecture: point to an inference code package
+#"architecture": "BeamForCausalLM",
+#"code": { "type": "github", "repo": "acme/beam-inferstack", "ref": "v0.1.0", "subdir": "pkg" }
 
-# 상태 조회
+# Check status
 curl https://api.inferstack.dev/v1/custom-models/my-qwen-ft \\
   -H "Authorization: Bearer $INFERSTACK_API_KEY"`}
           />
         </section>
 
         <section>
-          <h2 id="cli">CLI 레퍼런스</h2>
+          <h2 id="cli">CLI reference</h2>
           <CodeBlock
             className="mt-4"
             lang="bash"
             code={`pip install -U inferstack-cli
 inferstack login --key sk-is-v1-...
 
-# 로컬 가중치 업로드 (멀티파트, 재개 가능)
+# Upload local weights (multipart, resumable)
 inferstack models create my-model --format gguf
 inferstack upload ./my-model-Q4_K_M.gguf --model my-model --parallel 8
 
-# safetensors 디렉터리 + 커스텀 아키텍처 코드
+# safetensors directory + custom architecture code
 inferstack models create beam-ft --format safetensors --arch BeamForCausalLM
 inferstack upload ./beam-ft/ --model beam-ft
-inferstack code push ./beam-inferstack/ --model beam-ft     # inferstack.yaml 포함 디렉터리
+inferstack code push ./beam-inferstack/ --model beam-ft     # directory containing inferstack.yaml
 
-# 원격 소스에서 가져오기
+# Import from a remote source
 inferstack models import hf://Qwen/Qwen3.8-27B --slug qwen-27b --gpu H100
 inferstack models import modelscope://Qwen/Qwen3.8-27B --slug qwen-27b-ms
 
-# 배포 / 상태 / 로그
+# Deploy / status / logs
 inferstack deploy my-model --gpu L40S --min 0 --max 2
 inferstack models status my-model
 inferstack logs my-model --follow
 
-# 패키지 로컬 검증 (배포 전)
+# Validate a package locally (before deploying)
 inferstack code validate ./beam-inferstack/`}
           />
         </section>
 
         <section>
-          <h2 id="arch">아키텍처 패키지 규격 (v1)</h2>
+          <h2 id="arch">Architecture package spec (v1)</h2>
           <p className="mt-3">
-            InferStack 레지스트리에 없는 아키텍처(<Link to="/deploy" className="text-brand-500 hover:underline">지원 목록</Link>)는 아래 규격의 추론 코드 패키지를 GitHub 리포지토리 또는 로컬 디렉터리로 업로드해야 합니다. 런타임은 <code>config.json</code>의 <code>architectures[0]</code>와 매니페스트의 <code>metadata.architectures</code>를 매칭하여 엔트리포인트 클래스를 로드합니다.
+            If your architecture isn't in the InferStack registry (<Link to="/deploy" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">supported architectures</Link>), upload an inference code package that follows the spec below, from a GitHub repository or a local directory. The runtime matches <code>architectures[0]</code> in <code>config.json</code> against <code>metadata.architectures</code> in the manifest to load the entrypoint class.
           </p>
-          <pre className="mt-4 overflow-x-auto rounded-xl bg-slate-100 p-4 font-mono text-xs dark:bg-white/5">{SPEC_TREE}</pre>
+          <pre className="mt-4 overflow-x-auto rounded-xl bg-raised p-4 font-mono text-xs">{SPEC_TREE}</pre>
           <h3>inferstack.yaml</h3>
           <CodeBlock className="mt-3" lang="yaml" code={manifestTemplate('BeamForCausalLM', 'beam')} />
-          <h3>model.py — InferStackModel 인터페이스</h3>
-          <Card className="mt-3 divide-y divide-slate-100 text-sm dark:divide-white/5">
+          <h3>model.py: the InferStackModel interface</h3>
+          <Card className="mt-3 divide-y divide-line text-sm">
             {[
-              ['load(weights_dir, config, device_map)', '가중치 로드. 텐서 병렬 rank 정보가 device_map으로 전달됩니다.'],
-              ['tokenize(messages, tools)', '채팅 메시지 → 토큰 ID. 채팅 템플릿 적용 책임.'],
-              ['generate(req) → Iterator[TokenChunk]', '토큰을 yield 하면 런타임이 SSE 스트리밍·과금·stop 처리.'],
-              ['health() → bool', '헬스체크. False면 레플리카가 교체됩니다.'],
+              ['load(weights_dir, config, device_map)', 'Loads the weights. Tensor-parallel rank info is passed in device_map.'],
+              ['tokenize(messages, tools)', 'Chat messages → token IDs. Responsible for applying the chat template.'],
+              ['generate(req) → Iterator[TokenChunk]', 'Yield tokens; the runtime handles SSE streaming, billing, and stop sequences.'],
+              ['health() → bool', 'Health check. Replicas that return False are replaced.'],
             ].map(([a, b]) => (
               <div key={a} className="px-4 py-2.5">
                 <div className="font-mono text-xs font-medium">{a}</div>
-                <div className="text-slate-600 dark:text-slate-400">{b}</div>
+                <div className="text-fg2">{b}</div>
               </div>
             ))}
           </Card>
           <CodeBlock className="mt-4" lang="python" code={modelPyTemplate('BeamForCausalLM')} />
           <h3>requirements.txt</h3>
           <CodeBlock className="mt-3" lang="text" code={REQUIREMENTS_TEMPLATE} />
-          <h3>검증 규칙</h3>
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-slate-600 dark:text-slate-400">
+          <h3>Validation rules</h3>
+          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-fg2">
             <li>
-              <code>inferstack.yaml</code>, <code>model.py</code> 필수 · 패키지 크기 50MB 이하 (가중치 포함 금지)
+              <code>inferstack.yaml</code> and <code>model.py</code> are required · Package must be 50 MB or smaller (no weights)
             </li>
             <li>
-              <code>runtime.base</code>가 <code>vllm</code>/<code>sglang</code>이면 해당 엔진의 모델 플러그인 API로 등록, <code>custom</code>이면 <code>generate()</code>를 직접 호출
+              If <code>runtime.base</code> is <code>vllm</code>/<code>sglang</code>, the model is registered through that engine's model plugin API; if it's <code>custom</code>, <code>generate()</code> is called directly
             </li>
-            <li>빌드는 네트워크 격리 환경에서 requirements.txt만 설치 후 실행됩니다</li>
+            <li>Builds install only requirements.txt and run in a network-isolated environment</li>
             <li>
-              <code>tests/test_smoke.py</code>가 있으면 배포 전 tiny-random 가중치로 실행됩니다
+              If <code>tests/test_smoke.py</code> exists, it runs against tiny random weights before deployment
             </li>
           </ul>
         </section>
 
         <section>
-          <h2 id="billing">과금</h2>
+          <h2 id="billing">Billing</h2>
           <p className="mt-3">
-            카탈로그 모델은 입력/출력 토큰 단위로 과금되며 캐시된 입력 토큰은 75% 할인됩니다. 비공개 커스텀 모델은 GPU 사용 시간(초 단위)으로, 마켓플레이스 공개 모델은 호출자에게 토큰 단위로 과금되고 제공자에게 매출의 80%가 정산됩니다. 자세한 내용은{' '}
-            <Link to="/pricing" className="text-brand-500 hover:underline">
-              가격
+            Catalog models are billed per input and output token, and cached input tokens are 75% off. Private custom models are billed per second of GPU time. Public marketplace models are billed to callers per token, and the provider receives 80% of the revenue. See{' '}
+            <Link to="/pricing" className="text-fg underline decoration-line2 underline-offset-4 hover:decoration-fg">
+              Pricing
             </Link>{' '}
-            페이지를 참고하세요.
+            for details.
           </p>
         </section>
       </article>

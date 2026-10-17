@@ -1,6 +1,6 @@
 /**
- * Hugging Face Hub 연동 (브라우저에서 공개 API 직접 호출, CORS 허용됨).
- * 네트워크가 막혀 있으면 호출부에서 폴백 데이터를 사용합니다.
+ * Hugging Face Hub integration (calls the public API directly from the browser; CORS allowed).
+ * If the network is blocked, callers fall back to bundled data.
  */
 const HF = 'https://huggingface.co'
 
@@ -87,7 +87,7 @@ export async function trendingLLMs(limit = 12) {
     searchModels({ pipeline: 'image-text-to-text', sort: 'trendingScore', limit }),
   ])
   const all = [...(a.status === 'fulfilled' ? a.value : []), ...(b.status === 'fulfilled' ? b.value : [])]
-  if (!all.length) throw new Error('Hugging Face API에 연결할 수 없습니다')
+  if (!all.length) throw new Error('Can’t reach the Hugging Face API')
   return all
     .sort((x, y) => (y.likes ?? 0) - (x.likes ?? 0))
     .filter((m, i, arr) => arr.findIndex((z) => z.id === m.id) === i)
@@ -130,7 +130,7 @@ export async function getModelInfo(repo: string, opts: { revision?: string; toke
     const tree = await getJSON<TreeEntry[]>(`${HF}/api/models/${repo}/tree/${encodeURIComponent(rev)}?recursive=true`, opts.token)
     files = tree.filter((t) => t.type === 'file').map((t) => ({ path: t.path, size: t.lfs?.size ?? t.size }))
   } catch {
-    /* tree 실패 시 siblings 사용 */
+    /* fall back to siblings if tree fails */
   }
 
   let ctx = raw.gguf?.context_length
@@ -185,7 +185,7 @@ export interface GGUFVariant {
 
 const QUANT_RE = /(?:^|[-_.])((?:UD-)?(?:IQ\d_[A-Z]+|Q\d_K_[SML]|Q\d_K|Q\d_\d|Q\d_[01]|TQ\d_\d|BF16|F16|F32|MXFP4(?:_MOE)?))(?=[-_.])/i
 
-/** GGUF 파일을 양자화 타입별로 그룹핑 (split 파일 -00001-of-0000N 지원) */
+/** Group GGUF files by quant type (supports split files -00001-of-0000N) */
 export function groupGGUF(files: HFSibling[]): GGUFVariant[] {
   const ggufs = files.filter((f) => f.path.toLowerCase().endsWith('.gguf') && !/mmproj/i.test(f.path))
   const map = new Map<string, HFSibling[]>()
@@ -201,7 +201,7 @@ export function groupGGUF(files: HFSibling[]): GGUFVariant[] {
       quant,
       files: fs.sort((a, b) => a.path.localeCompare(b.path)),
       size: fs.reduce((s, f) => s + (f.size ?? 0), 0),
-      label: fs.length > 1 ? `${fs[0].path.replace(/-0+1-of-\d+/, '')} (${fs.length}개 분할)` : fs[0].path,
+      label: fs.length > 1 ? `${fs[0].path.replace(/-0+1-of-\d+/, '')} (${fs.length} parts)` : fs[0].path,
     }))
     .sort((a, b) => b.size - a.size)
 }

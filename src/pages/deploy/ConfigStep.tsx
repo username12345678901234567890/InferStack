@@ -23,31 +23,31 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         <Card className="space-y-4 p-5">
-          <div className="text-sm font-semibold">기본 정보</div>
+          <div className="text-sm font-semibold">Basics</div>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <Label>표시 이름</Label>
+              <Label>Display name</Label>
               <Input value={s.displayName} onChange={(e) => set({ displayName: e.target.value })} placeholder="My Fine-tuned Model" />
             </div>
             <div>
-              <Label>모델 ID</Label>
-              <div className="flex items-center rounded-lg border border-slate-300 bg-slate-50 pl-3 text-sm dark:border-white/15 dark:bg-white/5">
-                <span className="font-mono text-slate-500">{username}/</span>
+              <Label>Model ID</Label>
+              <div className="flex items-center rounded-xl border border-line2 bg-raised pl-3 text-sm">
+                <span className="font-mono text-fg3">{username}/</span>
                 <input value={s.slug} onChange={(e) => set({ slug: slugify(e.target.value) })} className="h-10 flex-1 bg-transparent pr-3 font-mono outline-none" />
               </div>
             </div>
           </div>
           <div>
-            <Label hint="선택">설명</Label>
-            <Textarea rows={2} value={s.description} onChange={(e) => set({ description: e.target.value })} placeholder="이 모델이 잘하는 일, 학습 데이터, 사용 시 주의사항 등" />
+            <Label hint="optional">Description</Label>
+            <Textarea rows={2} value={s.description} onChange={(e) => set({ description: e.target.value })} placeholder="What it’s good at, training data, usage caveats…" />
           </div>
         </Card>
 
         <Card className="space-y-4 p-5">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-semibold">하드웨어</div>
+            <div className="text-sm font-semibold">Hardware</div>
             <Button size="sm" variant="ghost" onClick={() => set({ gpu: rec.gpu, gpuCount: rec.count })}>
-              <Wand2 size={14} /> 추천 적용 ({rec.count}x {rec.gpu})
+              <Wand2 size={14} /> Use recommended ({rec.count}x {rec.gpu})
             </Button>
           </div>
           <div className="grid gap-2 sm:grid-cols-2">
@@ -58,24 +58,24 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
                   key={g.id}
                   onClick={() => set({ gpu: g.id })}
                   className={cx(
-                    'flex items-center justify-between rounded-lg border px-3 py-2.5 text-left text-sm transition-colors',
-                    s.gpu === g.id ? 'border-brand-500 bg-brand-500/5 ring-2 ring-brand-500/20' : 'border-slate-200 hover:border-slate-300 dark:border-white/10 dark:hover:border-white/20',
+'flex items-center justify-between rounded-xl border px-3 py-2.5 text-left text-sm transition-colors',
+                    s.gpu === g.id ? 'border-accent/60 bg-accent/[0.04] ring-1 ring-accent/20' : 'border-line hover:border-line2',
                   )}
                 >
                   <div>
                     <div className="font-medium">{g.name}</div>
-                    <div className="text-xs text-slate-500">
-                      {g.vram}GB · ${g.price.toFixed(2)}/hr
+                    <div className="text-xs text-fg3">
+                      {g.vram} GB · ${g.price.toFixed(2)}/hr
                     </div>
                   </div>
-                  {ok ? <CheckCircle2 size={15} className="text-emerald-500" /> : <span className="text-[11px] text-slate-400">VRAM 부족</span>}
+                  {!ok ? <span className="text-[11px] text-fg3">Not enough VRAM</span> : s.gpu === g.id ? <CheckCircle2 size={15} className="text-fg" /> : null}
                 </button>
               )
             })}
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             <div>
-              <Label>GPU 수 (TP)</Label>
+              <Label>GPUs (TP)</Label>
               <Select value={s.gpuCount} onChange={(e) => set({ gpuCount: +e.target.value })}>
                 {[1, 2, 4, 8].map((n) => (
                   <option key={n} value={n}>
@@ -85,11 +85,11 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
               </Select>
             </div>
             <div>
-              <Label>최소 레플리카</Label>
+              <Label>Min replicas</Label>
               <Input type="number" min={0} max={s.maxReplicas} value={s.minReplicas} onChange={(e) => set({ minReplicas: Math.max(0, +e.target.value), scaleToZero: +e.target.value === 0 })} />
             </div>
             <div>
-              <Label>최대 레플리카</Label>
+              <Label>Max replicas</Label>
               <Input type="number" min={Math.max(1, s.minReplicas)} max={32} value={s.maxReplicas} onChange={(e) => set({ maxReplicas: Math.max(1, +e.target.value) })} />
             </div>
           </div>
@@ -97,15 +97,15 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
             checked={s.scaleToZero}
             onChange={(v) => set({ scaleToZero: v, minReplicas: v ? 0 : Math.max(1, s.minReplicas) })}
             label="Scale to zero"
-            description="요청이 없으면 15분 후 레플리카를 0으로 줄여 비용을 절감합니다 (콜드스타트 발생)"
+            description="Scale to 0 replicas after 15 minutes without requests to save cost (adds cold starts)"
           />
         </Card>
 
         <Card className="space-y-4 p-5">
-          <div className="text-sm font-semibold">추론 설정</div>
+          <div className="text-sm font-semibold">Inference</div>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <Label hint={`최대 ${fmtNum(maxCtx)}`}>최대 컨텍스트 길이</Label>
+              <Label hint={`up to ${fmtNum(maxCtx)}`}>Max context length</Label>
               <Select value={s.contextLength} onChange={(e) => set({ contextLength: +e.target.value })}>
                 {[4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576]
                   .filter((c) => c <= Math.max(maxCtx, 4096))
@@ -117,53 +117,53 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
               </Select>
             </div>
             <div>
-              <Label>채팅 템플릿</Label>
+              <Label>Chat template</Label>
               <Select value={s.chatTemplate} onChange={(e) => set({ chatTemplate: e.target.value })}>
-                <option value="auto">자동 (tokenizer_config / GGUF 메타데이터)</option>
+                <option value="auto">Auto (tokenizer_config / GGUF metadata)</option>
                 <option value="chatml">ChatML</option>
                 <option value="llama3">Llama 3</option>
                 <option value="gemma">Gemma</option>
                 <option value="mistral">Mistral [INST]</option>
-                <option value="none">없음 (completion 전용)</option>
+                <option value="none">None (completions only)</option>
               </Select>
             </div>
           </div>
         </Card>
 
         <Card className="space-y-4 p-5">
-          <div className="text-sm font-semibold">공개 범위 & 가격</div>
+          <div className="text-sm font-semibold">Visibility & pricing</div>
           <div className="grid gap-2 sm:grid-cols-2">
             {[
-              { id: 'private' as const, icon: Lock, title: '비공개', desc: '내 API 키로만 호출 가능. GPU 시간당 과금.' },
-              { id: 'public' as const, icon: Globe, title: '마켓플레이스 공개', desc: '모든 사용자가 호출. 토큰 매출의 80%를 정산받습니다.' },
+              { id: 'private' as const, icon: Lock, title: 'Private', desc: 'Only callable with your API keys. Billed per GPU hour.' },
+              { id: 'public' as const, icon: Globe, title: 'Public on marketplace', desc: 'Anyone can call it. You earn 80% of token revenue.' },
             ].map((o) => (
               <button
                 key={o.id}
                 onClick={() => set({ visibility: o.id })}
-                className={cx('rounded-lg border p-3 text-left text-sm', s.visibility === o.id ? 'border-brand-500 bg-brand-500/5 ring-2 ring-brand-500/20' : 'border-slate-200 dark:border-white/10')}
+                className={cx('rounded-xl border p-3 text-left text-sm', s.visibility === o.id ? 'border-accent/60 bg-accent/[0.04] ring-1 ring-accent/20' : 'border-line')}
               >
                 <div className="flex items-center gap-2 font-medium">
                   <o.icon size={15} /> {o.title}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">{o.desc}</div>
+                <div className="mt-1 text-xs text-fg3">{o.desc}</div>
               </button>
             ))}
           </div>
           {s.visibility === 'public' && (
             <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
               <div>
-                <Label>입력 가격 ($/1M)</Label>
+                <Label>Input price ($/1M)</Label>
                 <Input type="number" step={0.01} min={0} value={s.priceIn} onChange={(e) => set({ priceIn: Math.max(0, +e.target.value) })} />
               </div>
               <div>
-                <Label>출력 가격 ($/1M)</Label>
+                <Label>Output price ($/1M)</Label>
                 <Input type="number" step={0.01} min={0} value={s.priceOut} onChange={(e) => set({ priceOut: Math.max(0, +e.target.value) })} />
               </div>
               <Button variant="outline" onClick={() => set({ priceIn: suggested.in, priceOut: suggested.out })}>
-                <Wand2 size={14} /> 추천가
+                <Wand2 size={14} /> Suggest price
               </Button>
-              <div className="text-xs text-slate-500 md:col-span-3">
-                추천가 ${suggested.in}/${suggested.out} — 유사 규모 카탈로그 모델 가격과 예상 처리량 기반. 손익분기 처리량 ≈ {fmtNum(Math.round((hourly / Math.max(0.01, s.priceOut * 0.8)) * 1e6 / 3600))} 출력 토큰/초
+              <div className="text-xs text-fg3 md:col-span-3">
+                Suggested ${suggested.in}/${suggested.out}, based on similar-size catalog models and expected throughput. Break-even ≈ {fmtNum(Math.round((hourly / Math.max(0.01, s.priceOut * 0.8)) * 1e6 / 3600))} output tokens/s
               </div>
             </div>
           )}
@@ -172,28 +172,28 @@ export function ConfigStep({ s, set }: { s: WizardState; set: Setter }) {
 
       <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
         <Card className="p-5">
-          <div className="text-sm font-semibold">리소스 추정</div>
+          <div className="text-sm font-semibold">Resource estimate</div>
           <div className="mt-4 space-y-3 text-sm">
-            <Row k="필요 VRAM" v={`~${need} GB`} />
-            <Row k="선택 구성" v={`${s.gpuCount}x ${s.gpu} (${(GPUS.find((g) => g.id === s.gpu)?.vram ?? 0) * s.gpuCount} GB)`} />
-            <Row k="추천 구성" v={`${rec.count}x ${rec.gpu}`} />
+            <Row k="VRAM required" v={`~${need} GB`} />
+            <Row k="Selected" v={`${s.gpuCount}x ${s.gpu} (${(GPUS.find((g) => g.id === s.gpu)?.vram ?? 0) * s.gpuCount} GB)`} />
+            <Row k="Recommended" v={`${rec.count}x ${rec.gpu}`} />
           </div>
           <div className={cx('mt-4 flex items-start gap-2 rounded-lg p-3 text-xs', fits ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300' : 'bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300')}>
             {fits ? <CheckCircle2 size={14} className="mt-0.5 shrink-0" /> : <AlertTriangle size={14} className="mt-0.5 shrink-0" />}
-            {fits ? '선택한 하드웨어에 모델과 KV 캐시가 적재됩니다.' : 'VRAM이 부족합니다. GPU 수를 늘리거나 양자화를 적용하세요.'}
+            {fits ? 'The model and KV cache fit on the selected hardware.' : 'Not enough VRAM. Add GPUs or apply quantization.'}
           </div>
         </Card>
         <Card className="p-5">
-          <div className="text-sm font-semibold">예상 비용</div>
+          <div className="text-sm font-semibold">Estimated cost</div>
           <div className="mt-3 text-3xl font-bold tracking-tight">
             {fmtUSD(hourly)}
-            <span className="text-sm font-normal text-slate-500">/hr · 레플리카당</span>
+            <span className="text-sm font-normal text-fg3">/hr per replica</span>
           </div>
           <div className="mt-3 space-y-2 text-sm">
-            <Row k="상시 최소 비용" v={s.minReplicas === 0 ? '$0 (scale to zero)' : `${fmtUSD(hourly * s.minReplicas * 24 * 30, 0)}/월`} />
-            <Row k="최대 부하 시" v={`${fmtUSD(hourly * s.maxReplicas)}/hr`} />
+            <Row k="Baseline cost" v={s.minReplicas === 0 ? '$0 (scale to zero)' : `${fmtUSD(hourly * s.minReplicas * 24 * 30, 0)}/mo`} />
+            <Row k="At peak" v={`${fmtUSD(hourly * s.maxReplicas)}/hr`} />
           </div>
-          <p className="mt-3 text-[11px] text-slate-500">초 단위 과금. 데모에서는 실제로 청구되지 않습니다.</p>
+          <p className="mt-3 text-[11px] text-fg3">Billed per second. Nothing is charged in this demo.</p>
         </Card>
       </div>
     </div>
@@ -211,7 +211,7 @@ function suggestPrice(s: WizardState, hourly: number) {
 function Row({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex justify-between gap-3">
-      <span className="text-slate-500">{k}</span>
+      <span className="text-fg3">{k}</span>
       <span className="text-right font-medium">{v}</span>
     </div>
   )
