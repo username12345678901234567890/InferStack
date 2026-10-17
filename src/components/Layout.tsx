@@ -180,7 +180,7 @@ export function Layout() {
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-40 border-b border-line bg-bg">
         <div className={cx(CONTAINER, 'flex h-14 items-center gap-4', isChat && 'max-w-none')}>
-          <Link to="/" className="mr-2 shrink-0" aria-label="InferStack home">
+          <Link to="/" className="mr-2 flex shrink-0 items-center" aria-label="InferStack home">
             <Logo />
           </Link>
           <GlobalSearch />
@@ -278,7 +278,7 @@ function Footer() {
     <footer className="border-t border-line">
       <div className={cx(CONTAINER, 'grid gap-10 py-14 md:grid-cols-[1.4fr_repeat(4,1fr)]')}>
         <div>
-          <Logo />
+          <Logo className="-mt-[2px]" />
           <p className="mt-4 max-w-[17rem] text-[13.5px] leading-relaxed text-fg3">The inference API for open-weight models. Call catalog models and your own fine-tunes from one endpoint.</p>
         </div>
         {cols.map((c) => (

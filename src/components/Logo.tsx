@@ -28,9 +28,10 @@ export function LogoMark({ size = 24, className = '' }: { size?: number; classNa
 
 export function Logo({ size = 22, className = '' }: { size?: number; className?: string }) {
   return (
-    <span className={'inline-flex items-center gap-2 ' + className}>
+    <span className={'flex w-fit items-center gap-2 ' + className}>
       <LogoMark size={size} />
-      <span className="text-[17px] font-semibold tracking-[-0.02em] text-fg">InferStack</span>
+      {/* 1px down: optically centers the caps on the mark and puts the baseline on the nav baseline */}
+      <span className="relative top-px text-[17px] font-semibold tracking-[-0.02em] text-fg">InferStack</span>
     </span>
   )
 }
